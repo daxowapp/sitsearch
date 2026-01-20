@@ -69,6 +69,11 @@
               <span class="ProgramBoxUni-price-original"><?= $program['fee'] ?></span>
               <span class="ProgramBoxUni-price-discounted"><?= $program['discounted_fee'] ?> <?= $program['Tuition_Currency'] ?></span>
             </div>
+          <?php elseif(!empty($program['Advanced_Discount'])): ?>
+            <div class="ProgramBoxUni-price-container">
+              <span class="ProgramBoxUni-price-original"><?= $program['fee'] ?></span>
+              <span class="ProgramBoxUni-price-discounted"><?= $program['Advanced_Discount'] ?> <?= $program['Tuition_Currency'] ?></span>
+            </div>
           <?php else: ?>
             <div class="ProgramBoxUni-price-container">
               <span class="ProgramBoxUni-price"><?= $program['fee'] ?> <?= $program['Tuition_Currency'] ?></span>

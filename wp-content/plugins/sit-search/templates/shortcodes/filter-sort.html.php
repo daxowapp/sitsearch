@@ -415,6 +415,9 @@ $filter_data = [
                         <?php if (!empty($program['discounted_fee'])): ?>
                             <span class="program-list-original-fee"><?php echo $program['fee']; ?> USD</span>
                             <span class="program-list-discounted-fee"><?php echo $program['discounted_fee']; ?> USD</span>
+                        <?php elseif (!empty($program['Advanced_Discount'])): ?>
+                            <span class="program-list-original-fee"><?php echo $program['fee']; ?> USD</span>
+                            <span class="program-list-discounted-fee"><?php echo $program['Advanced_Discount']; ?> USD</span>
                         <?php else: ?>
                             <span class="program-list-current-fee"><?php echo $program['fee']; ?> USD</span>
                         <?php endif; ?>
