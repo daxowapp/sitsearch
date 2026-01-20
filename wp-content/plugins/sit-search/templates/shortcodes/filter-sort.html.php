@@ -412,14 +412,17 @@ $filter_data = [
                 
                 <div class="program-list-right">
                     <div class="program-list-fee">
+                        <?php 
+                        $currency = !empty($program['Tuition_Currency']) ? $program['Tuition_Currency'] : 'USD';
+                        ?>
                         <?php if (!empty($program['discounted_fee'])): ?>
-                            <span class="program-list-original-fee"><?php echo $program['fee']; ?> USD</span>
-                            <span class="program-list-discounted-fee"><?php echo $program['discounted_fee']; ?> USD</span>
+                            <span class="program-list-original-fee"><?php echo $program['fee']; ?> <?php echo $currency; ?></span>
+                            <span class="program-list-discounted-fee"><?php echo $program['discounted_fee']; ?> <?php echo $currency; ?></span>
                         <?php elseif (!empty($program['Advanced_Discount'])): ?>
-                            <span class="program-list-original-fee"><?php echo $program['fee']; ?> USD</span>
-                            <span class="program-list-discounted-fee"><?php echo $program['Advanced_Discount']; ?> USD</span>
+                            <span class="program-list-original-fee"><?php echo $program['fee']; ?> <?php echo $currency; ?></span>
+                            <span class="program-list-discounted-fee"><?php echo $program['Advanced_Discount']; ?> <?php echo $currency; ?></span>
                         <?php else: ?>
-                            <span class="program-list-current-fee"><?php echo $program['fee']; ?> USD</span>
+                            <span class="program-list-current-fee"><?php echo $program['fee']; ?> <?php echo $currency; ?></span>
                         <?php endif; ?>
                     </div>
                     
