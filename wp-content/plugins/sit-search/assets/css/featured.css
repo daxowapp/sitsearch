@@ -1,0 +1,121 @@
+/* Featured Universities Section */
+.sit-featured-section {
+    margin-bottom: 30px;
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.sit-featured-heading {
+    margin-bottom: 15px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.sit-featured-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.sit-featured-card {
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #ffd700; /* Gold border for premium feel */
+    display: flex;
+    flex-direction: column;
+}
+
+.sit-featured-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.sit-featured-banner {
+    height: 120px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.sit-featured-logo {
+    position: absolute;
+    bottom: -20px;
+    left: 20px;
+    width: 60px;
+    height: 60px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sit-featured-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.sit-featured-content {
+    padding: 25px 20px 20px; /* Top padding clears logo */
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.sit-featured-title {
+    margin: 5px 0 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.sit-featured-meta {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.sit-featured-btn {
+    margin-top: auto;
+    display: block;
+    text-align: center;
+    background: #ffaa17;
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.sit-featured-btn:hover {
+    background: #e69500;
+    color: #fff;
+}
+
+/* Featured Badge on Program Card */
+.ProgramBoxUni-badge-featured {
+    background-color: #ffd700; /* Gold */
+    color: #000;
+    top: 10px;
+    left: 10px; /* Or wherever looks good, usually badges are absolute */
+    position: absolute;
+    z-index: 2;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}

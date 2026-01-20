@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//search.studyinturkiye.com/main-sitemap.xsl"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd http://www.google.com/schemas/sitemap-image/1.1 http://www.google.com/schemas/sitemap-image/1.1/sitemap-image.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/konya/</loc>
+		<lastmod>2025-05-16T23:26:51+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/ankara/</loc>
+		<lastmod>2025-09-10T14:45:48+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/istanbul/</loc>
+		<lastmod>2025-09-29T13:21:49+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/antalya/</loc>
+		<lastmod>2025-09-11T14:19:56+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/bolu/</loc>
+		<lastmod>2025-09-04T07:53:45+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/sakarya/</loc>
+		<lastmod>2025-09-04T07:55:03+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/trakya/</loc>
+		<lastmod>2025-09-11T14:24:22+00:00</lastmod>
+	</url>
+	<url>
+		<loc>https://search.studyinturkiye.com/sit-city/balikesir/</loc>
+		<lastmod>2025-09-04T07:56:02+00:00</lastmod>
+	</url>
+</urlset>

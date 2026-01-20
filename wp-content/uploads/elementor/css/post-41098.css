@@ -1,0 +1,199 @@
+.elementor-41098 .elementor-element.elementor-element-34b3797{--display:flex;--flex-direction:column;--container-widget-width:100%;--container-widget-height:initial;--container-widget-flex-grow:0;--container-widget-align-self:initial;--flex-wrap-mobile:wrap;}:root{--page-title-display:none;}/* Start custom CSS for shortcode, class: .elementor-element-cd291a6 *//* ------------------------------ */
+/* 1) Global / Structural Styles  */
+/* ------------------------------ */
+
+/* Overall container for the "Apply Now" section */
+.applynow-con {
+  background-color: #f9f9f9; /* Subtle light background */
+  padding: 2rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+/* Add some breathing room around the row */
+.applynow-con .row-main {
+  gap: 2rem;
+}
+
+/* For consistent spacing in all columns */
+.applynow-con .col-md-6,
+.applynow-con .col-md-12 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ------------------------------ */
+/* 2) Header & Title Styles       */
+/* ------------------------------ */
+
+.applynow-con .apply-title {
+  font-family: "Roboto", sans-serif; /* Example: override with a modern font */
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.applynow-con .sub-heading {
+  font-family: "Roboto", sans-serif;
+  font-size: 1rem;
+  color: #777; /* Lighter text for subheadings */
+  margin-bottom: 1rem;
+}
+
+/* ------------------------------ */
+/* 3) University Box Styles       */
+/* ------------------------------ */
+
+.university-box-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+.university-image img {
+  max-width: 100px;
+  border-radius: 4px;
+}
+
+.university-content h3 {
+  font-family: "Roboto", sans-serif;
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.university-attributes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.attribute {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.attribute img {
+  width: 24px;
+  height: 24px;
+}
+
+.attribute-content h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.attribute-content p {
+  font-size: 0.8rem;
+  color: #666;
+  margin: 0;
+}
+
+/* ------------------------------ */
+/* 4) Form Styles                 */
+/* ------------------------------ */
+
+/* Labels */
+.applynow-con form .form-label {
+  font-family: "Roboto", sans-serif;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+  color: #333;
+}
+
+/* Inputs & Selects */
+.applynow-con .form-control.custom-input,
+.applynow-con .form-select.custom-input,
+.applynow-con form input[type="file"] {
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: "Roboto", sans-serif;
+  color: #333;
+  transition: border-color 0.2s ease;
+}
+
+.applynow-con .form-control.custom-input:focus,
+.applynow-con .form-select.custom-input:focus,
+.applynow-con form input[type="file"]:focus {
+  border-color: #e30a17; /* highlight color on focus */
+  outline: none;
+}
+
+/* File inputs: remove default ugly button if desired */
+.applynow-con form input[type="file"]::file-.elementor-41098 .elementor-element.elementor-element-cd291a6-button {
+  background-color: #e30a17;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.75rem;
+  border-radius: 6px 0 0 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+.applynow-con form input[type="file"]::file-.elementor-41098 .elementor-element.elementor-element-cd291a6-button:hover {
+  background-color: #c00913;
+}
+
+/* Required field indicator */
+.applynow-con .text-danger {
+  color: #e30a17;
+}
+
+/* Rows inside the form */
+.applynow-con form .row.g-3 {
+  gap: 1rem;
+}
+
+/* Button */
+.applynow-con .btn.btn-danger.apply-btn {
+  background-color: #e30a17; /* SIT brand color or your custom color */
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-family: "Roboto", sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
+
+.applynow-con .btn.btn-danger.apply-btn:hover {
+  background-color: #c00913;
+}
+
+/* ------------------------------ */
+/* 5) Responsive Tweaks           */
+/* ------------------------------ */
+
+@media (max-width: 767px) {
+  .applynow-con {
+    padding: 1rem;
+  }
+
+  .university-box-wrapper {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .university-image img {
+    max-width: 80px;
+  }
+
+  .university-attributes {
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .applynow-con form .row.g-3 {
+    gap: 1rem 0;
+  }
+}/* End custom CSS */

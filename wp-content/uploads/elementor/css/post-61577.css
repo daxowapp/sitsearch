@@ -1,0 +1,284 @@
+.elementor-61577 .elementor-element.elementor-element-47a5ce26{--display:flex;--justify-content:center;}:root{--page-title-display:none;}@media(min-width:768px){.elementor-61577 .elementor-element.elementor-element-47a5ce26{--content-width:81%;}}/* Start custom CSS *//* Clean & Minimal Filter Styles */
+.university-filters {
+    background: #ffffff !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 8px !important;
+    padding: 1.5rem !important;
+    margin-bottom: 2rem !important;
+    box-shadow: none !important;
+}
+
+.filter-row {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 1rem !important;
+    align-items: end !important;
+}
+
+.filter-group {
+    display: flex !important;
+    flex-direction: column !important;
+    min-width: 180px !important;
+    flex: 1 !important;
+}
+
+.filter-group label {
+    font-weight: 500 !important;
+    margin-bottom: 0.5rem !important;
+    color: #374151 !important;
+    font-size: 0.875rem !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+
+.filter-group select {
+    padding: 0.75rem !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    background: white !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s !important;
+    cursor: pointer !important;
+    color: #374151 !important;
+}
+
+.filter-group select:focus {
+    outline: none !important;
+    border-color: #E10B17 !important;
+    box-shadow: 0 0 0 3px rgba(225, 11, 23, 0.1) !important;
+}
+
+.filter-group select:hover {
+    border-color: #9ca3af !important;
+}
+
+/* Filter Action Buttons */
+.filter-actions {
+    min-width: auto !important;
+}
+
+.filter-actions label {
+    visibility: hidden !important;
+}
+
+.button-group {
+    display: flex !important;
+    gap: 0.5rem !important;
+}
+
+#apply-filters,
+#reset-filters {
+    background: #E10B17 !important;
+    color: white !important;
+    border: 1px solid #E10B17 !important;
+    padding: 0.75rem 1.5rem !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
+}
+
+#reset-filters {
+    background: transparent !important;
+    color: #6b7280 !important;
+    border-color: #d1d5db !important;
+}
+
+#apply-filters:hover {
+    background: #c60a15 !important;
+    border-color: #c60a15 !important;
+}
+
+#reset-filters:hover {
+    background: #f9fafb !important;
+    color: #374151 !important;
+    border-color: #9ca3af !important;
+}
+
+/* Debug info styling */
+.debug-info {
+    background: #f9fafb !important;
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;
+    margin-top: 1rem !important;
+    border-radius: 6px !important;
+    padding: 1rem !important;
+    font-size: 0.75rem !important;
+}
+
+/* Responsive filters */
+@media (max-width: 768px) {
+    .filter-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 1rem !important;
+    }
+    
+    .filter-group {
+        min-width: auto !important;
+        margin-bottom: 0 !important;
+    }
+    
+    .button-group {
+        flex-direction: row !important;
+        justify-content: space-between !important;
+    }
+    
+    #apply-filters,
+    #reset-filters {
+        flex: 1 !important;
+    }
+}
+
+/* Clean Pagination Styling */
+.university-grid-pagination {
+    text-align: center !important;
+    margin-top: 2rem !important;
+    padding: 1rem 0 !important;
+}
+
+.university-grid-pagination .page-numbers {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.75rem 1rem !important;
+    margin: 0 0.25rem !important;
+    text-decoration: none !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px !important;
+    color: #374151 !important;
+    transition: all 0.2s ease !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    background: white !important;
+}
+
+.university-grid-pagination .page-numbers:hover {
+    background: #f9fafb !important;
+    border-color: #9ca3af !important;
+    color: #111827 !important;
+    text-decoration: none !important;
+}
+
+.university-grid-pagination .page-numbers.current {
+    background: #E10B17 !important;
+    border-color: #E10B17 !important;
+    color: white !important;
+    cursor: default !important;
+}
+
+.university-grid-pagination .page-numbers.current:hover {
+    background: #E10B17 !important;
+    border-color: #E10B17 !important;
+    color: white !important;
+}
+
+.university-grid-pagination .page-numbers.dots {
+    border: none !important;
+    background: none !important;
+    color: #9ca3af !important;
+    cursor: default !important;
+}
+
+.university-grid-pagination .page-numbers.dots:hover {
+    background: none !important;
+    border: none !important;
+    color: #9ca3af !important;
+}
+
+.university-grid-pagination .page-numbers.prev,
+.university-grid-pagination .page-numbers.next {
+    padding: 0.75rem 1.25rem !important;
+    font-weight: 500 !important;
+}
+
+/* Full-Width University Logo */
+.university-grid-container .university-logo {
+    padding: 0 !important;
+    background: #fafafa !important;
+    border-bottom: 1px solid #f0f0f0 !important;
+    min-height: 160px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
+.university-grid-container .university-logo img {
+    width: 100% !important;
+    height: 160px !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    filter: none !important;
+}
+
+.university-grid-container .university-logo-placeholder {
+    width: 100% !important;
+    height: 160px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+.university-grid-container .university-logo-placeholder .logo-placeholder {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 50% !important;
+    background: #E10B17 !important;
+    color: white !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 28px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    box-shadow: none !important;
+}
+
+/* Responsive logo adjustments */
+@media (max-width: 768px) {
+    .university-grid-container .university-logo {
+        min-height: 140px !important;
+    }
+    
+    .university-grid-container .university-logo img {
+        height: 140px !important;
+    }
+    
+    .university-grid-container .university-logo-placeholder {
+        height: 140px !important;
+    }
+    
+    .university-grid-container .university-logo-placeholder .logo-placeholder {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 24px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .university-grid-container .university-logo {
+        min-height: 120px !important;
+    }
+    
+    .university-grid-container .university-logo img {
+        height: 120px !important;
+    }
+    
+    .university-grid-container .university-logo-placeholder {
+        height: 120px !important;
+    }
+    
+    .university-grid-pagination .page-numbers {
+        padding: 0.5rem 0.75rem !important;
+        margin: 0 0.125rem !important;
+        min-width: 36px !important;
+        height: 36px !important;
+        font-size: 0.8rem !important;
+    }
+}/* End custom CSS */

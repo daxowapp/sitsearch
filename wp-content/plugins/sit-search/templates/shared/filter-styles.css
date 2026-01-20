@@ -1,0 +1,548 @@
+/* Shared Filter Styles for All Result Pages */
+
+/* Main Layout Styles */
+.filter-results-container {
+    display: flex;
+    gap: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.filter-sidebar {
+    width: 320px;
+    min-width: 320px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 0;
+    height: calc(100vh - 40px);
+    position: sticky;
+    top: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-sidebar-content {
+    padding: 24px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.filter-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.filter-sidebar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+.filter-sidebar::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}
+
+.results-main-content {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .filter-results-container {
+        flex-direction: column;
+        padding: 16px;
+    }
+    
+    .filter-sidebar {
+        width: 100%;
+        min-width: auto;
+        position: static;
+        height: auto;
+        max-height: 400px;
+        margin-bottom: 20px;
+    }
+    
+    .filter-sidebar.mobile-hidden {
+        display: none;
+    }
+    
+    .mobile-filter-toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #E20A17;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    .mobile-filter-toggle:hover {
+        background: #B8080F;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-filter-toggle {
+        display: none;
+    }
+}
+
+/* Sidebar Header */
+.filter-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-sidebar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.clear-all-filters {
+    background: none;
+    border: none;
+    color: #E20A17;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.clear-all-filters:hover {
+    background: #f8f9fa;
+}
+
+/* Filter Sections */
+.filter-section {
+    margin-bottom: 32px;
+}
+
+.filter-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.filter-checkbox-label:hover {
+    border-color: #E20A17;
+    background: #fef7f7;
+}
+
+.filter-checkbox-label.active {
+    border-color: #E20A17;
+    background: linear-gradient(135deg, #fef7f7 0%, #fdf2f2 100%);
+    box-shadow: 0 2px 4px rgba(226, 10, 23, 0.1);
+}
+
+.filter-checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #E20A17;
+    cursor: pointer;
+}
+
+.filter-checkbox-text {
+    font-size: 14px;
+    color: #495057;
+    font-weight: 500;
+    flex: 1;
+}
+
+.filter-checkbox-label.active .filter-checkbox-text {
+    color: #E20A17;
+    font-weight: 600;
+}
+
+/* Applied Filters in Sidebar */
+.applied-filters-sidebar {
+    margin-bottom: 24px;
+    padding: 16px;
+    background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+    border: 1px solid #e3e8ff;
+    border-radius: 12px;
+}
+
+.applied-filters-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 12px 0;
+}
+
+.applied-filters-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.applied-filters-list .filter-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #E20A17;
+    color: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.applied-filters-list .filter-tag .remove-filter {
+    background: rgba(255,255,255,0.3);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.applied-filters-list .filter-tag .remove-filter:hover {
+    background: rgba(255,255,255,0.5);
+}
+
+/* Filter Button Groups */
+.filter-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-button {
+    padding: 8px 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 20px;
+    background: white;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    border-color: #E20A17;
+    background: #fef7f7;
+}
+
+.filter-button.active {
+    background: #E20A17;
+    color: white;
+    border-color: #E20A17;
+}
+
+/* Price Range Inputs */
+.price-range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.price-input:focus {
+    outline: none;
+    border-color: #E20A17;
+    box-shadow: 0 0 0 2px rgba(226, 10, 23, 0.1);
+}
+
+.price-separator {
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* View Toggle Styles */
+.view-toggle {
+    display: flex;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-right: 12px;
+}
+
+.view-toggle button {
+    padding: 10px 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.view-toggle button.active {
+    background: #E20A17;
+    color: white;
+}
+
+.view-toggle button:hover:not(.active) {
+    background: #e9ecef;
+    color: #495057;
+}
+
+.view-toggle svg {
+    flex-shrink: 0;
+}
+
+/* Ensure filter-results container is visible */
+.filter-results {
+    width: 100%;
+    display: block;
+    min-height: 200px;
+}
+
+/* List View Styles */
+.all-faculties-program-list {
+    display: none;
+}
+
+.program-list-item {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.program-list-item:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-color: #E20A17;
+}
+
+.program-list-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.program-list-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.program-list-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8f9fa;
+    font-size: 24px;
+}
+
+.program-list-content {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.program-list-info {
+    flex: 1;
+}
+
+.program-list-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+.program-list-university {
+    font-size: 14px;
+    color: #6c757d;
+    margin: 0 0 12px 0;
+}
+
+.program-list-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.program-list-detail {
+    font-size: 12px;
+    color: #495057;
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.program-list-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.program-list-fee {
+    text-align: right;
+}
+
+.program-list-original-fee {
+    font-size: 14px;
+    color: #6c757d;
+    text-decoration: line-through;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.program-list-discounted-fee {
+    font-size: 18px;
+    font-weight: 600;
+    color: #E20A17;
+}
+
+.program-list-current-fee {
+    font-size: 18px;
+    font-weight: 600;
+    color: #E20A17;
+}
+
+.program-list-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.program-list-btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.program-list-btn-primary {
+    background: #E20A17;
+    color: white;
+    border: 1px solid #E20A17;
+}
+
+.program-list-btn-primary:hover {
+    background: #B8080F;
+    border-color: #B8080F;
+    transform: translateY(-1px);
+}
+
+.program-list-btn-outline {
+    background: transparent;
+    color: #E20A17;
+    border: 1px solid #E20A17;
+}
+
+.program-list-btn-outline:hover {
+    background: #E20A17;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Mobile Responsive - Same compact design */
+@media (max-width: 768px) {
+    .view-toggle {
+        order: -1;
+        width: 100%;
+        justify-content: center;
+        margin-right: 0;
+        margin-bottom: 12px;
+    }
+    
+    .program-list-item {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .program-list-content {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .program-list-right {
+        align-items: flex-start;
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .program-list-actions {
+        flex-direction: column;
+        width: 120px;
+    }
+    
+    .program-list-btn {
+        width: 100%;
+        min-width: auto;
+    }
+}

@@ -1,0 +1,502 @@
+# Copyright (C) 2024 SIT Development Team
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: SIT Program Recommender 1.0.0\n"
+"Report-Msgid-Bugs-To: https://sit.edu.sg\n"
+"POT-Creation-Date: 2024-01-01 12:00+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+
+#: includes/class-sit-admin.php:45
+msgid "SIT Recommender"
+msgstr ""
+
+#: includes/class-sit-admin.php:95
+msgid "General"
+msgstr ""
+
+#: includes/class-sit-admin.php:99
+msgid "OpenAI"
+msgstr ""
+
+#: includes/class-sit-admin.php:103
+msgid "Question Bank"
+msgstr ""
+
+#: includes/class-sit-admin.php:107
+msgid "Mapping"
+msgstr ""
+
+#: includes/class-sit-admin.php:111
+msgid "Display"
+msgstr ""
+
+#: includes/class-sit-admin.php:115
+msgid "Filters"
+msgstr ""
+
+#: includes/class-sit-admin.php:119
+msgid "Export/Import"
+msgstr ""
+
+#: includes/class-sit-admin.php:142
+msgid "Enable Plugin"
+msgstr ""
+
+#: includes/class-sit-admin.php:146
+msgid "Enable the SIT Program Recommender"
+msgstr ""
+
+#: includes/class-sit-admin.php:151
+msgid "Cache Duration (seconds)"
+msgstr ""
+
+#: includes/class-sit-admin.php:155
+msgid "How long to cache program data (300-86400 seconds)"
+msgstr ""
+
+#: includes/class-sit-admin.php:160
+msgid "Rate Limit"
+msgstr ""
+
+#: includes/class-sit-admin.php:164
+msgid "Maximum requests per IP per hour"
+msgstr ""
+
+#: includes/class-sit-admin.php:169
+msgid "Rate Limit Window (seconds)"
+msgstr ""
+
+#: includes/class-sit-admin.php:173
+msgid "Time window for rate limiting"
+msgstr ""
+
+#: includes/class-sit-admin.php:187
+msgid "Enable OpenAI Integration"
+msgstr ""
+
+#: includes/class-sit-admin.php:191
+msgid "Use OpenAI for enhanced recommendations"
+msgstr ""
+
+#: includes/class-sit-admin.php:196
+msgid "API Key"
+msgstr ""
+
+#: includes/class-sit-admin.php:200
+msgid "Test Connection"
+msgstr ""
+
+#: includes/class-sit-admin.php:201
+msgid "Your OpenAI API key"
+msgstr ""
+
+#: includes/class-sit-admin.php:206
+msgid "Model"
+msgstr ""
+
+#: includes/class-sit-admin.php:214
+msgid "Max Tokens"
+msgstr ""
+
+#: includes/class-sit-admin.php:218
+msgid "Maximum tokens for OpenAI response"
+msgstr ""
+
+#: includes/class-sit-admin.php:223
+msgid "Temperature"
+msgstr ""
+
+#: includes/class-sit-admin.php:227
+msgid "Creativity level (0-1)"
+msgstr ""
+
+#: includes/class-sit-admin.php:238
+msgid "Quiz Questions Management"
+msgstr ""
+
+#: includes/class-sit-admin.php:239
+msgid "Manage the quiz questions used for program recommendations."
+msgstr ""
+
+#: includes/class-sit-admin.php:242
+msgid "Add Question"
+msgstr ""
+
+#: includes/class-sit-admin.php:243
+msgid "Reset to Default"
+msgstr ""
+
+#: includes/class-sit-admin.php:252
+#, php-format
+msgid "Question %d"
+msgstr ""
+
+#: includes/class-sit-admin.php:255
+msgid "Question Text"
+msgstr ""
+
+#: includes/class-sit-admin.php:261
+msgid "Category"
+msgstr ""
+
+#: includes/class-sit-admin.php:267
+msgid "Required"
+msgstr ""
+
+#: includes/class-sit-admin.php:271
+msgid "Required question"
+msgstr ""
+
+#: includes/class-sit-admin.php:277
+msgid "Weight"
+msgstr ""
+
+#: includes/class-sit-admin.php:284
+msgid "Remove Question"
+msgstr ""
+
+#: includes/class-sit-admin.php:294
+msgid "Department Mapping"
+msgstr ""
+
+#: includes/class-sit-admin.php:295
+msgid "Configure department vector weights and meta key mappings."
+msgstr ""
+
+#: includes/class-sit-admin.php:306
+msgid "Results Per Page"
+msgstr ""
+
+#: includes/class-sit-admin.php:312
+msgid "Show Progress Bar"
+msgstr ""
+
+#: includes/class-sit-admin.php:316
+msgid "Display quiz progress bar"
+msgstr ""
+
+#: includes/class-sit-admin.php:328
+msgid "Filter Settings"
+msgstr ""
+
+#: includes/class-sit-admin.php:335
+msgid "Export/Import Settings"
+msgstr ""
+
+#: includes/class-sit-admin.php:337
+msgid "Export Settings"
+msgstr ""
+
+#: includes/class-sit-admin.php:338
+msgid "Download all plugin settings as a JSON file."
+msgstr ""
+
+#: includes/class-sit-admin.php:339
+msgid "Export Settings"
+msgstr ""
+
+#: includes/class-sit-admin.php:341
+msgid "Import Settings"
+msgstr ""
+
+#: includes/class-sit-admin.php:342
+msgid "Upload a JSON file to import settings."
+msgstr ""
+
+#: includes/class-sit-admin.php:344
+msgid "Import Settings"
+msgstr ""
+
+#: includes/class-sit-engine.php:289
+msgid "Excellent Match"
+msgstr ""
+
+#: includes/class-sit-engine.php:291
+msgid "Good Match"
+msgstr ""
+
+#: includes/class-sit-engine.php:293
+msgid "Fair Match"
+msgstr ""
+
+#: includes/class-sit-engine.php:295
+msgid "Potential Match"
+msgstr ""
+
+#: includes/class-sit-frontend.php:97
+msgid "Program Recommender is currently disabled."
+msgstr ""
+
+#: includes/class-sit-frontend.php:117
+msgid "Loading..."
+msgstr ""
+
+#: includes/class-sit-frontend.php:123
+msgid "Find Your Perfect Program"
+msgstr ""
+
+#: includes/class-sit-frontend.php:124
+msgid "Take our quick assessment to discover SIT programs that match your interests, skills, and career goals."
+msgstr ""
+
+#: includes/class-sit-frontend.php:129
+msgid "Personalized Matching"
+msgstr ""
+
+#: includes/class-sit-frontend.php:130
+msgid "Get recommendations tailored to your unique profile"
+msgstr ""
+
+#: includes/class-sit-frontend.php:135
+msgid "Quick Assessment"
+msgstr ""
+
+#: includes/class-sit-frontend.php:136
+msgid "Complete the quiz in just 5-10 minutes"
+msgstr ""
+
+#: includes/class-sit-frontend.php:141
+msgid "Expert Insights"
+msgstr ""
+
+#: includes/class-sit-frontend.php:142
+msgid "Detailed explanations for each recommendation"
+msgstr ""
+
+#: includes/class-sit-frontend.php:146
+msgid "Start Assessment"
+msgstr ""
+
+#: includes/class-sit-frontend.php:151
+msgid "Or browse programs directly:"
+msgstr ""
+
+#: includes/class-sit-frontend.php:153
+msgid "Browse All Programs"
+msgstr ""
+
+#: includes/class-sit-frontend.php:167
+msgid "Exit Quiz"
+msgstr ""
+
+#: includes/class-sit-frontend.php:180
+msgid "Previous"
+msgstr ""
+
+#: includes/class-sit-frontend.php:183
+msgid "Next"
+msgstr ""
+
+#: includes/class-sit-frontend.php:186
+msgid "Get My Recommendations"
+msgstr ""
+
+#: includes/class-sit-frontend.php:195
+msgid "Your Program Recommendations"
+msgstr ""
+
+#: includes/class-sit-frontend.php:199
+msgid "Retake Assessment"
+msgstr ""
+
+#: includes/class-sit-frontend.php:203
+msgid "Filter Results"
+msgstr ""
+
+#: includes/class-sit-frontend.php:210
+msgid "Filter Programs"
+msgstr ""
+
+#: includes/class-sit-frontend.php:213
+msgid "School"
+msgstr ""
+
+#: includes/class-sit-frontend.php:215
+msgid "All Schools"
+msgstr ""
+
+#: includes/class-sit-frontend.php:219
+msgid "Level"
+msgstr ""
+
+#: includes/class-sit-frontend.php:221
+msgid "All Levels"
+msgstr ""
+
+#: includes/class-sit-frontend.php:225
+msgid "Study Mode"
+msgstr ""
+
+#: includes/class-sit-frontend.php:227
+msgid "All Modes"
+msgstr ""
+
+#: includes/class-sit-frontend.php:232
+msgid "Apply Filters"
+msgstr ""
+
+#: includes/class-sit-frontend.php:235
+msgid "Clear All"
+msgstr ""
+
+#: includes/class-sit-frontend.php:248
+msgid "Load More Programs"
+msgstr ""
+
+#: includes/class-sit-frontend.php:256
+msgid "Browse All Programs"
+msgstr ""
+
+#: includes/class-sit-frontend.php:259
+msgid "Search programs..."
+msgstr ""
+
+#: includes/class-sit-frontend.php:261
+msgid "Search"
+msgstr ""
+
+#: includes/class-sit-frontend.php:265
+msgid "← Back to Assessment"
+msgstr ""
+
+#: includes/class-sit-frontend.php:278
+msgid "Oops! Something went wrong"
+msgstr ""
+
+#: includes/class-sit-frontend.php:280
+msgid "Try Again"
+msgstr ""
+
+#: includes/class-sit-frontend.php:283
+msgid "Start Over"
+msgstr ""
+
+#: includes/class-sit-frontend.php:291
+msgid "JavaScript Required"
+msgstr ""
+
+#: includes/class-sit-frontend.php:292
+msgid "This program recommender requires JavaScript to function properly. Please enable JavaScript in your browser or view our"
+msgstr ""
+
+#: includes/class-sit-frontend.php:293
+msgid "complete program list"
+msgstr ""
+
+#: includes/class-sit-frontend.php:310
+msgid "Featured Programs"
+msgstr ""
+
+#: includes/class-sit-frontend.php:325
+msgid "Learn More"
+msgstr ""
+
+#: includes/class-sit-frontend.php:380
+msgid "years"
+msgstr ""
+
+#: includes/class-sit-frontend.php:386
+msgid "Why this program matches you:"
+msgstr ""
+
+#: includes/class-sit-frontend.php:396
+msgid "Match Score:"
+msgstr ""
+
+#: includes/class-sit-frontend.php:407
+msgid "View Details"
+msgstr ""
+
+#: includes/class-sit-frontend.php:412
+msgid "Requirements"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:85
+msgid "Optional user profile data"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:95
+msgid "Quiz session ID"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:100
+msgid "Question ID"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:105
+msgid "Selected answer ID"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:117
+msgid "Additional filters"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:123
+msgid "Use OpenAI for reranking"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:135
+msgid "Search query"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:140
+msgid "Filter by school"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:145
+msgid "Filter by level"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:150
+msgid "Filter by study mode"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:156
+msgid "Page number"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:162
+msgid "Programs per page"
+msgstr ""
+
+#: includes/class-sit-rest-api.php:184
+msgid "SIT Program Recommender is currently disabled."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:189
+msgid "Rate limit exceeded. Please try again later."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:195
+msgid "Invalid security token."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:221
+msgid "Quiz session started successfully."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:248
+msgid "Invalid or expired session."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:254
+msgid "Invalid question or answer."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:270
+msgid "Answer submitted successfully."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:302
+msgid "Please complete all required questions first."
+msgstr ""
+
+#: includes/class-sit-rest-api.php:332
+msgid "Recommendations generated successfully."
+msgstr ""

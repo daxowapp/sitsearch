@@ -1,0 +1,323 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "type": "multiple_choice",
+      "category": "interests",
+      "question": "Which field interests you the most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Technology and Computing",
+          "vector": [1, 0, 0, 0, 0, 0, 0, 0]
+        },
+        {
+          "id": "b",
+          "text": "Engineering and Design",
+          "vector": [0, 1, 0, 0, 0, 0, 0, 0]
+        },
+        {
+          "id": "c",
+          "text": "Business and Management",
+          "vector": [0, 0, 1, 0, 0, 0, 0, 0]
+        },
+        {
+          "id": "d",
+          "text": "Health and Life Sciences",
+          "vector": [0, 0, 0, 1, 0, 0, 0, 0]
+        },
+        {
+          "id": "e",
+          "text": "Social Sciences and Humanities",
+          "vector": [0, 0, 0, 0, 1, 0, 0, 0]
+        },
+        {
+          "id": "f",
+          "text": "Creative Arts and Media",
+          "vector": [0, 0, 0, 0, 0, 1, 0, 0]
+        },
+        {
+          "id": "g",
+          "text": "Environmental and Sustainability",
+          "vector": [0, 0, 0, 0, 0, 0, 1, 0]
+        },
+        {
+          "id": "h",
+          "text": "Maritime and Aviation",
+          "vector": [0, 0, 0, 0, 0, 0, 0, 1]
+        }
+      ],
+      "required": true,
+      "weight": 1.0
+    },
+    {
+      "id": 2,
+      "type": "multiple_choice",
+      "category": "skills",
+      "question": "What type of work environment do you prefer?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Laboratory or technical workspace",
+          "vector": [0.8, 0.6, 0, 0.7, 0, 0, 0.3, 0.2]
+        },
+        {
+          "id": "b",
+          "text": "Office-based collaborative environment",
+          "vector": [0.3, 0.2, 0.9, 0.1, 0.6, 0.4, 0.2, 0.1]
+        },
+        {
+          "id": "c",
+          "text": "Field work and outdoor settings",
+          "vector": [0.1, 0.7, 0.2, 0.3, 0.4, 0.2, 0.8, 0.9]
+        },
+        {
+          "id": "d",
+          "text": "Clinical or healthcare settings",
+          "vector": [0.2, 0.3, 0.1, 0.9, 0.5, 0, 0.1, 0]
+        },
+        {
+          "id": "e",
+          "text": "Creative studios or workshops",
+          "vector": [0.4, 0.8, 0.3, 0, 0.2, 0.9, 0.1, 0.1]
+        }
+      ],
+      "required": true,
+      "weight": 0.8
+    },
+    {
+      "id": 3,
+      "type": "multiple_choice",
+      "category": "career_goals",
+      "question": "What is your primary career goal?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Become a technical specialist or researcher",
+          "vector": [0.9, 0.7, 0.1, 0.8, 0.3, 0.2, 0.6, 0.4]
+        },
+        {
+          "id": "b",
+          "text": "Lead teams and manage projects",
+          "vector": [0.4, 0.5, 0.9, 0.3, 0.7, 0.6, 0.4, 0.5]
+        },
+        {
+          "id": "c",
+          "text": "Start my own business or consultancy",
+          "vector": [0.6, 0.6, 0.8, 0.2, 0.4, 0.7, 0.3, 0.3]
+        },
+        {
+          "id": "d",
+          "text": "Help people and make a social impact",
+          "vector": [0.2, 0.3, 0.4, 0.9, 0.8, 0.5, 0.7, 0.2]
+        },
+        {
+          "id": "e",
+          "text": "Create innovative solutions or products",
+          "vector": [0.8, 0.9, 0.6, 0.4, 0.3, 0.8, 0.5, 0.6]
+        }
+      ],
+      "required": true,
+      "weight": 0.9
+    },
+    {
+      "id": 4,
+      "type": "multiple_choice",
+      "category": "learning_style",
+      "question": "How do you prefer to learn new concepts?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Hands-on practical experience",
+          "vector": [0.7, 0.9, 0.3, 0.6, 0.2, 0.7, 0.8, 0.8]
+        },
+        {
+          "id": "b",
+          "text": "Theoretical study and research",
+          "vector": [0.8, 0.4, 0.6, 0.7, 0.8, 0.3, 0.5, 0.2]
+        },
+        {
+          "id": "c",
+          "text": "Group discussions and collaboration",
+          "vector": [0.3, 0.5, 0.8, 0.5, 0.9, 0.6, 0.4, 0.4]
+        },
+        {
+          "id": "d",
+          "text": "Visual and creative methods",
+          "vector": [0.4, 0.6, 0.4, 0.3, 0.6, 0.9, 0.3, 0.3]
+        },
+        {
+          "id": "e",
+          "text": "Case studies and real-world examples",
+          "vector": [0.5, 0.7, 0.7, 0.8, 0.7, 0.5, 0.6, 0.7]
+        }
+      ],
+      "required": true,
+      "weight": 0.6
+    },
+    {
+      "id": 5,
+      "type": "multiple_choice",
+      "category": "problem_solving",
+      "question": "What type of problems do you enjoy solving?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Complex technical challenges",
+          "vector": [0.9, 0.8, 0.2, 0.4, 0.1, 0.3, 0.5, 0.6]
+        },
+        {
+          "id": "b",
+          "text": "People and organizational issues",
+          "vector": [0.2, 0.3, 0.8, 0.6, 0.9, 0.4, 0.3, 0.2]
+        },
+        {
+          "id": "c",
+          "text": "Creative and design challenges",
+          "vector": [0.4, 0.7, 0.5, 0.2, 0.4, 0.9, 0.3, 0.4]
+        },
+        {
+          "id": "d",
+          "text": "Health and wellness problems",
+          "vector": [0.3, 0.4, 0.3, 0.9, 0.6, 0.2, 0.4, 0.1]
+        },
+        {
+          "id": "e",
+          "text": "Environmental and sustainability issues",
+          "vector": [0.5, 0.6, 0.4, 0.5, 0.7, 0.4, 0.9, 0.7]
+        }
+      ],
+      "required": true,
+      "weight": 0.8
+    },
+    {
+      "id": 6,
+      "type": "multiple_choice",
+      "category": "study_mode",
+      "question": "What study mode would you prefer?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Full-time on-campus",
+          "vector": [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
+        },
+        {
+          "id": "b",
+          "text": "Part-time while working",
+          "vector": [0.3, 0.4, 0.7, 0.4, 0.6, 0.4, 0.3, 0.4]
+        },
+        {
+          "id": "c",
+          "text": "Online or blended learning",
+          "vector": [0.6, 0.3, 0.6, 0.3, 0.4, 0.5, 0.2, 0.2]
+        },
+        {
+          "id": "d",
+          "text": "Intensive workshop-style",
+          "vector": [0.7, 0.6, 0.4, 0.6, 0.3, 0.7, 0.4, 0.5]
+        }
+      ],
+      "required": false,
+      "weight": 0.4
+    },
+    {
+      "id": 7,
+      "type": "multiple_choice",
+      "category": "industry_preference",
+      "question": "Which industry sector appeals to you most?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Technology and Software",
+          "vector": [0.9, 0.3, 0.4, 0.1, 0.2, 0.5, 0.2, 0.1]
+        },
+        {
+          "id": "b",
+          "text": "Healthcare and Pharmaceuticals",
+          "vector": [0.3, 0.4, 0.3, 0.9, 0.4, 0.1, 0.3, 0.1]
+        },
+        {
+          "id": "c",
+          "text": "Financial Services and Banking",
+          "vector": [0.4, 0.2, 0.8, 0.1, 0.3, 0.2, 0.1, 0.2]
+        },
+        {
+          "id": "d",
+          "text": "Manufacturing and Engineering",
+          "vector": [0.5, 0.9, 0.4, 0.2, 0.1, 0.3, 0.4, 0.6]
+        },
+        {
+          "id": "e",
+          "text": "Media and Entertainment",
+          "vector": [0.3, 0.4, 0.6, 0.2, 0.5, 0.9, 0.2, 0.2]
+        },
+        {
+          "id": "f",
+          "text": "Government and Public Service",
+          "vector": [0.2, 0.3, 0.5, 0.6, 0.8, 0.3, 0.6, 0.4]
+        },
+        {
+          "id": "g",
+          "text": "Transportation and Logistics",
+          "vector": [0.4, 0.6, 0.6, 0.2, 0.3, 0.2, 0.5, 0.9]
+        },
+        {
+          "id": "h",
+          "text": "Environmental and Green Technology",
+          "vector": [0.6, 0.7, 0.3, 0.4, 0.5, 0.4, 0.9, 0.3]
+        }
+      ],
+      "required": false,
+      "weight": 0.7
+    },
+    {
+      "id": 8,
+      "type": "multiple_choice",
+      "category": "work_style",
+      "question": "How do you prefer to work on projects?",
+      "options": [
+        {
+          "id": "a",
+          "text": "Independently with minimal supervision",
+          "vector": [0.8, 0.6, 0.3, 0.4, 0.2, 0.7, 0.5, 0.4]
+        },
+        {
+          "id": "b",
+          "text": "In small, focused teams",
+          "vector": [0.6, 0.7, 0.6, 0.6, 0.5, 0.6, 0.6, 0.6]
+        },
+        {
+          "id": "c",
+          "text": "In large, diverse groups",
+          "vector": [0.3, 0.5, 0.8, 0.5, 0.8, 0.5, 0.4, 0.5]
+        },
+        {
+          "id": "d",
+          "text": "With direct mentorship and guidance",
+          "vector": [0.4, 0.4, 0.4, 0.7, 0.6, 0.4, 0.3, 0.3]
+        },
+        {
+          "id": "e",
+          "text": "Leading and coordinating others",
+          "vector": [0.5, 0.6, 0.9, 0.4, 0.7, 0.6, 0.5, 0.6]
+        }
+      ],
+      "required": false,
+      "weight": 0.5
+    }
+  ],
+  "scoring": {
+    "vector_dimensions": [
+      "Technology & Computing",
+      "Engineering & Design", 
+      "Business & Management",
+      "Health & Life Sciences",
+      "Social Sciences & Humanities",
+      "Creative Arts & Media",
+      "Environmental & Sustainability",
+      "Maritime & Aviation"
+    ],
+    "normalization": "l2",
+    "aggregation": "weighted_sum"
+  }
+}

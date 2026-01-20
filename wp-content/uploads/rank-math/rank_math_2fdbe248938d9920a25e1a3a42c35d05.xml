@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type="text/xsl" href="//search.studyinturkiye.com/main-sitemap.xsl"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+	<Document>
+		<name>Locations for SIT Search by Study in Turkiye</name>
+		<open>1</open>
+		<Folder>
+			<atom:link href="https://search.studyinturkiye.com" />
+			<Placemark>
+				<name><![CDATA[SIT Search by Study in Turkiye]]></name>
+				<description><![CDATA[SIT Search - ]]></description>
+				<address><![CDATA[Ziya Gökalp Mah. Süleyman Demirel Bulvarı Mall Of İstanbul Floor:14 Office:116, 34490 Başakşehir/, İstanbul, Turkiye]]></address>
+				<phoneNumber><![CDATA[+90 5493061000]]></phoneNumber>
+				<atom:link href="https://search.studyinturkiye.com"/>
+				<LookAt>
+					<altitude>0</altitude>
+					<range></range>
+					<tilt>0</tilt>
+				</LookAt>
+				<Point>
+				</Point>
+			</Placemark>
+		</Folder>
+	</Document>
+</kml>

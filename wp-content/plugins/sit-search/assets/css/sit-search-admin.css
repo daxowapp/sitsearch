@@ -1,0 +1,11 @@
+td.flex-fields {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 15px;
+}
+
+td.flex-fields label {
+    /*color: #e50e0e;*/
+    font-weight: 600;
+    cursor: pointer;
+}

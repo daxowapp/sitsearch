@@ -1,0 +1,200 @@
+{
+  "departments": {
+    "computing_information_systems": {
+      "name": "Computing and Information Systems",
+      "vector_weights": [1.0, 0.3, 0.4, 0.2, 0.1, 0.3, 0.3, 0.1],
+      "meta_mappings": {
+        "school": "School of Computing and Information Systems",
+        "duration_years": "3-4",
+        "mode": "full-time",
+        "level": "undergraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "high_math_score",
+          "bonus": 0.2,
+          "description": "Strong mathematical background preferred"
+        },
+        {
+          "condition": "programming_experience",
+          "bonus": 0.3,
+          "description": "Prior programming experience is advantageous"
+        }
+      ]
+    },
+    "engineering": {
+      "name": "Engineering",
+      "vector_weights": [0.4, 1.0, 0.3, 0.2, 0.1, 0.2, 0.4, 0.3],
+      "meta_mappings": {
+        "school": "School of Engineering",
+        "duration_years": "4",
+        "mode": "full-time",
+        "level": "undergraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "strong_physics",
+          "bonus": 0.25,
+          "description": "Strong physics foundation required"
+        },
+        {
+          "condition": "hands_on_experience",
+          "bonus": 0.2,
+          "description": "Practical hands-on experience valued"
+        }
+      ]
+    },
+    "business": {
+      "name": "Business and Management",
+      "vector_weights": [0.2, 0.2, 1.0, 0.1, 0.4, 0.3, 0.2, 0.2],
+      "meta_mappings": {
+        "school": "School of Business",
+        "duration_years": "3-4",
+        "mode": "full-time,part-time",
+        "level": "undergraduate,postgraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "leadership_experience",
+          "bonus": 0.3,
+          "description": "Leadership and management experience preferred"
+        },
+        {
+          "condition": "communication_skills",
+          "bonus": 0.2,
+          "description": "Strong communication skills essential"
+        }
+      ]
+    },
+    "health_life_sciences": {
+      "name": "Health and Life Sciences",
+      "vector_weights": [0.2, 0.3, 0.2, 1.0, 0.3, 0.1, 0.3, 0.1],
+      "meta_mappings": {
+        "school": "School of Health and Life Sciences",
+        "duration_years": "3-5",
+        "mode": "full-time",
+        "level": "undergraduate,postgraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "biology_chemistry_background",
+          "bonus": 0.4,
+          "description": "Strong background in biology and chemistry required"
+        },
+        {
+          "condition": "healthcare_experience",
+          "bonus": 0.3,
+          "description": "Healthcare or volunteer experience preferred"
+        }
+      ]
+    },
+    "humanities_social_sciences": {
+      "name": "Humanities and Social Sciences",
+      "vector_weights": [0.1, 0.1, 0.4, 0.3, 1.0, 0.4, 0.4, 0.1],
+      "meta_mappings": {
+        "school": "School of Humanities and Social Sciences",
+        "duration_years": "3-4",
+        "mode": "full-time,part-time",
+        "level": "undergraduate,postgraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "research_interest",
+          "bonus": 0.3,
+          "description": "Interest in research and critical thinking"
+        },
+        {
+          "condition": "community_service",
+          "bonus": 0.2,
+          "description": "Community service experience valued"
+        }
+      ]
+    },
+    "design_media": {
+      "name": "Design and Media",
+      "vector_weights": [0.3, 0.4, 0.3, 0.1, 0.3, 1.0, 0.2, 0.1],
+      "meta_mappings": {
+        "school": "School of Design and Media",
+        "duration_years": "3-4",
+        "mode": "full-time",
+        "level": "undergraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "creative_portfolio",
+          "bonus": 0.4,
+          "description": "Strong creative portfolio required"
+        },
+        {
+          "condition": "design_software_skills",
+          "bonus": 0.3,
+          "description": "Proficiency in design software preferred"
+        }
+      ]
+    },
+    "sustainable_living": {
+      "name": "Sustainable Living and Environmental Studies",
+      "vector_weights": [0.3, 0.4, 0.3, 0.4, 0.5, 0.2, 1.0, 0.3],
+      "meta_mappings": {
+        "school": "School of Sustainable Living",
+        "duration_years": "3-4",
+        "mode": "full-time,part-time",
+        "level": "undergraduate,postgraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "environmental_awareness",
+          "bonus": 0.3,
+          "description": "Strong environmental awareness and commitment"
+        },
+        {
+          "condition": "sustainability_projects",
+          "bonus": 0.2,
+          "description": "Experience in sustainability projects preferred"
+        }
+      ]
+    },
+    "maritime_aviation": {
+      "name": "Maritime and Aviation Studies",
+      "vector_weights": [0.2, 0.6, 0.4, 0.1, 0.2, 0.2, 0.3, 1.0],
+      "meta_mappings": {
+        "school": "School of Maritime and Aviation",
+        "duration_years": "3-4",
+        "mode": "full-time",
+        "level": "undergraduate"
+      },
+      "bonus_rules": [
+        {
+          "condition": "technical_aptitude",
+          "bonus": 0.3,
+          "description": "Strong technical and mechanical aptitude"
+        },
+        {
+          "condition": "industry_experience",
+          "bonus": 0.4,
+          "description": "Prior maritime or aviation industry experience"
+        }
+      ]
+    }
+  },
+  "global_settings": {
+    "min_score_threshold": 0.3,
+    "max_recommendations": 10,
+    "score_normalization": "min_max",
+    "reason_templates": {
+      "high_match": "This program strongly aligns with your interests in {primary_areas} and your preference for {work_style}.",
+      "medium_match": "This program is a good fit based on your interest in {primary_areas} and could develop your skills in {secondary_areas}.",
+      "bonus_applied": "Additional consideration given for {bonus_reason}."
+    }
+  },
+  "program_meta_keys": {
+    "school": "sit_program_school",
+    "duration": "sit_program_duration", 
+    "mode": "sit_program_mode",
+    "level": "sit_program_level",
+    "intake": "sit_program_intake",
+    "fees": "sit_program_fees",
+    "requirements": "sit_program_requirements",
+    "career_prospects": "sit_program_careers"
+  }
+}

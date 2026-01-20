@@ -1,0 +1,23 @@
+{
+  "name": "sit/studyinturkiye",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Sabeeh",
+      "email": "email@example.com"
+    }
+  ],
+  "require": {
+    "monolog/monolog": "^2.8 || ^3.0",
+    "ext-curl": "*",
+    "fpdf/fpdf": "^1.86",
+    "stripe/stripe-php": "^17.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "SIT\\Search\\": "src/"
+    }
+  }
+}

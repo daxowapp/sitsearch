@@ -1,0 +1,359 @@
+/**
+ * SIT Program Recommender Block Editor Styles
+ */
+
+/* Block Preview */
+.sit-block-preview {
+    border: 2px dashed #0073aa;
+    border-radius: 8px;
+    padding: 24px;
+    background: #f8f9fa;
+    text-align: center;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.sit-block-preview-header h3 {
+    margin: 0 0 8px 0;
+    color: #0073aa;
+    font-size: 1.5em;
+}
+
+.sit-block-preview-header p {
+    margin: 0 0 24px 0;
+    color: #666;
+    font-size: 1em;
+}
+
+.sit-block-preview-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.sit-preview-feature {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+    font-size: 14px;
+    color: #333;
+}
+
+.sit-preview-feature .dashicons {
+    color: #0073aa;
+    font-size: 18px;
+}
+
+.sit-block-preview-settings {
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+    color: #666;
+    font-size: 12px;
+}
+
+/* Inspector Controls */
+.components-panel__body .components-base-control__label {
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.components-toggle-control .components-base-control__field {
+    margin-bottom: 16px;
+}
+
+.components-range-control__wrapper {
+    margin-bottom: 16px;
+}
+
+/* Block Icon */
+.wp-block-sit-program-recommender {
+    position: relative;
+}
+
+.wp-block-sit-program-recommender::before {
+    content: '\f118';
+    font-family: dashicons;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #0073aa;
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    z-index: 1;
+}
+
+/* Block Toolbar */
+.block-editor-block-toolbar .components-toolbar-group {
+    border-right: 1px solid #e0e0e0;
+}
+
+.block-editor-block-toolbar .components-button {
+    color: #1e1e1e;
+}
+
+.block-editor-block-toolbar .components-button:hover {
+    color: #0073aa;
+}
+
+/* Block Inserter */
+.block-editor-inserter__item .block-editor-block-types-list__item-title {
+    font-weight: 600;
+}
+
+.block-editor-inserter__item .block-editor-block-types-list__item-description {
+    color: #757575;
+    font-size: 13px;
+}
+
+/* Block Variations */
+.sit-block-variation {
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sit-block-variation:hover {
+    border-color: #0073aa;
+    background: #f0f8ff;
+}
+
+.sit-block-variation.selected {
+    border-color: #0073aa;
+    background: #f0f8ff;
+    box-shadow: 0 0 0 1px #0073aa;
+}
+
+.sit-block-variation h4 {
+    margin: 0 0 8px 0;
+    color: #1e1e1e;
+    font-size: 14px;
+}
+
+.sit-block-variation p {
+    margin: 0;
+    color: #757575;
+    font-size: 13px;
+}
+
+/* Responsive Block Preview */
+@media (max-width: 768px) {
+    .sit-block-preview {
+        padding: 16px;
+    }
+    
+    .sit-block-preview-content {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .sit-preview-feature {
+        padding: 8px;
+        font-size: 13px;
+    }
+}
+
+/* Dark Mode Support */
+@media (prefers-color-scheme: dark) {
+    .sit-block-preview {
+        background: #1e1e1e;
+        border-color: #4f94d4;
+    }
+    
+    .sit-block-preview-header h3 {
+        color: #4f94d4;
+    }
+    
+    .sit-block-preview-header p,
+    .sit-block-preview-settings {
+        color: #ccc;
+    }
+    
+    .sit-preview-feature {
+        background: #2d2d2d;
+        border-color: #444;
+        color: #ccc;
+    }
+    
+    .sit-preview-feature .dashicons {
+        color: #4f94d4;
+    }
+    
+    .sit-block-variation {
+        background: #2d2d2d;
+        border-color: #444;
+    }
+    
+    .sit-block-variation:hover,
+    .sit-block-variation.selected {
+        background: #1a2b3d;
+        border-color: #4f94d4;
+    }
+    
+    .sit-block-variation h4 {
+        color: #fff;
+    }
+    
+    .sit-block-variation p {
+        color: #ccc;
+    }
+}
+
+/* Animation for block insertion */
+@keyframes sit-block-insert {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.wp-block-sit-program-recommender.is-selected {
+    animation: sit-block-insert 0.3s ease-out;
+}
+
+/* Block Alignment */
+.wp-block-sit-program-recommender.alignwide {
+    max-width: 1200px;
+}
+
+.wp-block-sit-program-recommender.alignfull {
+    max-width: none;
+}
+
+/* Block Spacing */
+.wp-block-sit-program-recommender {
+    margin: 1.5em 0;
+}
+
+.wp-block-sit-program-recommender:first-child {
+    margin-top: 0;
+}
+
+.wp-block-sit-program-recommender:last-child {
+    margin-bottom: 0;
+}
+
+/* Inspector Panel Styling */
+.components-panel__body-title {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.components-base-control .components-base-control__help {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #757575;
+    font-style: italic;
+}
+
+/* Custom Control Styling */
+.sit-theme-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.sit-theme-option {
+    padding: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 12px;
+}
+
+.sit-theme-option:hover {
+    border-color: #0073aa;
+}
+
+.sit-theme-option.selected {
+    border-color: #0073aa;
+    background: #f0f8ff;
+    color: #0073aa;
+}
+
+.sit-theme-preview {
+    width: 100%;
+    height: 20px;
+    border-radius: 2px;
+    margin-bottom: 4px;
+}
+
+.sit-theme-preview.default {
+    background: linear-gradient(90deg, #0073aa, #00a0d2);
+}
+
+.sit-theme-preview.modern {
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.sit-theme-preview.minimal {
+    background: linear-gradient(90deg, #2d3748, #4299e1);
+}
+
+/* Block Validation */
+.sit-block-validation-error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 16px 0;
+    color: #721c24;
+    font-size: 13px;
+}
+
+.sit-block-validation-error .dashicons {
+    color: #dc3545;
+    margin-right: 8px;
+}
+
+/* Loading State */
+.sit-block-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #666;
+}
+
+.sit-block-loading .components-spinner {
+    margin-right: 12px;
+}
+
+/* Success State */
+.sit-block-success {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    padding: 12px;
+    margin: 16px 0;
+    color: #155724;
+    font-size: 13px;
+}
+
+.sit-block-success .dashicons {
+    color: #28a745;
+    margin-right: 8px;
+}
