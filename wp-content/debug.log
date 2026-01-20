@@ -4210,3 +4210,88 @@ Stack trace:
 [17-Jan-2026 19:54:29 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 695
 [17-Jan-2026 19:54:29 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 699
 [17-Jan-2026 19:54:29 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 715
+[20-Jan-2026 13:29:55 UTC] Automatic updates starting...
+[20-Jan-2026 13:29:55 UTC]   Automatic plugin updates starting...
+[20-Jan-2026 13:29:55 UTC]   Automatic plugin updates complete.
+[20-Jan-2026 13:29:55 UTC] Automatic updates complete.
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:30:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:30:09 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:30:15 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:33:21 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:35:03 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:50:06 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:51:04 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "image" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 290
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "location" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 293
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "link" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 295
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "image" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 290
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "location" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 293
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "link" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 295
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "image" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 290
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "location" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 293
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "link" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 295
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "image" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 290
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "location" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 293
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "link" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 295
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "image" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 287
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "name" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 290
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "location" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 293
+[20-Jan-2026 13:52:22 UTC] PHP Warning:  Undefined array key "link" in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/single-program.html.php on line 295
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 609
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 615
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 631
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 658
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 724
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $disstr in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 728
+[20-Jan-2026 13:53:23 UTC] PHP Warning:  Undefined variable $pdf_program in /Users/darwish/Dev/sitsearch/wp-content/plugins/sit-search/templates/shortcodes/filter-sort.html.php on line 744

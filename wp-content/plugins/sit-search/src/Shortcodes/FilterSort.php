@@ -470,9 +470,18 @@ class FilterSort
             // 2. User Selected Sort
             switch ($sort) {
                 case 'fee_low':
-                    return intval($a['fee'] ?: 0) - intval($b['fee'] ?: 0);
                 case 'fee_high':
-                    return intval($b['fee'] ?: 0) - intval($a['fee'] ?: 0);
+                    // Use effective fee: discounted_fee if available, otherwise Advanced_Discount, otherwise fee (official)
+                    $effective_fee_a = !empty($a['discounted_fee']) ? intval($a['discounted_fee']) : 
+                                       (!empty($a['Advanced_Discount']) ? intval($a['Advanced_Discount']) : intval($a['fee'] ?: 0));
+                    $effective_fee_b = !empty($b['discounted_fee']) ? intval($b['discounted_fee']) : 
+                                       (!empty($b['Advanced_Discount']) ? intval($b['Advanced_Discount']) : intval($b['fee'] ?: 0));
+                    
+                    if ($sort === 'fee_low') {
+                        return $effective_fee_a - $effective_fee_b;
+                    } else {
+                        return $effective_fee_b - $effective_fee_a;
+                    }
                 case 'popular':
                     return intval($b['views_count'] ?: 0) - intval($a['views_count'] ?: 0);
                 case 'newest':

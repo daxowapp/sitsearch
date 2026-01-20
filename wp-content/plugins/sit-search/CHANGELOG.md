@@ -11,10 +11,17 @@ All notable changes to the SIT Search plugin will be documented in this file.
   - Integrates with existing filter system (URL parameters, applied filters display)
   - Works with "Clear All" and individual filter removal
 
+### Fixed
+- **Price Sorting** - Sorting by price (Low to High / High to Low) now uses effective price
+  - Uses discounted_fee when available, otherwise Advanced_Discount, otherwise official fee
+  - Programs with discounts are now sorted correctly by their actual price
+- **Sort Dropdown** - Fixed sort dropdown not responding in new results header
+  - Updated selector to target `#sort-dropdown` and `.results-sort-select`
+
 ### Changed
-- `src/Shortcodes/FilterSort.php` - Added city filter handling, tax_query, and available_cities extraction
+- `src/Shortcodes/FilterSort.php` - Added city filter handling, fixed price sorting logic
 - `templates/shortcodes/filter-sort.html.php` - Added City filter UI section in sidebar
-- `assets/js/main.js` - Added city checkbox handlers, URL initialization, and filter display
+- `assets/js/main.js` - Added city checkbox handlers, fixed sort dropdown selector
 - `src/App.php` - Bumped plugin version to `3.0.9` for cache busting
 
 ---
