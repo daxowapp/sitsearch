@@ -2,6 +2,23 @@
 
 All notable changes to the SIT Search plugin will be documented in this file.
 
+## [1.1.6] - 2026-01-20
+
+### Added
+- **Search API Endpoint** - New REST API for Next.js headless frontend
+  - `GET /wp-json/sit-search/v1/search` - Full search with filters, sorting, pagination
+  - `GET /wp-json/sit-search/v1/program/{slug}` - Single program by slug
+  - `GET /wp-json/sit-search/v1/university/{slug}` - Single university with programs
+  - `GET /wp-json/sit-search/v1/featured-universities` - Featured universities list
+  - `GET /wp-json/sit-search/v1/filter-options` - All filter dropdowns in one call
+- **API Documentation** - Created `docs/API.md` documenting all endpoints
+
+### Changed
+- `src/App.php` - Registered new SearchEndpoint
+- `src/Endpoints/SearchEndpoint.php` - New comprehensive endpoint file
+
+---
+
 ## [1.1.5] - 2026-01-20
 
 ### Added
@@ -17,10 +34,11 @@ All notable changes to the SIT Search plugin will be documented in this file.
   - Programs with discounts are now sorted correctly by their actual price
 - **Sort Dropdown** - Fixed sort dropdown not responding in new results header
   - Updated selector to target `#sort-dropdown` and `.results-sort-select`
+- **Currency Display** - List view now uses actual Tuition_Currency instead of hardcoded USD
 
 ### Changed
 - `src/Shortcodes/FilterSort.php` - Added city filter handling, fixed price sorting logic
-- `templates/shortcodes/filter-sort.html.php` - Added City filter UI section in sidebar
+- `templates/shortcodes/filter-sort.html.php` - Added City filter UI, fixed currency display
 - `assets/js/main.js` - Added city checkbox handlers, fixed sort dropdown selector
 - `src/App.php` - Bumped plugin version to `3.0.9` for cache busting
 

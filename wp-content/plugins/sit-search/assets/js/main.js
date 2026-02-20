@@ -475,17 +475,7 @@ jQuery(document).ready(function ($) {
             }
         }
     });
-    $("form#search-bar").submit(function (event) {
-        let speciality = $("select[name='speciality']").val();
-        let country = $("select[name='country']").val();
-        let level = $("select[name='level']").val();
-        let type = $("select[name='univerity-type']").val();
 
-        if (speciality === "0" || country === "0" || level === "0" || type === "0") {
-            alert("Please select a valid option for all fields before submitting.");
-            event.preventDefault();
-        }
-    });
     $('.select2').select2({
         placeholder: 'Select an option',
     });

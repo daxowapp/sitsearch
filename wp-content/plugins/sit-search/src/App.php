@@ -103,6 +103,7 @@ class App
             (new Endpoints\FacultyEndpoint)->register_routes();
             (new Endpoints\SpecialityEndpoint)->register_routes();
             (new Endpoints\CityEndpoint)->register_routes();
+            (new Endpoints\SearchEndpoint)->register_routes();
         });
     }
 
@@ -365,7 +366,6 @@ class App
 
     public function debugging()
     {
-
         $search = [];
         if (isset($_GET['speciality'])) {
             $search['speciality'] = is_array($_GET['speciality']) ? $_GET['speciality'] : esc_attr($_GET['speciality']);
@@ -548,7 +548,7 @@ class App
     public function setup_assets()
     {
         // Use plugin version for cache busting instead of time()
-        $plugin_version = '3.0.9'; // City filter feature
+        $plugin_version = '3.0.10'; // Cache busting
         
         //OwlCarousel2 - For all carousels
         //OwlCarousel2 - For all carousels
