@@ -27,7 +27,7 @@ if (!empty($_GET['isScholarShip']) && $_GET['isScholarShip'] == 'Yes') {
     $scholarship_filter = 'Scholarship ';
 }
 
-if (!empty($speciality_term) && !empty($degree_term) && !empty($country_term)) {
+if (!empty($speciality_term) && !is_wp_error($speciality_term) && !empty($degree_term) && !is_wp_error($degree_term) && !empty($country_term) && !is_wp_error($country_term)) {
     $heading = $degree_term->name . ' ' . $speciality_term->name . ' Courses In ' . $country_term->name;
 } else {
     $heading = "Search For Course";
@@ -311,7 +311,7 @@ $search_value = isset($_GET['search']) ? $_GET['search'] : '';
     <div class="header-info">
         <span class="courses-found"><?= $query->found_posts ?> courses found</span>
         <div class="search-by-name-campus">
-            <input type="text" id="search-university" value="<?= $_GET['search'] ?>" placeholder="Search by name..." />
+            <input type="text" id="search-university" value="<?= esc_attr($search_value) ?>" placeholder="Search by name..." />
             <button>Go</button>
         </div>
         <div class="header-actions">

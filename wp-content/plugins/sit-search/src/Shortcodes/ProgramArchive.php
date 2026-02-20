@@ -102,13 +102,13 @@ class ProgramArchive
             }
         }
 
-        if (!empty($country)) {
-            $tax_query[] = array(
-                'taxonomy' => 'sit-country',
-                'field'    => 'term_id',
-                'terms'    => $country,
-            );
-        }
+//        if (!empty($country)) {
+//            $tax_query[] = array(
+//                'taxonomy' => 'sit-country',
+//                'field'    => 'term_id',
+//                'terms'    => $country,
+//            );
+//        }
 
         if (!empty($speciality)) {
             $tax_query[] = array(
@@ -143,12 +143,40 @@ class ProgramArchive
 
         // Filter programs by university's Active_in_Search status
         $active_university_ids = array();
-        $all_universities = get_posts(array(
+        $uni_args = array(
             'post_type' => 'sit-university',
             'post_status' => 'publish',
             'posts_per_page' => -1,
             'fields' => 'ids'
-        ));
+        );
+
+        if (!empty($country)) {
+            $uni_args['tax_query'] = array(
+                array(
+                    'taxonomy' => 'sit-country',
+                    'field'    => 'term_id',
+                    'terms'    => $country,
+                )
+            );
+        }
+
+
+        $all_universities = get_posts($uni_args);
+
+        // $all_universities = get_posts($uni_args);
+
+        echo '<div id="sit-debug-info" style="display:block; padding:10px; background:#fff; border:2px solid red; position:relative; z-index:9999;">';
+        echo '<strong>DEBUG INFO:</strong><br>';
+        echo 'GET Country: ' . esc_html($country) . '<br>';
+        echo 'Uni Query Tax Query: ' . json_encode($uni_args['tax_query'] ?? []) . '<br>';
+        echo 'Found Unis Count: ' . count($all_universities) . '<br>';
+        if (count($all_universities) > 0) {
+            $unis_debug = array_map(function($id) { return get_the_title($id) . " ($id)"; }, array_slice($all_universities, 0, 5));
+            echo 'First 5 Unis: ' . implode(', ', $unis_debug) . '<br>';
+        } else {
+            echo 'No universities found for this country.<br>';
+        }
+        echo '</div>';
         
         foreach ($all_universities as $uni_id) {
             $active_in_search = get_field('Active_in_Search', $uni_id);
@@ -346,6 +374,11 @@ class ProgramArchive
         $query = new \WP_Query($args);
 
         $pdf_query = new \WP_Query($pdf_arg);
+
+        // DEBUG: Log the query arguments to debug country filtering issue
+        error_log('ProgramArchive Query Args: ' . print_r($args, true));
+        error_log('ProgramArchive GET params: ' . print_r($_GET, true));
+
         
         // Create a separate query to get program IDs for filter options (not full objects)
         $filter_args = $args;

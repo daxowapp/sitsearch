@@ -28,17 +28,12 @@ $recent_search=array_slice($recent_search, -5);
         <div class="form-group">
             <img src="<?= STI_SEARCH_URL ?>assets/images/accomodation.png"/>
             <select class="select2" name="country">
-                <option value="0" selected>Where do you want to study?</option>
+                <option value="0" <?php echo empty($_GET['country']) ? 'selected' : ''; ?>>Where do you want to study?</option>
                 <?php
                 foreach ($countries as $country) {
-                    if (isset($_GET['country'])) {
-                        if ($_GET['country'] == $country->term_id) {
-                            $sel = 'selected';
-                        } else {
-                            $sel = '';
-                        }
-                    } else {
-                        $sel = '';
+                    $sel = '';
+                    if (isset($_GET['country']) && $_GET['country'] == $country->term_id) {
+                        $sel = 'selected';
                     }
                     echo '<option ' . $sel . ' value="' . $country->term_id . '">' . $country->name . '</option>';
                 }

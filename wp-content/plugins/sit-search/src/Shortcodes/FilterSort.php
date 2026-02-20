@@ -145,38 +145,47 @@ class FilterSort
         if ($north_cyprus_term) {
             $allowed_countries[] = $north_cyprus_term->term_id;
         }
-        
-        // If user selected a specific country, use it only if it's Turkey or North Cyprus
+
+        // Determine target country
+        $target_country_ids = [];
         if (!empty($country)) {
-            if (in_array($country, $allowed_countries)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'sit-country',
-                    'field'    => 'term_id',
-                    'terms'    => $country,
-                );
-                $term = get_term($country);
-                $country_name = $term->name;
-            } else {
-                // If selected country is not Turkey/North Cyprus, default to both
-                $tax_query[] = array(
-                    'taxonomy' => 'sit-country',
-                    'field'    => 'term_id',
-                    'terms'    => $allowed_countries,
-                    'operator' => 'IN',
-                );
-            }
+            // Trust user selection if set
+            $target_country_ids = [$country];
+            $term = get_term($country);
+            $country_name = $term ? $term->name : '';
         } else {
-            // No specific country selected, default to Turkey and North Cyprus only
-            if (!empty($allowed_countries)) {
-                $tax_query[] = array(
-                    'taxonomy' => 'sit-country',
-                    'field'    => 'term_id',
-                    'terms'    => $allowed_countries,
-                    'operator' => 'IN',
-                );
-            }
+            // Default to Allowed (Turkey + NC)
+            $target_country_ids = $allowed_countries;
         }
 
+        // Prepare University Query Args to get Active Unis in Target Countries
+        $uni_args = array(
+            'post_type' => 'sit-university',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'fields' => 'ids',
+            'tax_query' => array(
+                array(
+                    'taxonomy' => 'sit-country',
+                    'field'    => 'term_id',
+                    'terms'    => $target_country_ids,
+                    'operator' => 'IN'
+                )
+            )
+        );
+
+        $potential_unis = get_posts($uni_args);
+        
+        $active_university_ids = array();
+        foreach($potential_unis as $uid) {
+             // Check ACF field for active in search
+             $is_active = get_field('Active_in_Search', $uid);
+             if($is_active == '1' || $is_active === true) {
+                 $active_university_ids[] = $uid;
+             }
+        }
+        
+        // Restore Speciality Filter
         if (!empty($speciality)) {
             $tax_query[] = array(
                 'taxonomy' => 'sit-speciality',
@@ -194,8 +203,7 @@ class FilterSort
             'compare' => 'EXISTS',
         );
 
-        // Optimised Active_in_Search check
-        $active_university_ids = CachedData::get_active_university_ids();
+        // Filter valid universities by country
         
         if (!empty($active_university_ids)) {
             $meta_query[] = array(
@@ -204,7 +212,7 @@ class FilterSort
                 'compare' => 'IN',
             );
         } else {
-            // No active universities found, return no results
+            // No active universities found in the selected country
             $meta_query[] = array(
                 'key'     => 'zh_university',
                 'value'   => array(-1),
