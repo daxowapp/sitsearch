@@ -371,6 +371,14 @@ jQuery(document).ready(function ($) {
     // Handle search functionality
     function handleSearch() {
         const searchValue = $('#search-university').val().trim();
+        if (searchValue.length > 1) {
+            // Trigger the global AI search that we will expose from ai-search.js
+            if (typeof window.performGlobalAiSearch === 'function') {
+                window.performGlobalAiSearch(searchValue);
+                return;
+            }
+        }
+        
         const currentUrl = new URL(window.location.href);
 
         if (searchValue) {
@@ -379,12 +387,12 @@ jQuery(document).ready(function ($) {
             currentUrl.searchParams.delete('search');
         }
 
-        // Navigate to new URL with search parameter
+        // Navigate to new URL with search parameter if AI search fails
         window.location.href = currentUrl.toString();
     }
 
     // Search button click handler
-    $(document).on('click', '.ProgramArchivePage-search-button', function (e) {
+    $(document).on('click', '.ProgramArchivePage-search-button, .results-search-btn', function (e) {
         e.preventDefault();
         handleSearch();
     });

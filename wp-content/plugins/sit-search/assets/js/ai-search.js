@@ -94,7 +94,16 @@ jQuery(document).ready(function($) {
             expandedTerms = localSynonyms[queryLower];
         } else {
             $('#sit-ai-loading').show();
-            $('#sit-ai-search-btn').prop('disabled', true).text('AI is thinking...');
+            
+            // Handle loading state for different button types
+            const shortcodeBtn = $('#sit-ai-search-btn');
+            if (shortcodeBtn.length) shortcodeBtn.prop('disabled', true).text('AI is thinking...');
+            
+            const resultsBtnText = $('.results-search-btn span');
+            if (resultsBtnText.length) resultsBtnText.text('Thinking...');
+            
+            const archiveBtn = $('.ProgramArchivePage-search-button');
+            if (archiveBtn.length) archiveBtn.prop('disabled', true).text('Thinking...');
             
             try {
                 const response = await $.get(sit_ai_search_vars.api_url + 'ai-search', { q: query });
@@ -112,4 +121,7 @@ jQuery(document).ready(function($) {
         const searchParam = expandedTerms.join(',');
         window.location.href = resultsUrl + '?search=' + encodeURIComponent(searchParam) + '&ai_query=' + encodeURIComponent(queryLower);
     }
+
+    // Expose globally so main.js can use it for archive page search inputs
+    window.performGlobalAiSearch = performAiSearch;
 });
