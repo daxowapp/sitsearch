@@ -555,7 +555,7 @@ class App
     public function setup_assets()
     {
         // Use plugin version for cache busting instead of time()
-        $plugin_version = '3.0.11'; // AI Search redirect
+        $plugin_version = '3.0.12'; // AI Search fix for archive integration
         
         //OwlCarousel2 - For all carousels
         //OwlCarousel2 - For all carousels

@@ -1,5 +1,4 @@
 jQuery(document).ready(function($) {
-    if ($('#sit-ai-search-input').length === 0) return;
 
     const localSynonyms = {
         'cs': ['computer science', 'software engineering', 'information technology'],
