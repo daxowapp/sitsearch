@@ -34,6 +34,7 @@ use SIT\Search\Shortcodes\CampusFaculties;
 use SIT\Search\Shortcodes\UniversityPrograms;
 use SIT\Search\Shortcodes\UniversityGrid;
 use SIT\Search\Shortcodes\AISearchAdmin;
+use SIT\Search\Shortcodes\AiSearch;
 use SIT\Search\Endpoints\ProgramEndpoint;
 use SIT\Search\Endpoints\CountryEndpoint;
 use SIT\Search\Endpoints\ProgramDataEndpoint;
