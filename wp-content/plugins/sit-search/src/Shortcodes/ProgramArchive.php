@@ -278,18 +278,25 @@ class ProgramArchive
 
         $university_ids = array();
 
-        if (!empty($search)) {
+        // Support comma-separated AI search terms (e.g. "computer science,software engineering,IT")
+        $search_terms = !empty($search) ? array_map('trim', explode(',', $search)) : [];
+
+        if (!empty($search_terms)) {
+            // Build university meta query for ALL search terms
+            $uni_meta_conditions = ['relation' => 'OR'];
+            foreach ($search_terms as $term) {
+                $uni_meta_conditions[] = [
+                    'key'     => 'Account_Name',
+                    'value'   => $term,
+                    'compare' => 'LIKE',
+                ];
+            }
+
             $university_query = new \WP_Query(array(
                 'post_type'      => 'sit-university',
                 'posts_per_page' => -1,
                 'post_status'    => 'publish',
-                'meta_query'     => array(
-                    array(
-                        'key'     => 'Account_Name',
-                        'value'   => $search,
-                        'compare' => 'LIKE',
-                    ),
-                ),
+                'meta_query'     => [$uni_meta_conditions],
                 'fields'         => 'ids',
             ));
 
@@ -298,20 +305,27 @@ class ProgramArchive
             }
         }
 
-        if (!empty($search)) {
-            $meta_query[] = array(
-                'relation' => 'OR',
-                array(
+        if (!empty($search_terms)) {
+            // Build program meta query for ALL search terms
+            $program_search_conditions = ['relation' => 'OR'];
+            
+            if (!empty($university_ids)) {
+                $program_search_conditions[] = [
                     'key'     => 'zh_university',
                     'value'   => $university_ids,
                     'compare' => 'IN',
-                ),
-                array(
+                ];
+            }
+
+            foreach ($search_terms as $term) {
+                $program_search_conditions[] = [
                     'key'     => 'Product_Name',
-                    'value'   => $search,
+                    'value'   => $term,
                     'compare' => 'LIKE',
-                ),
-            );
+                ];
+            }
+
+            $meta_query[] = $program_search_conditions;
         }
 
         $args = array(

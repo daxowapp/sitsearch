@@ -555,7 +555,7 @@ class App
     public function setup_assets()
     {
         // Use plugin version for cache busting instead of time()
-        $plugin_version = '3.0.10'; // Cache busting
+        $plugin_version = '3.0.11'; // AI Search redirect
         
         //OwlCarousel2 - For all carousels
         //OwlCarousel2 - For all carousels
@@ -574,7 +574,8 @@ class App
         
         wp_enqueue_script('sit-ai-search', STI_SEARCH_URL . 'assets/js/ai-search.js', ['jquery'], $plugin_version, true);
         wp_localize_script('sit-ai-search', 'sit_ai_search_vars', [
-            'api_url' => rest_url('sit-search/v1/')
+            'api_url' => rest_url('sit-search/v1/'),
+            'results_url' => home_url('/results/')
         ]);
         
         // Remove duplicate jQuery - WordPress already loads it
