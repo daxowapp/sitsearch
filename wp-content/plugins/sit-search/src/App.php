@@ -88,6 +88,7 @@ class App
         'search_program' => SearchProgram::class,
         'university_grid' => UniversityGrid::class,
         'ai_search_admin' => AISearchAdmin::class,
+        'sit_ai_search' => AiSearch::class,
     );
 
     public function register_endpoints(): void
@@ -104,6 +105,8 @@ class App
             (new Endpoints\SpecialityEndpoint)->register_routes();
             (new Endpoints\CityEndpoint)->register_routes();
             (new Endpoints\SearchEndpoint)->register_routes();
+            (new Endpoints\AiSearchEndpoint)->register_routes();
+            (new Endpoints\AiSearchIndexEndpoint)->register_routes();
         });
     }
 
@@ -128,6 +131,9 @@ class App
 
         // Initialize University Status Admin page
         new \SIT\Search\Actions\UniversityStatusAdmin();
+
+        // Initialize AI Settings Admin page
+        new \SIT\Search\Actions\AiSettingsAdmin();
 
         $this->setup_hooks();
         $this->setup_shortcodes();
@@ -564,6 +570,11 @@ class App
         wp_enqueue_style('sit-featured', STI_SEARCH_URL . 'assets/css/featured.css', [], $plugin_version);
         wp_enqueue_style('guides-css', STI_SEARCH_URL . 'assets/css/guides.css', [], $plugin_version);
         wp_enqueue_script('sit-search', STI_SEARCH_URL . 'assets/js/main.js', ['jquery', 'sit-owl-carousel', 'sit-select2'], $plugin_version, true);
+        
+        wp_enqueue_script('sit-ai-search', STI_SEARCH_URL . 'assets/js/ai-search.js', ['jquery'], $plugin_version, true);
+        wp_localize_script('sit-ai-search', 'sit_ai_search_vars', [
+            'api_url' => rest_url('sit-search/v1/')
+        ]);
         
         // Remove duplicate jQuery - WordPress already loads it
         // wp_enqueue_script('ajax-js', 'https://code.jquery.com/jquery-3.6.4.min.js'); // REMOVED - duplicate

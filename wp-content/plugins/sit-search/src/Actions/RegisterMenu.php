@@ -43,11 +43,25 @@ class RegisterMenu extends Hook
             'sit-search-mapping',
             array($this, 'mappingPage')
         );
+        // AI Search Settings Page
+        add_submenu_page(
+            'sit-search',
+            'AI Search Settings',
+            'AI Search',
+            'manage_options',
+            'sit-search-ai-settings',
+            array($this, 'aiSettingsPage')
+        );
     }
 
     public function menuPage()
     {
         (new Dashboard())->render();
+    }
+
+    public function aiSettingsPage()
+    {
+        Template::render('admin/ai-settings');
     }
 
     public function mappingPage()
