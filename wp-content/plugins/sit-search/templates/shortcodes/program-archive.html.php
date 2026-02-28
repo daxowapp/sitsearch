@@ -18,7 +18,7 @@ $filter_data = [
 
 // Set page-specific variables
 $results_count = isset($query) ? $query->found_posts : 0;
-$search_value = isset($_GET['search']) ? $_GET['search'] : '';
+$search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']) : (isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '');
 ?>
 
 <div class="program-archive-wrapper">
@@ -719,7 +719,7 @@ $search_value = isset($_GET['search']) ? $_GET['search'] : '';
                     <div class="ProgramArchivePage-search-wrapper">
                         <div class="ProgramArchivePage-search-input">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                            <input type="text" id="search-university" value="<?= isset($_GET['search']) ? esc_attr($_GET['search']) : '' ?>" placeholder="Search by name..." />
+                            <input type="text" id="search-university" value="<?= esc_attr($search_value) ?>" placeholder="Search by name..." />
                             <button class="ProgramArchivePage-search-button">Go</button>
                         </div>
                     </div>

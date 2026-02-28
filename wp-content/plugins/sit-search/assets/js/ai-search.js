@@ -110,6 +110,6 @@ jQuery(document).ready(function($) {
 
         // Redirect to results page with expanded search terms
         const searchParam = expandedTerms.join(',');
-        window.location.href = resultsUrl + '?search=' + encodeURIComponent(searchParam);
+        window.location.href = resultsUrl + '?search=' + encodeURIComponent(searchParam) + '&ai_query=' + encodeURIComponent(queryLower);
     }
 });

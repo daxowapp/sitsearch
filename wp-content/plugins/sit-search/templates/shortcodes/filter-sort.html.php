@@ -45,7 +45,7 @@ if ($speciality_valid && $degree_valid && $country_valid) {
 <?php
 // Prepare data for shared templates
 $results_count = isset($query) ? $query->found_posts : 0;
-$search_value = isset($_GET['search']) ? $_GET['search'] : '';
+$search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']) : (isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '');
 
 // Configure which filters to show for this page
 $filter_config = [
@@ -80,7 +80,7 @@ $filter_data = [
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.3-4.3"></path>
                 </svg>
-                <input type="text" id="search-university" class="results-search-input" value="<?= isset($_GET['search']) ? esc_attr($_GET['search']) : '' ?>" placeholder="Search programs, universities..." />
+                <input type="text" id="search-university" class="results-search-input" value="<?= esc_attr($search_value) ?>" placeholder="Search programs, universities..." />
                 <button class="results-search-btn">
                     <span>Search</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

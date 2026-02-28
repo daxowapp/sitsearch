@@ -325,40 +325,45 @@ class FilterSort
 
 
 
-        if (!empty($search) && (!empty($type) && $type != 'All')) {
+        $search_terms = !empty($search) ? array_map('trim', explode(',', $search)) : [];
+        $program_search_conditions = ['relation' => 'OR'];
+        if (!empty($search_terms)) {
+            foreach ($search_terms as $term) {
+                $program_search_conditions[] = [
+                    'key'     => 'Product_Name',
+                    'value'   => $term,
+                    'compare' => 'LIKE',
+                ];
+            }
+        }
 
+        $safe_uni_ids = empty($university_ids) ? [-1] : $university_ids;
+
+        if (!empty($search_terms) && (!empty($type) && $type != 'All')) {
             $meta_query[] = array(
                 'relation' => 'AND',
                 array(
                     'key'     => 'zh_university',
-                    'value'   => $university_ids,
+                    'value'   => $safe_uni_ids,
                     'compare' => 'IN',
                 ),
-                array(
-                    'key'     => 'Product_Name',
-                    'value'   => $search,
-                    'compare' => 'LIKE',
-                ),
+                $program_search_conditions,
             );
-        } elseif(empty($search) && (!empty($type) && $type != 'All')){
+        } elseif(empty($search_terms) && (!empty($type) && $type != 'All')){
             $meta_query[] = array(
                 'key'     => 'zh_university',
-                'value'   => $university_ids,
+                'value'   => $safe_uni_ids,
                 'compare' => 'IN',
             );
-        } elseif(!empty($search) && empty($type)){
+        } elseif(!empty($search_terms) && empty($type)){
             $meta_query[] = array(
                 'relation' => 'OR',
                 array(
                     'key'     => 'zh_university',
-                    'value'   => $university_ids,
+                    'value'   => $safe_uni_ids,
                     'compare' => 'IN',
                 ),
-                array(
-                    'key'     => 'Product_Name',
-                    'value'   => $search,
-                    'compare' => 'LIKE',
-                ),
+                $program_search_conditions,
             );
         } 
 
@@ -1150,18 +1155,24 @@ class FilterSort
             $zh_university_values = array_unique($zh_university_values);
         }
         if (!empty($zh_university_values)) {
+            $search_terms = !empty($search) ? array_map('trim', explode(',', $search)) : [];
+            $uni_meta_conditions = ['relation' => 'OR'];
+            if (!empty($search_terms)) {
+                foreach ($search_terms as $term) {
+                    $uni_meta_conditions[] = [
+                        'key'     => 'Account_Name',
+                        'value'   => $term,
+                        'compare' => 'LIKE',
+                    ];
+                }
+            }
+
             $university_query = new \WP_Query(array(
                 'post_type'      => 'sit-university',
                 'posts_per_page' => -1,
                 'post_status'    => 'publish',
                 'post__in'       => $zh_university_values,
-                'meta_query'     => array(
-                    array(
-                        'key'     => 'Account_Name',
-                        'value'   => $search,
-                        'compare' => 'LIKE',
-                    ),
-                ),
+                'meta_query'     => array($uni_meta_conditions),
                 'fields'         => 'ids',
             ));
 
