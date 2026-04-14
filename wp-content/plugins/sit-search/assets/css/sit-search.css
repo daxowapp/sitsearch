@@ -7037,12 +7037,37 @@ a.uni-link:hover {
   transform: translateX(3px);
 }
 
-/* Keyword Search Styling */
-.uni-keyword-search {
+/* Keyword Search & Filters Styling */
+.uni-filters {
+  display: flex;
   margin-bottom: 20px;
+  gap: 16px;
+  align-items: center;
+}
+
+.uni-level-filter select {
+  height: 48px;
+  padding: 0 15px;
+  border-radius: 8px;
+  border: 1px solid #e6eaf1;
+  background-color: white;
+  color: #1a1a1a;
+  font-size: 15px;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+  width: 200px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s ease;
+}
+
+.uni-level-filter select:focus {
+  border-color: var(--uni-primary, #e20a17);
+  box-shadow: 0 4px 15px rgba(226, 10, 23, 0.1);
 }
 
 .uni-search-input {
+  flex: 1;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -7249,6 +7274,15 @@ a.uni-link:hover {
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .uni-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .uni-level-filter select {
+    width: 100%;
+  }
+
   .uni-program-row {
     flex-direction: column;
     align-items: flex-start;

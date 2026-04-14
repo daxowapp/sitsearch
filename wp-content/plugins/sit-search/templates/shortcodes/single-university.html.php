@@ -238,14 +238,23 @@ $location_str    = $city ? "$city, $country" : $country;
       </div>
 
       <div class="up-card-body">
-        <!-- Keyword Search -->
-        <div class="uni-keyword-search">
+        <!-- Keyword Search & Level Filter -->
+        <div class="uni-filters">
           <div class="uni-search-input">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             <input type="text" id="programKeyword" placeholder="Search programs by keyword...">
             <button id="clearSearchBtn" class="uni-clear-search">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
+          </div>
+          <div class="uni-level-filter">
+             <select id="programLevel">
+               <option value="">All Levels</option>
+               <option value="associate">Associate</option>
+               <option value="bachelor">Bachelor</option>
+               <option value="master">Master</option>
+               <option value="phd">PhD / Doctorate</option>
+             </select>
           </div>
         </div>
 
@@ -589,13 +598,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function updateProgramDisplay() {
     const keyword = keywordInput ? keywordInput.value.toLowerCase().trim() : '';
+    const levelSelect = document.getElementById('programLevel');
+    const selectedLevel = levelSelect ? levelSelect.value : '';
+    
     let vis = 0;
     programCards.forEach(card => {
       const title = card.querySelector('.upr-title').textContent.toLowerCase();
+      const badgeElem = card.querySelector('.upr-level-badge');
+      const cardLevel = badgeElem ? badgeElem.textContent.toLowerCase().trim() : '';
       const pg = parseInt(card.dataset.page);
-      const match = keyword === '' || title.includes(keyword);
-      if (match) {
-        if (keyword !== '' || pg === currentPage) { card.style.display = ''; vis++; }
+      
+      const keywordMatch = keyword === '' || title.includes(keyword);
+      
+      let levelMatch = true;
+      if (selectedLevel !== '') {
+        if (selectedLevel === 'phd' && (cardLevel.includes('phd') || cardLevel.includes('doctor'))) {
+            levelMatch = true;
+        } else {
+            levelMatch = cardLevel.includes(selectedLevel);
+        }
+      }
+
+      if (keywordMatch && levelMatch) {
+        if ((keyword !== '' || selectedLevel !== '') || pg === currentPage) { card.style.display = ''; vis++; }
         else { card.style.display = 'none'; }
       } else { card.style.display = 'none'; }
     });
@@ -603,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (programCards.length > 0 && vis === 0) { if (noResultsMessage) noResultsMessage.style.display = 'block'; }
     else { if (noResultsMessage) noResultsMessage.style.display = 'none'; }
     const pagination = document.querySelector('.uni-pagination');
-    if (pagination) pagination.style.display = keyword !== '' ? 'none' : '';
+    if (pagination) pagination.style.display = (keyword !== '' || selectedLevel !== '') ? 'none' : '';
     updatePaginationState();
   }
 
@@ -624,8 +649,24 @@ document.addEventListener('DOMContentLoaded', function() {
     keywordInput.addEventListener('input', updateProgramDisplay);
     keywordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); updateProgramDisplay(); } });
   }
-  if (clearSearchBtn) clearSearchBtn.addEventListener('click', function() { keywordInput.value = ''; updateProgramDisplay(); });
-  if (clearSearch) clearSearch.addEventListener('click', function() { keywordInput.value = ''; updateProgramDisplay(); });
+  
+  const levelSelect = document.getElementById('programLevel');
+  if (levelSelect) {
+      levelSelect.addEventListener('change', function() {
+          updateProgramDisplay();
+      });
+  }
+
+  if (clearSearchBtn) clearSearchBtn.addEventListener('click', function() { 
+      keywordInput.value = ''; 
+      if(levelSelect) levelSelect.value = '';
+      updateProgramDisplay(); 
+  });
+  if (clearSearch) clearSearch.addEventListener('click', function() { 
+      keywordInput.value = ''; 
+      if(levelSelect) levelSelect.value = '';
+      updateProgramDisplay(); 
+  });
   if (prevPageBtn) prevPageBtn.addEventListener('click', function() { if (currentPage > 1) changePage(currentPage - 1); });
   if (nextPageBtn) nextPageBtn.addEventListener('click', function() { if (currentPage < maxPage) changePage(currentPage + 1); });
 
