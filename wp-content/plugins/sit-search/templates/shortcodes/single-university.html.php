@@ -13,6 +13,7 @@ $year_founded    = !empty($program['Year_Founded']) ? $program['Year_Founded'] :
 $total_students  = !empty($program['total_students']) ? $program['total_students'] : '';
 $ranking         = !empty($program['ranking']) ? $program['ranking'] : '--';
 $image_url       = !empty($program['image_url']) ? $program['image_url'] : '';
+$uni_logo        = !empty($program['uni_logo']) ? $program['uni_logo'] : '';
 $brochure_url    = !empty($program['University_brochure']) ? $program['University_brochure'] : '';
 $uni_id          = !empty($program['unic_id']) ? $program['unic_id'] : '';
 $location_str    = $city ? "$city, $country" : $country;
@@ -24,7 +25,14 @@ $location_str    = $city ? "$city, $country" : $country;
 <div class="up-hero">
   <div class="up-hero-inner">
     <div class="up-hero-text">
-      <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
+      <div class="up-hero-title-wrapper">
+        <?php if ($uni_logo): ?>
+        <div class="up-hero-logo">
+          <img src="<?= esc_url($uni_logo) ?>" alt="<?= esc_attr($title) ?> Logo">
+        </div>
+        <?php endif; ?>
+        <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
+      </div>
 
       <?php if ($location_str): ?>
       <div class="up-hero-location">

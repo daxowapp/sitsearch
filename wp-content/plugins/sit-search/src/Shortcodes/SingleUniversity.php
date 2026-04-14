@@ -36,11 +36,15 @@ class SingleUniversity
                 esc_url(get_post_meta($current_post_id, 'uni_image', true))
                 :'https://placehold.co/714x340?text=University',
             'Year_Founded'=>get_post_meta($current_post_id, 'Year_Founded', true),
+            'uni_logo'=>!empty(get_post_meta($current_post_id, 'uni_logo', true))  ?
+                esc_url(get_post_meta($current_post_id, 'uni_logo', true))
+                : '',
         ];
 
         $other_args = array(
             'post_type'      => 'sit-program',
             'posts_per_page' => -1, // Get all posts
+            'no_found_rows'  => true,
             'post_status'    => 'publish',
             'meta_key'       => 'zh_university',
             'meta_value'     => $current_post_id,
@@ -48,8 +52,19 @@ class SingleUniversity
         $uni_query = new \WP_Query($other_args);
         $universities = $uni_query->get_posts();
 
-        $universities = array_map(function ($university) {
-            $oth_uniid = get_post_meta($university->ID, 'zh_university', true);
+        // Pre-warm caches to prevent N+1 queries during mapping
+        $uni_post_ids = wp_list_pluck($universities, 'ID');
+        if (!empty($uni_post_ids)) {
+            update_meta_cache('post', $uni_post_ids);
+            update_object_term_cache($uni_post_ids, ['sit-degree', 'sit-language', 'sit-country']);
+
+            // since all programs belong to $current_post_id (which is a university),
+            // $oth_uniid in the loop will just be $current_post_id. We can prime its terms just in case.
+            update_object_term_cache([$current_post_id], 'sit-city');
+        }
+
+        $universities = array_map(function ($university) use ($current_post_id) {
+            $oth_uniid = get_post_meta($university->ID, 'zh_university', true) ?: $current_post_id;
             $degree_terms = get_the_terms($university->ID, 'sit-degree');
             $language_terms = get_the_terms($university->ID, 'sit-language');
             $country_terms = get_the_terms($university->ID, 'sit-country');
@@ -89,6 +104,7 @@ class SingleUniversity
         $campus_args = array(
             'post_type'      => 'sit-campus',
             'posts_per_page' => -1, // Get all posts
+            'no_found_rows'  => true,
             'post_status'    => 'publish',
             'meta_key'       => 'zh_university',
             'meta_value'     => $current_post_id,
@@ -96,8 +112,14 @@ class SingleUniversity
         $campus_query = new \WP_Query($campus_args);
         $campuses = $campus_query->get_posts();
 
-        $campuses = array_map(function ($campus) {
-            $uniid=get_post_meta($campus->ID, 'zh_university', true);
+        // Pre-warm caches for campuses
+        $campus_post_ids = wp_list_pluck($campuses, 'ID');
+        if (!empty($campus_post_ids)) {
+            update_meta_cache('post', $campus_post_ids);
+        }
+
+        $campuses = array_map(function ($campus) use ($current_post_id) {
+            $uniid = get_post_meta($campus->ID, 'zh_university', true) ?: $current_post_id;
             $country_terms = get_the_terms($uniid, 'sit-country');
             return [
                 'cam_id' => $campus->ID,
