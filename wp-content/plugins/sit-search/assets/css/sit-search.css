@@ -9909,3 +9909,136 @@ details[open] > .programPage-faq-question .programPage-faq-chevron {
         font-size: 13px;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROGRAM ARCHIVE — Grid Layout Fix for ProgramBoxUni Cards
+   ═══════════════════════════════════════════════════════════════ */
+
+.all-faculties-program {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 20px !important;
+}
+
+@media (max-width: 768px) {
+    .all-faculties-program {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER SIDEBAR — Show More / Show Less Toggle
+   ═══════════════════════════════════════════════════════════════ */
+
+.filter-show-more-items {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.filter-show-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 0;
+    border: none;
+    background: transparent;
+    color: #E20A17;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    margin-top: 4px;
+}
+
+.filter-show-more-btn:hover {
+    color: #c8090f;
+    text-decoration: underline;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER SIDEBAR — Button Group (Duration, Scholarship pills)
+   ═══════════════════════════════════════════════════════════════ */
+
+.filter-button-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.filter-button {
+    padding: 7px 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 100px;
+    background: #fff;
+    color: #6c757d;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+    border-color: #E20A17;
+    color: #E20A17;
+    background: #fff5f5;
+}
+
+.filter-button.active {
+    background: #E20A17;
+    color: #fff;
+    border-color: #E20A17;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FILTER SIDEBAR — Price Range Inputs
+   ═══════════════════════════════════════════════════════════════ */
+
+.price-range-inputs {
+    display: flex;
+    gap: 12px;
+}
+
+.price-input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.price-input-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.price-input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.price-input:focus {
+    border-color: #E20A17;
+}
+
+.price-input::placeholder {
+    color: #adb5bd;
+}
+
+/* Hide number input spinners */
+.price-input::-webkit-outer-spin-button,
+.price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.price-input[type=number] {
+    -moz-appearance: textfield;
+}

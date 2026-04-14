@@ -575,27 +575,43 @@ $search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : 
             <div class="filter-options">
                 <?php
                 $selected_degrees = isset($_GET['level']) ? (is_array($_GET['level']) ? $_GET['level'] : [$_GET['level']]) : [];
+                $primary_degrees = ['Bachelor', 'Master', 'PhD'];
+                $degree_list = (isset($all_degrees) && !empty($all_degrees)) ? $all_degrees : get_terms(['taxonomy' => 'sit-degree', 'hide_empty' => false]);
+                $other_count = 0;
                 
-                if (isset($all_degrees) && !empty($all_degrees)) {
-                    foreach ($all_degrees as $degree_term) {
-                        $is_checked = in_array($degree_term->term_id, $selected_degrees) ? 'checked' : '';
-                        $active_class = in_array($degree_term->term_id, $selected_degrees) ? 'active' : '';
-                        echo '<label class="filter-checkbox-label ' . $active_class . '">';
-                        echo '<input type="checkbox" class="degree-checkbox" value="' . esc_attr($degree_term->term_id) . '" ' . $is_checked . '>';
-                        echo '<span class="filter-checkbox-text">' . esc_html($degree_term->name) . '</span>';
-                        echo '</label>';
-                    }
-                } else {
-                    $fallback_degrees = get_terms(['taxonomy' => 'sit-degree', 'hide_empty' => false]);
-                    if (!empty($fallback_degrees)) {
-                        foreach ($fallback_degrees as $degree_term) {
+                if (!empty($degree_list)) {
+                    // Primary degrees first
+                    foreach ($degree_list as $degree_term) {
+                        if (in_array($degree_term->name, $primary_degrees)) {
                             $is_checked = in_array($degree_term->term_id, $selected_degrees) ? 'checked' : '';
                             $active_class = in_array($degree_term->term_id, $selected_degrees) ? 'active' : '';
                             echo '<label class="filter-checkbox-label ' . $active_class . '">';
                             echo '<input type="checkbox" class="degree-checkbox" value="' . esc_attr($degree_term->term_id) . '" ' . $is_checked . '>';
                             echo '<span class="filter-checkbox-text">' . esc_html($degree_term->name) . '</span>';
                             echo '</label>';
+                        } else {
+                            $other_count++;
                         }
+                    }
+                    
+                    // Other degrees in collapsible section
+                    if ($other_count > 0) {
+                        echo '<div class="filter-show-more-items" id="degreeShowMoreItems" style="display: none;">';
+                        foreach ($degree_list as $degree_term) {
+                            if (!in_array($degree_term->name, $primary_degrees)) {
+                                $is_checked = in_array($degree_term->term_id, $selected_degrees) ? 'checked' : '';
+                                $active_class = in_array($degree_term->term_id, $selected_degrees) ? 'active' : '';
+                                echo '<label class="filter-checkbox-label ' . $active_class . '">';
+                                echo '<input type="checkbox" class="degree-checkbox" value="' . esc_attr($degree_term->term_id) . '" ' . $is_checked . '>';
+                                echo '<span class="filter-checkbox-text">' . esc_html($degree_term->name) . '</span>';
+                                echo '</label>';
+                            }
+                        }
+                        echo '</div>';
+                        echo '<button type="button" class="filter-show-more-btn" onclick="toggleShowMore(this, \'degreeShowMoreItems\')">';
+                        echo '<span class="show-more-text">Show more (' . $other_count . ')</span>';
+                        echo '<span class="show-less-text" style="display:none;">Show less</span>';
+                        echo '</button>';
                     }
                 }
                 ?>
@@ -632,18 +648,44 @@ $search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : 
             <div class="filter-options">
                 <?php
                 $selected_languages = isset($_GET['language']) ? (is_array($_GET['language']) ? $_GET['language'] : [$_GET['language']]) : [];
+                $primary_languages = ['English', 'Turkish'];
+                $lang_other_count = 0;
                 
                 if (isset($available_languages) && !empty($available_languages)) {
+                    // Primary languages first
                     foreach ($available_languages as $lang_term) {
-                        $is_checked = in_array($lang_term->name, $selected_languages) ? 'checked' : '';
-                        $active_class = in_array($lang_term->name, $selected_languages) ? 'active' : '';
-                        echo '<label class="filter-checkbox-label ' . $active_class . '">';
-                        echo '<input type="checkbox" class="language-checkbox" value="' . esc_attr($lang_term->name) . '" ' . $is_checked . '>';
-                        echo '<span class="filter-checkbox-text">' . esc_html($lang_term->name) . '</span>';
-                        echo '</label>';
+                        if (in_array($lang_term->name, $primary_languages)) {
+                            $is_checked = in_array($lang_term->name, $selected_languages) ? 'checked' : '';
+                            $active_class = in_array($lang_term->name, $selected_languages) ? 'active' : '';
+                            echo '<label class="filter-checkbox-label ' . $active_class . '">';
+                            echo '<input type="checkbox" class="language-checkbox" value="' . esc_attr($lang_term->name) . '" ' . $is_checked . '>';
+                            echo '<span class="filter-checkbox-text">' . esc_html($lang_term->name) . '</span>';
+                            echo '</label>';
+                        } else {
+                            $lang_other_count++;
+                        }
+                    }
+                    
+                    // Other languages in collapsible section
+                    if ($lang_other_count > 0) {
+                        echo '<div class="filter-show-more-items" id="languageShowMoreItems" style="display: none;">';
+                        foreach ($available_languages as $lang_term) {
+                            if (!in_array($lang_term->name, $primary_languages)) {
+                                $is_checked = in_array($lang_term->name, $selected_languages) ? 'checked' : '';
+                                $active_class = in_array($lang_term->name, $selected_languages) ? 'active' : '';
+                                echo '<label class="filter-checkbox-label ' . $active_class . '">';
+                                echo '<input type="checkbox" class="language-checkbox" value="' . esc_attr($lang_term->name) . '" ' . $is_checked . '>';
+                                echo '<span class="filter-checkbox-text">' . esc_html($lang_term->name) . '</span>';
+                                echo '</label>';
+                            }
+                        }
+                        echo '</div>';
+                        echo '<button type="button" class="filter-show-more-btn" onclick="toggleShowMore(this, \'languageShowMoreItems\')">';
+                        echo '<span class="show-more-text">Show more (' . $lang_other_count . ')</span>';
+                        echo '<span class="show-less-text" style="display:none;">Show less</span>';
+                        echo '</button>';
                     }
                 } else {
-                    // Fallback: If available_languages is not set, show message
                     echo '<p style="color: #666; font-size: 14px; font-style: italic;">No languages found in current results.</p>';
                 }
                 ?>
@@ -1516,6 +1558,22 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleMobileFilters() {
     const sidebar = document.getElementById('filterSidebar');
     sidebar.classList.toggle('mobile-hidden');
+}
+
+// Toggle show more/less in filter sections
+function toggleShowMore(btn, targetId) {
+    const target = document.getElementById(targetId);
+    const moreText = btn.querySelector('.show-more-text');
+    const lessText = btn.querySelector('.show-less-text');
+    if (target.style.display === 'none') {
+        target.style.display = 'flex';
+        moreText.style.display = 'none';
+        lessText.style.display = 'inline';
+    } else {
+        target.style.display = 'none';
+        moreText.style.display = 'inline';
+        lessText.style.display = 'none';
+    }
 }
 
 // Update applied filters display in sidebar
