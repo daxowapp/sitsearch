@@ -6164,20 +6164,21 @@ a.uni-link:hover {
   flex-wrap: wrap;
 }
 
-.up-hero-text { flex: 1; min-width: 0; }
-
-.up-hero-title-wrapper {
+.up-hero-profile {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 12px;
+  gap: 24px;
+  flex: 1;
+  min-width: 0;
 }
 
+.up-hero-text { flex: 1; min-width: 0; }
+
 .up-hero-logo {
-  width: 64px;
-  height: 64px;
+  width: 96px;
+  height: 96px;
   flex-shrink: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   overflow: hidden;
   background: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.06);
@@ -6185,6 +6186,7 @@ a.uni-link:hover {
   align-items: center;
   justify-content: center;
   border: 1px solid #f1f3f5;
+  padding: 8px; /* Give some breathing room to the logo */
 }
 
 .up-hero-logo img {
@@ -6678,6 +6680,8 @@ a.uni-link:hover {
 
 @media (max-width: 768px) {
   .up-hero-inner { flex-direction: column; align-items: flex-start; }
+  .up-hero-profile { gap: 16px; }
+  .up-hero-logo { width: 80px; height: 80px; border-radius: 14px; }
   .up-hero-title { font-size: 28px; }
   .up-hero-actions { width: 100%; flex-direction: column; }
   .up-btn-apply, .up-btn-secondary { width: 100%; justify-content: center; }
@@ -6688,6 +6692,8 @@ a.uni-link:hover {
 
 @media (max-width: 480px) {
   .up-hero { padding: 32px 0 28px; }
+  .up-hero-profile { gap: 12px; }
+  .up-hero-logo { width: 64px; height: 64px; border-radius: 12px; padding: 6px; }
   .up-hero-title { font-size: 24px; }
   .up-stats-grid { grid-template-columns: 1fr; }
   .up-card-heading { font-size: 16px; padding: 16px 18px; }

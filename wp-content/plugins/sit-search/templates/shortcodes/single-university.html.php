@@ -24,15 +24,16 @@ $location_str    = $city ? "$city, $country" : $country;
      ══════════════════════════════════════════════ -->
 <div class="up-hero">
   <div class="up-hero-inner">
-    <div class="up-hero-text">
-      <div class="up-hero-title-wrapper">
-        <?php if ($uni_logo): ?>
-        <div class="up-hero-logo">
-          <img src="<?= esc_url($uni_logo) ?>" alt="<?= esc_attr($title) ?> Logo" onerror="this.onerror=null; this.src='https://placehold.co/64x64?text=U';">
-        </div>
-        <?php endif; ?>
-        <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
+    <!-- Logo & Text Row -->
+    <div class="up-hero-profile">
+      <?php if ($uni_logo): ?>
+      <div class="up-hero-logo">
+        <img src="<?= esc_url($uni_logo) ?>" alt="<?= esc_attr($title) ?> Logo" onerror="this.onerror=null; this.src='https://placehold.co/128x128?text=U';">
       </div>
+      <?php endif; ?>
+
+      <div class="up-hero-text">
+        <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
 
       <?php if ($location_str): ?>
       <div class="up-hero-location">
@@ -51,7 +52,8 @@ $location_str    = $city ? "$city, $country" : $country;
         <?php endif; ?>
         <span class="up-pill"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg> QS #<?= esc_html($ranking) ?></span>
       </div>
-    </div>
+      </div>
+    </div> <!-- /up-hero-profile -->
 
     <div class="up-hero-actions">
       <button class="up-btn-apply trigger-modal">
