@@ -28,7 +28,7 @@ $location_str    = $city ? "$city, $country" : $country;
       <div class="up-hero-title-wrapper">
         <?php if ($uni_logo): ?>
         <div class="up-hero-logo">
-          <img src="<?= esc_url($uni_logo) ?>" alt="<?= esc_attr($title) ?> Logo">
+          <img src="<?= esc_url($uni_logo) ?>" alt="<?= esc_attr($title) ?> Logo" onerror="this.onerror=null; this.src='https://placehold.co/64x64?text=U';">
         </div>
         <?php endif; ?>
         <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
