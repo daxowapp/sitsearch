@@ -18,7 +18,7 @@ $filter_data = [
 
 // Set page-specific variables
 $results_count = isset($query) ? $query->found_posts : 0;
-$search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']) : (isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '');
+$search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
 ?>
 
 <div class="program-archive-wrapper">
@@ -46,9 +46,12 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
 .filter-sidebar {
     width: 280px !important;
     min-width: 280px !important;
-    background: #fff !important;
-    border-radius: 12px !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+    background: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(24px) !important;
+    -webkit-backdrop-filter: blur(24px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: var(--sit-radius-xl, 24px) !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.05) !important;
     padding: 0 !important;
     height: calc(100vh - 40px) !important;
     position: sticky !important;
@@ -720,7 +723,12 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
                         <div class="ProgramArchivePage-search-input">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                             <input type="text" id="search-university" value="<?= esc_attr($search_value) ?>" placeholder="Search by name..." />
-                            <button class="ProgramArchivePage-search-button">Go</button>
+                            <button class="ProgramArchivePage-search-button">
+                                <span class="btn-text">Go</span>
+                                <div class="sit-btn-dots">
+                                    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                                </div>
+                            </button>
                         </div>
                     </div>
                     
@@ -804,8 +812,13 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
         <!-- Program Results Grid -->
         <div class="all-faculties-program" id="programsGridContainer">
             <?php
+            $anim_index = 0;
             foreach ($programs as $university) {
-                \SIT\Search\Services\Template::render('shortcodes/program-box-uni', ['program' => $university]);
+                \SIT\Search\Services\Template::render('shortcodes/program-box-uni', [
+                    'program' => $university, 
+                    'animation_delay' => ($anim_index * 100) . 'ms'
+                ]);
+                $anim_index++;
             }
             ?>
         </div>
@@ -813,11 +826,14 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
         <!-- LIST VIEW (Moved from bottom) -->
         <div class="all-faculties-program-list" id="programsListContainer" style="display: none;">
             <?php
+            $anim_index = 0;
             foreach ($programs as $university) {
                 // Use the same program data structure as your grid view
                 $program = $university;
+                $delay = ($anim_index * 100) . 'ms';
+                $anim_index++;
                 ?>
-                <div class="program-list-item">
+                <div class="program-list-item sit-reveal" style="transition-delay: <?php echo esc_attr($delay); ?>">
                     <div class="program-list-image">
                         <?php if (!empty($program['image_url'])): ?>
                             <img src="<?php echo $program['image_url']; ?>" alt="<?php echo $program['title']; ?>">
@@ -833,7 +849,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
                             
                             <div class="program-list-details">
                                 <span class="program-list-detail">
-                                    🕒 <?php echo $program['duration']; ?>
+                                    🕒 <?php echo !empty($program['duration']) ? (is_numeric($program['duration']) ? $program['duration'].' Years' : $program['duration']) : 'Not specified'; ?>
                                 </span>
                                 <span class="program-list-detail">
                                     🌐 <?php 
@@ -865,10 +881,10 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
                         <div class="program-list-right">
                             <div class="program-list-fee">
                                 <?php if (!empty($program['discounted_fee'])): ?>
-                                    <span class="program-list-original-fee"><?php echo $program['fee']; ?> USD</span>
-                                    <span class="program-list-discounted-fee"><?php echo $program['discounted_fee']; ?> USD</span>
+                                    <span class="program-list-original-fee"><?php echo $program['fee']; ?> <?php echo isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD'; ?></span>
+                                    <span class="program-list-discounted-fee"><?php echo $program['discounted_fee']; ?> <?php echo isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD'; ?></span>
                                 <?php else: ?>
-                                    <span class="program-list-current-fee"><?php echo $program['fee']; ?> USD</span>
+                                    <span class="program-list-current-fee"><?php echo !empty($program['fee']) ? $program['fee'] . ' ' . (isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD') : 'Contact University'; ?></span>
                                 <?php endif; ?>
                             </div>
                             
@@ -962,7 +978,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
 </div>
 
 <!-- Export Popup -->
-<div class="export-overlay" id="exportModal">
+<div class="export-overlay" id="exportModal" style="display: none;">
     <div class="export-popup">
         <div class="export-header">
             <div class="headers-info">
@@ -971,7 +987,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
             </div>
             <div class="header-action">
                 <button onclick="downloadPDF()" class="print-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer h-4 w-4"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg> Print/Save PDF</button>
-                <p>Total Programs:<?= count($pdf_program); ?></p>
+                <p>Total Programs:<?= isset($pdf_program) && count($pdf_program) > 0 ? count($pdf_program) : $results_count; ?></p>
             </div>
             <button class="close-export" onclick="closeExportPopup()">×</button>
         </div>
@@ -992,18 +1008,19 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
             </thead>
             <tbody>
             <?php
-            foreach ($pdf_program as $program) {
+            $actual_pdf_program = empty($pdf_program) ? $programs : $pdf_program;
+            foreach ($actual_pdf_program as $program) {
               if(!empty($program['discounted_fee'])){
-                    $fee='<span>'.$program['fee'].' USD</span>'.$program['discounted_fee'].' USD';
+                    $fee='<span>'.$program['fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD').'</span>'.$program['discounted_fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD');
                 }
                 else{
-                    $fee=$program['fee'].' USD';
+                    $fee = !empty($program['fee']) ? $program['fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD') : 'Contact University';
                 }
                 ?>
                 <tr>
                     <td><?= $program['title'] ?></td>
                     <td><?= $program['uni_title'] ?></td>
-                    <td><?= $program['duration'] ?></td>
+                    <td><?= !empty($program['duration']) ? (is_numeric($program['duration']) ? $program['duration'].' Years' : $program['duration']) : 'Not specified' ?></td>
                     <td><?php 
                     // Extract language from title if it's in parentheses at the end
                     if (preg_match('/\(([^)]+)\)$/', $program['title'], $matches)) {
@@ -1029,7 +1046,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
 
         <h3>Program Details</h3>
         <?php
-        foreach ($pdf_program as $program) {
+        foreach ($actual_pdf_program as $program) {
             ?>
             <div class="program-card">
                 <div class="university-image">
@@ -1085,7 +1102,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
     </div>
 </div>
 
-<div id="expoting-download" >
+<div id="expoting-download" style="display: none;">
     <div class="export-popup">
         <div class="export-header">
             <div class="headers-info">
@@ -1093,7 +1110,7 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
                 <p class="generated-date">Generated on: <?php echo date('Y-m-d'); ?></p>
             </div>
             <div class="header-action">
-                <p>Total Programs:<?= count($pdf_program); ?></p>
+                <p>Total Programs:<?= isset($pdf_program) && count($pdf_program) > 0 ? count($pdf_program) : $results_count; ?></p>
             </div>
         </div>
 
@@ -1113,18 +1130,18 @@ $search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']
             </thead>
             <tbody>
             <?php
-            foreach ($pdf_program as $program) {
+            foreach ($actual_pdf_program as $program) {
               if(!empty($program['discounted_fee'])){
-                    $fee='<span style=" text-decoration: line-through;display: block;">'.$program['fee'].' USD</span>'.$program['discounted_fee'].' USD';
+                    $fee='<span style=" text-decoration: line-through;display: block;">'.$program['fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD').'</span>'.$program['discounted_fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD');
                 }
                 else{
-                    $fee=$program['fee'].' USD';
+                    $fee = !empty($program['fee']) ? $program['fee'].' '.(isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD') : 'Contact University';
                 }
                 ?>
                 <tr>
                     <td><?= $program['title'] ?></td>
                     <td><?= $program['uni_title'] ?></td>
-                    <td><?= $program['duration'] ?></td>
+                    <td><?= !empty($program['duration']) ? (is_numeric($program['duration']) ? $program['duration'].' Years' : $program['duration']) : 'Not specified' ?></td>
                     <td><?php 
                     // Extract language from title if it's in parentheses at the end
                     if (preg_match('/\(([^)]+)\)$/', $program['title'], $matches)) {

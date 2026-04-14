@@ -67,11 +67,15 @@
           <?php if(!empty($program['discounted_fee'])): ?>
             <div class="ProgramBoxUni-price-container">
               <span class="ProgramBoxUni-price-original"><?= $program['fee'] ?></span>
-              <span class="ProgramBoxUni-price-discounted"><?= $program['discounted_fee'] ?> <?= $program['Tuition_Currency'] ?></span>
+              <span class="ProgramBoxUni-price-discounted"><?= $program['discounted_fee'] ?> <?= isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD' ?></span>
             </div>
           <?php else: ?>
             <div class="ProgramBoxUni-price-container">
-              <span class="ProgramBoxUni-price"><?= $program['fee'] ?> <?= $program['Tuition_Currency'] ?></span>
+              <?php if(!empty($program['fee'])): ?>
+                <span class="ProgramBoxUni-price"><?= $program['fee'] ?> <?= isset($program['Tuition_Currency']) && $program['Tuition_Currency'] ? $program['Tuition_Currency'] : 'USD' ?></span>
+              <?php else: ?>
+                <span class="ProgramBoxUni-price" style="font-size: 16px;">Contact University</span>
+              <?php endif; ?>
             </div>
           <?php endif; ?>
         </div>
@@ -84,7 +88,7 @@
         </div>
         <div class="ProgramBoxUni-attribute-content">
           <h4 class="ProgramBoxUni-attribute-label">Duration</h4>
-          <span class="ProgramBoxUni-attribute-value"><?= $program['duration'] ?></span>
+          <span class="ProgramBoxUni-attribute-value"><?= !empty($program['duration']) ? (is_numeric($program['duration']) ? $program['duration'].' Years' : $program['duration']) : 'Not specified' ?></span>
         </div>
       </div>
       
@@ -95,7 +99,7 @@
         </div>
         <div class="ProgramBoxUni-attribute-content">
           <h4 class="ProgramBoxUni-attribute-label">Study Mode</h4>
-          <span class="ProgramBoxUni-attribute-value"><?= isset($program['study_mode']) ? $program['study_mode'] : 'Full-time' ?></span>
+          <span class="ProgramBoxUni-attribute-value"><?= !empty($program['study_mode']) ? $program['study_mode'] : 'Full-time' ?></span>
         </div>
       </div>
       
@@ -106,7 +110,7 @@
         </div>
         <div class="ProgramBoxUni-attribute-content">
           <h4 class="ProgramBoxUni-attribute-label">Intake</h4>
-          <span class="ProgramBoxUni-attribute-value"><?= isset($program['intake']) ? $program['intake'] : 'September' ?></span>
+          <span class="ProgramBoxUni-attribute-value"><?= !empty($program['intake']) ? $program['intake'] : 'September' ?></span>
         </div>
       </div>
     </div>
