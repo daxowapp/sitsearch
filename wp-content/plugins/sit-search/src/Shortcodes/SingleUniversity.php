@@ -38,7 +38,7 @@ class SingleUniversity
             'Year_Founded'=>get_post_meta($current_post_id, 'Year_Founded', true),
             'uni_logo'=>!empty(get_post_meta($current_post_id, 'uni_logo', true))  ?
                 esc_url(get_post_meta($current_post_id, 'uni_logo', true))
-                : '',
+                : 'https://placehold.co/128x128?text=U',
         ];
 
         $other_args = array(
