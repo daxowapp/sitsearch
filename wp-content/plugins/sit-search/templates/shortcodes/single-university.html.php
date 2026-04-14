@@ -1,667 +1,519 @@
 <?php
-// At the beginning of your template or in your controller:
-$program = array_merge([
-    'discounted_fee' => '',
-    'Advanced_Discount' => '',
-    // other defaults
-], $program);
+/**
+ * Single University Page Template — Redesigned (up-* namespace)
+ * Matches the pp-* program page design system.
+ */
 
-// Then your existing code should work consistently
-if(!empty($program['discounted_fee'])){ 
+// Safely get values with defaults
+$title           = !empty($program['title']) ? $program['title'] : 'University';
+$city            = !empty($program['city']) ? $program['city'] : '';
+$country         = !empty($program['pro_country']) ? $program['pro_country'] : 'Turkey';
+$description     = !empty($program['description']) ? $program['description'] : '';
+$year_founded    = !empty($program['Year_Founded']) ? $program['Year_Founded'] : '';
+$total_students  = !empty($program['total_students']) ? $program['total_students'] : '';
+$ranking         = !empty($program['ranking']) ? $program['ranking'] : '--';
+$image_url       = !empty($program['image_url']) ? $program['image_url'] : '';
+$brochure_url    = !empty($program['University_brochure']) ? $program['University_brochure'] : '';
+$uni_id          = !empty($program['unic_id']) ? $program['unic_id'] : '';
+$location_str    = $city ? "$city, $country" : $country;
 ?>
-    <p class="label">Discounted course fee</p>
-    <p class="info"><?= $program['Tuition_Currency'] ?> <?= $program['discounted_fee'] ?></p>
-<?php } ?>
 
-<div class="uni-hero" style="background-image: url('<?= $program['image_url'] ?>');">
-  <div class="uni-hero-container">
-    <div class="uni-hero-content">
-      <div class="uni-hero-badge">University Program</div>
-      <h1 class="uni-hero-title"><?= $program['title'] ?></h1>
-      
-      <div class="uni-hero-location">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <?= $program['city'] ?>, <?= $program['pro_country'] ?>
+<!-- ══════════════════════════════════════════════
+     HERO SECTION
+     ══════════════════════════════════════════════ -->
+<div class="up-hero">
+  <div class="up-hero-inner">
+    <div class="up-hero-text">
+      <h1 class="up-hero-title"><?= esc_html($title) ?></h1>
+
+      <?php if ($location_str): ?>
+      <div class="up-hero-location">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <?= esc_html($location_str) ?>
       </div>
-      
-      <div class="uni-hero-stats">
-        <div class="uni-hero-stat">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <span class="uni-hero-stat-label">Founded <?= $program['Year_Founded'] ?></span>
-        </div>
-        
-        <div class="uni-hero-stat">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg>
-          <span class="uni-hero-stat-label"><?= $program['total_students'] ?> Students</span>
-        </div>
-        
-        <div class="uni-hero-stat">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-          </svg>
-          <span class="uni-hero-stat-label">Ranking <?= $program['ranking'] ?></span>
-        </div>
+      <?php endif; ?>
+
+      <!-- Pill Badges -->
+      <div class="up-hero-pills">
+        <?php if ($year_founded): ?>
+        <span class="up-pill"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg> Founded <?= esc_html($year_founded) ?></span>
+        <?php endif; ?>
+        <?php if ($total_students): ?>
+        <span class="up-pill"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg> <?= esc_html($total_students) ?> Students</span>
+        <?php endif; ?>
+        <span class="up-pill"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg> QS #<?= esc_html($ranking) ?></span>
       </div>
     </div>
-    
-    <div class="uni-hero-actions">
-      <button class="uni-hero-button primary trigger-modal">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-        </svg>
+
+    <div class="up-hero-actions">
+      <button class="up-btn-apply trigger-modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         Apply Now
       </button>
-      <a href="#" class="uni-hero-button secondary">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        Learn More
+      <?php if ($brochure_url): ?>
+      <a href="<?= esc_url($brochure_url) ?>" class="up-btn-secondary" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Brochure
       </a>
+      <?php endif; ?>
     </div>
   </div>
 </div>
 
-<div class="uni-breadcrumb">
-  <div class="uni-breadcrumb-container">
-    <a href="/" class="uni-breadcrumb-item">
-      <span class="uni-breadcrumb-home">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7m-7-7v14" />
-        </svg>
-      </span>
-    </a>
-    <span class="uni-breadcrumb-separator">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-    </span>
-    <span class="uni-breadcrumb-current"><?= $program['title'] ?></span>
+<!-- Breadcrumb -->
+<div class="up-breadcrumb">
+  <div class="up-breadcrumb-inner">
+    <a href="/">🏠 Home</a>
+    <span class="up-bc-sep">›</span>
+    <span class="up-bc-current"><?= esc_html($title) ?></span>
   </div>
 </div>
 
-<div class="uni-layout">
-  <!-- Main Content Area -->
-  <div class="uni-content">
-    <!-- Key Information Card -->
-    <div class="uni-card" id="key-information">
-      <div class="uni-card-header">
-        <h2 class="uni-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Key Information about <?= $program['title'] ?>
-        </h2>
+<!-- ══════════════════════════════════════════════
+     MAIN LAYOUT — Two columns
+     ══════════════════════════════════════════════ -->
+<div class="up-layout">
+
+  <!-- ──── LEFT COLUMN ──── -->
+  <div class="up-main">
+
+    <!-- GEO Summary — Entity-rich, citable by AI engines -->
+    <div class="up-geo-summary">
+      <div class="up-geo-summary-bar"></div>
+      <div class="up-geo-summary-body">
+        <p><strong><?= esc_html($title) ?></strong> is a university located in <?= esc_html($location_str) ?>.<?php if ($year_founded): ?> Founded in <?= esc_html($year_founded) ?>.<?php endif; ?> QS World Ranking: #<?= esc_html($ranking) ?>.<?php if ($total_students): ?> The university has <?= esc_html($total_students) ?> students enrolled across its programs.<?php endif; ?></p>
+        <time datetime="<?= get_the_modified_date('c', $uni_id) ?>" class="up-geo-date">Updated <?= get_the_modified_date('M j, Y', $uni_id) ?></time>
       </div>
-      
-      <div class="uni-card-body">
-        <div class="uni-card-row">
-          <div class="uni-card-column">
-            <p class="uni-card-label">Intake Months</p>
-            <p class="uni-card-value">January, August</p>
+    </div>
+
+    <!-- ── University Details ── -->
+    <div class="up-card" id="key-information">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        University Details
+      </div>
+
+      <div class="up-stats-grid">
+        <!-- Type -->
+        <div class="up-stat-tile up-stat-blue">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">TYPE</span>
+            <span class="up-stat-value">University</span>
           </div>
-          
-          <div class="uni-card-column">
-            <p class="uni-card-label">Delivery Locations</p>
-            <p class="uni-card-value"><?= $program['pro_country'] ?></p>
+        </div>
+
+        <!-- Founded -->
+        <?php if ($year_founded): ?>
+        <div class="up-stat-tile up-stat-purple">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">FOUNDED</span>
+            <span class="up-stat-value"><?= esc_html($year_founded) ?></span>
           </div>
-          
-          <div class="uni-card-column">
-            <p class="uni-card-label">Program Type</p>
-            <p class="uni-card-value">University Degree</p>
+        </div>
+        <?php endif; ?>
+
+        <!-- Location -->
+        <div class="up-stat-tile up-stat-orange">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">LOCATION</span>
+            <span class="up-stat-value"><?= esc_html($location_str) ?></span>
+          </div>
+        </div>
+
+        <!-- Students -->
+        <?php if ($total_students): ?>
+        <div class="up-stat-tile up-stat-green">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">STUDENTS</span>
+            <span class="up-stat-value"><?= esc_html($total_students) ?></span>
+          </div>
+        </div>
+        <?php endif; ?>
+
+        <!-- Ranking -->
+        <div class="up-stat-tile up-stat-gold">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">QS RANKING</span>
+            <span class="up-stat-value">#<?= esc_html($ranking) ?></span>
+          </div>
+        </div>
+
+        <!-- Accommodation -->
+        <div class="up-stat-tile up-stat-teal">
+          <div class="up-stat-icon"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg></div>
+          <div class="up-stat-info">
+            <span class="up-stat-label">ACCOMMODATION</span>
+            <span class="up-stat-value">Available</span>
           </div>
         </div>
       </div>
-      
-      <div class="uni-card-footer">
-        <button class="uni-button primary trigger-modal">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
+
+      <div class="up-card-cta">
+        <button class="up-check-btn trigger-modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           Check Eligibility
         </button>
       </div>
     </div>
-    
-    <!-- Program Overview Card -->
-    <div class="uni-card" id="course-overview">
-      <div class="uni-card-header">
-        <h2 class="uni-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
-          <?= $program['title'] ?> Overview
-        </h2>
+
+    <!-- ── University Overview ── -->
+    <?php if ($description): ?>
+    <div class="up-card" id="course-overview">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        About <?= esc_html($title) ?>
       </div>
-      
-      <div class="uni-card-body">
-        <p class="uni-card-text"><?= $program['description'] ?></p>
+      <div class="up-card-body">
+        <div class="up-overview-text"><?= $description ?></div>
       </div>
-      
-      <div class="uni-card-footer">
-        <button class="uni-button primary trigger-modal">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-          </svg>
+      <div class="up-card-actions">
+        <button class="up-btn-apply trigger-modal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
           Help Me Apply
         </button>
-        
-        <a href="<?= $program['University_brochure'] ?>" class="uni-button outline">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-          </svg>
+        <?php if ($brochure_url): ?>
+        <a href="<?= esc_url($brochure_url) ?>" class="up-btn-outline" target="_blank">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
           Download Brochure
         </a>
+        <?php endif; ?>
       </div>
     </div>
-    
-    <!-- CTA Card -->
-    <div class="uni-cta-card">
-      <h2 class="uni-cta-title">More Than <?= $program['total_students'] ?> Students Studying at <?= $program['title'] ?> – Join Them Now</h2>
-      
-      <div class="uni-cta-actions">
-        <button class="uni-button secondary trigger-modal">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-          </svg>
-          Apply Now
-        </button>
+    <?php endif; ?>
+
+    <!-- ── CTA Banner ── -->
+    <div class="up-cta-banner">
+      <div class="up-cta-decor"></div>
+      <div class="up-cta-decor up-cta-decor-2"></div>
+      <div class="up-cta-content">
+        <div class="up-cta-text">
+          <h3>Start Your Journey</h3>
+          <p>Study at <?= esc_html($title) ?> in <?= esc_html($country) ?></p>
+        </div>
+        <button class="up-cta-btn trigger-modal">Apply Now <span>→</span></button>
       </div>
     </div>
-    
-    <!-- Institution Details Card -->
-    <div class="uni-card" id="university-detail">
-      <div class="uni-card-header">
-        <h2 class="uni-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-          </svg>
-          <?= $program['title'] ?> Details
-        </h2>
+
+    <!-- ── QS Ranking Card ── -->
+    <div class="up-card" id="university-detail">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+        World Rankings
       </div>
-      
-      <div class="uni-card-body">
-        <div class="uni-card-row">
-          <div class="uni-card-column">
-            <p class="uni-card-label">Type of Institution</p>
-            <p class="uni-card-value">University</p>
-          </div>
-          
-          <div class="uni-card-column">
-            <p class="uni-card-label">Year Founded</p>
-            <p class="uni-card-value"><?= $program['Year_Founded'] ?></p>
-          </div>
-        </div>
-        
-        <div class="uni-card-row">
-          <div class="uni-card-column">
-            <p class="uni-card-label">Total Students</p>
-            <p class="uni-card-value"><?= $program['total_students'] ?></p>
-          </div>
-          
-          <div class="uni-card-column">
-            <p class="uni-card-label">On-Campus Accommodation</p>
-            <p class="uni-card-value">Available</p>
-          </div>
-        </div>
-        
-        <h3 class="uni-card-subtitle"><?= $program['title'] ?> Ranking</h3>
-        
-        <div class="uni-ranking">
-          <div class="uni-ranking-logo">
+      <div class="up-card-body">
+        <div class="up-ranking-row">
+          <div class="up-ranking-logo">
             <img src="https://search.studyinturkiye.com/wp-content/uploads/2025/02/qs-top-universities-vector-logo-2022-1.png" alt="QS Ranking Logo">
           </div>
-          
-          <div class="uni-ranking-info">
-            <p class="uni-ranking-label">QS World University Rankings</p>
-            <p class="uni-ranking-value"><?= $program['ranking'] ?></p>
+          <div class="up-ranking-info">
+            <span class="up-ranking-label">QS World University Rankings</span>
+            <span class="up-ranking-value">#<?= esc_html($ranking) ?></span>
           </div>
         </div>
       </div>
     </div>
-    
+
+    <!-- ── University Programs ── -->
     <?php if(!empty($other_uni)): ?>
-    <!-- University Programs Card -->
-<!-- University Programs Card with Simple Filter -->
-<div class="uni-card" id="other-university">
-  <div class="uni-card-header">
-    <h2 class="uni-card-title">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-      </svg>
-      <?= $program['title'] ?> Programs
-    </h2>
-    
-    <a href="/university/?uni-id=<?= $program['unic_id'] ?>" class="uni-card-link">
-      View All
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
-  </div>
-  
-  <div class="uni-card-body">
-    <!-- Simple Keyword Search -->
-    <div class="uni-keyword-search">
-      <div class="uni-search-input">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-        <input type="text" id="programKeyword" placeholder="Search programs by keyword...">
-        <button id="clearSearchBtn" class="uni-clear-search">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+    <div class="up-card" id="other-university">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        Programs at <?= esc_html($title) ?>
+        <a href="/university/?uni-id=<?= esc_attr($uni_id) ?>" class="up-view-all">View All →</a>
       </div>
-    </div>
-    
-    <!-- Programs Results Info -->
-    <div class="uni-programs-results">
-      <div class="uni-programs-count">
-        Showing <span id="visibleCount">0</span> out of <span id="totalCount">0</span> programs
-      </div>
-    </div>
-    
-    <!-- Programs Grid (2 per row) - Preserving dynamic content -->
-    <div id="programsContainer" class="uni-programs-grid">
-      <?php 
-      // Check if there are programs to display
-      if(!empty($other_uni)): 
-        // Initialize counter for pagination
-        $program_counter = 0;
-        $items_per_page = 2;
-        
-        // Loop through all programs
-        foreach ($other_uni as $index => $university): 
-          // Calculate page number (1-based)
-          $page_number = ceil(($index + 1) / $items_per_page);
-          
-          // Set display style based on page number
-          $display_style = ($page_number == 1) ? '' : 'style="display: none;"';
-      ?>
-      <!-- Program Card -->
-      <div class="uni-program-card" data-page="<?= $page_number ?>" <?= $display_style ?>>
-        <div class="uni-program-header">
-          <img src="<?= $university['image_url'] ?>" alt="<?= $university['title'] ?>" class="uni-program-image">
-          <div class="uni-program-overlay"></div>
-          <div class="uni-program-logo">
-            <img src="<?= isset($university['uni_logo']) ? $university['uni_logo'] : 'https://search.studyinturkiye.com/wp-content/uploads/2023/06/medipol-logo.png' ?>" alt="University Logo">
-          </div>
-          <div class="uni-program-language"><?= isset($university['language']) ? $university['language'] : 'English' ?></div>
-        </div>
-        
-        <div class="uni-program-content">
-          <h3 class="uni-program-title"><?= $university['title'] ?></h3>
-          
-          <div class="uni-program-location">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            <?= isset($university['city']) ? $university['city'] : 'Istanbul' ?>, <?= isset($university['country']) ? $university['country'] : 'Turkey' ?>
-          </div>
-          
-          <div class="uni-program-info">
-            <div class="uni-program-detail">
-              <span class="uni-program-detail-label">Duration</span>
-<span class="uni-program-detail-value"><?php 
-$duration = isset($university['duration']) ? $university['duration'] : '';
-if ($duration) {
-    echo $duration . ($duration == 1 ? ' Year' : ' Years');
-} else {
-    echo 'Years';
-}
-?></span>            </div>
-            
-            <div class="uni-program-detail">
-              <span class="uni-program-detail-label">Study Mode</span>
-              <span class="uni-program-detail-value"><?= isset($university['study_mode']) ? $university['study_mode'] : 'Full-time' ?></span>
-            </div>
-            
-            <div class="uni-program-detail">
-              <span class="uni-program-detail-label">Intake</span>
-              <span class="uni-program-detail-value"><?= isset($university['intake']) ? $university['intake'] : 'September' ?></span>
-            </div>
-            
-            <div class="uni-program-detail">
-              <span class="uni-program-detail-label">Level</span>
-              <span class="uni-program-detail-value"><?= $university['level'] ?></span>
-            </div>
+
+      <div class="up-card-body">
+        <!-- Keyword Search -->
+        <div class="uni-keyword-search">
+          <div class="uni-search-input">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="programKeyword" placeholder="Search programs by keyword...">
+            <button id="clearSearchBtn" class="uni-clear-search">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
           </div>
         </div>
-        
-        <div class="uni-program-actions">
-          <div class="uni-program-price">
-            <span class="uni-program-price-label">Annual Tuition</span>
-            <span class="uni-program-price-value"><?php if(isset($university['discounted_fee']) && $university['discounted_fee'] != '' && $university['discounted_fee'] != '0'){ ?>
-    <p class="info"><?= $university['Tuition_Currency'] ?> <?= $university['discounted_fee'] ?></p>
-<?php }
-else{
-    ?>
-    <p class="info"><?= $university['Tuition_Currency'] ?> <?= $university['fee'] ?></p>
-    <?php
-}
-?></span>
+
+        <div class="uni-programs-results">
+          <div class="uni-programs-count">
+            Showing <span id="visibleCount">0</span> out of <span id="totalCount">0</span> programs
           </div>
-          
-          <a href="<?= isset($university['guid']) ? $university['guid'] : $university['link'] ?>" class="uni-program-button">
-            View Program
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </a>
         </div>
-      </div>
-      <?php 
-        endforeach;
-        
-        // Calculate total pages
-        $total_pages = ceil(count($other_uni) / $items_per_page);
-      ?>
-      
-      <!-- No Results Message (initially hidden) -->
-      <div id="noResultsMessage" class="uni-no-results" style="display: none;">
-        <div class="uni-no-results-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-        </div>
-        <h3>No matching programs found</h3>
-        <p>Try a different keyword or clear your search.</p>
-        <button id="clearSearch" class="uni-clear-button">Clear Search</button>
-      </div>
-    </div>
-    
-    <!-- Dynamic Pagination -->
-<!-- Dynamic Pagination with Limited Page Buttons -->
-<?php if ($total_pages > 1): ?>
-<div class="uni-pagination">
-  <button class="uni-pagination-button" id="prevPage" disabled>
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-    </svg>
-    Previous
-  </button>
-  
-  <div class="uni-pagination-pages">
-    <?php
-    // Maximum number of page buttons to show
-    $max_buttons = 8;
-    
-    // Calculate which page buttons to show
-    if ($total_pages <= $max_buttons) {
-      // If total pages are less than the max, show all pages
-      $start_page = 1;
-      $end_page = $total_pages;
-    } else {
-      // Calculate start and end page numbers with current page in the middle
-      $start_page = max(1, min($total_pages - $max_buttons + 1, 1));
-      $end_page = min($total_pages, $max_buttons);
-    }
-    
-    // Generate page buttons
-    for ($i = $start_page; $i <= $end_page; $i++): 
-    ?>
-    <button class="uni-pagination-page <?= ($i == 1) ? 'active' : '' ?>" data-page="<?= $i ?>"><?= $i ?></button>
-    <?php endfor; ?>
-    
-    <?php if ($total_pages > $max_buttons): ?>
-    <span class="uni-pagination-dots">...</span>
-    <button class="uni-pagination-page" data-page="<?= $total_pages ?>"><?= $total_pages ?></button>
-    <?php endif; ?>
-  </div>
-  
-  <button class="uni-pagination-button" id="nextPage" <?= ($total_pages <= 1) ? 'disabled' : '' ?>>
-    Next
-    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-    </svg>
-  </button>
-</div>
-<?php endif; ?>
-    
-    <?php else: ?>
-    <!-- No Programs Message -->
-    <div class="uni-no-programs">
-      <div class="uni-no-results-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-      </div>
-      <h3>No programs available</h3>
-      <p>There are currently no programs to display.</p>
-    </div>
-    <?php endif; ?>
-  </div>
-</div>
-    <?php endif; ?>
-    
-    <?php if(!empty($campuses)): ?>
-    <!-- University Campuses Card -->
-    <div class="uni-card" id="university-campus">
-      <div class="uni-card-header">
-        <h2 class="uni-card-title">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-          <?= $program['title'] ?> Campuses
-        </h2>
-      </div>
-      
-      <div class="uni-card-body">
-        <div class="uni-carousel">
-            
-            
 
-          <?php foreach ($campuses as $campus): {
+        <!-- Programs List -->
+        <div id="programsContainer" class="uni-programs-list">
+          <?php
+            $program_counter = 0;
+            $items_per_page = 10;
+            foreach ($other_uni as $index => $university):
+              $page_number = ceil(($index + 1) / $items_per_page);
+              $display_style = ($page_number == 1) ? '' : 'style="display: none;"';
+              $level = isset($university['level']) ? $university['level'] : 'N/A';
+              $level_class = 'level-default';
+              $level_lower = strtolower($level);
+              if (strpos($level_lower, 'bachelor') !== false) $level_class = 'level-bachelor';
+              elseif (strpos($level_lower, 'master') !== false) $level_class = 'level-master';
+              elseif (strpos($level_lower, 'phd') !== false || strpos($level_lower, 'doctor') !== false) $level_class = 'level-phd';
+              elseif (strpos($level_lower, 'associate') !== false) $level_class = 'level-associate';
+          ?>
 
-                        \SIT\Search\Services\Template::render('shortcodes/uni-campus', ['university' => $campus]);
-
-                    }
-
-                    ?> 
-          
-
-
-          <!-- <div class="uni-carousel-item">
-            <div class="uni-carousel-image">
-              <img src="<?= $campus['image_url'] ?>" alt="<?= $campus['title'] ?>">
-            </div>
-            
-            <div class="uni-carousel-content">
-              <h3 class="uni-carousel-title"><?= $campus['title'] ?></h3>
-              
-              <div class="uni-carousel-location">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <?= $campus['city'] ?>, <?= $campus['pro_country'] ?>
+          <div class="uni-program-row" data-page="<?= $page_number ?>" <?= $display_style ?>>
+            <!-- Left: Level Badge + Program Info -->
+            <div class="upr-main">
+              <div class="upr-level-badge <?= $level_class ?>">
+                <?= $level ?>
               </div>
-              
-              <div class="uni-carousel-details">
-                <div class="uni-carousel-detail">
-                  <span class="uni-carousel-detail-label">Facilities</span>
-                  <span class="uni-carousel-detail-value">Modern Campus</span>
-                </div>
-                
-                <div class="uni-carousel-detail">
-                  <span class="uni-carousel-detail-label">Location</span>
-                  <span class="uni-carousel-detail-value">City Center</span>
+              <div class="upr-info">
+                <a href="<?= isset($university['guid']) ? $university['guid'] : $university['link'] ?>" class="upr-title">
+                  <?= $university['title'] ?>
+                </a>
+                <div class="upr-meta-tags">
+                  <span class="upr-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <?php
+                      $dur = isset($university['duration']) ? $university['duration'] : '';
+                      echo $dur ? $dur . ($dur == 1 ? ' Year' : ' Years') : 'N/A';
+                    ?>
+                  </span>
+                  <span class="upr-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                    <?= isset($university['language']) ? $university['language'] : 'English' ?>
+                  </span>
+                  <span class="upr-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <?= isset($university['study_mode']) ? $university['study_mode'] : 'Full-time' ?>
+                  </span>
+                  <span class="upr-tag">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <?= isset($university['intake']) ? $university['intake'] : 'September' ?>
+                  </span>
                 </div>
               </div>
             </div>
-            
-            <div class="uni-carousel-footer">
-              <a href="<?= $campus['link'] ?>" class="uni-carousel-link">View Campus</a>
+
+            <!-- Right: Tuition + CTA -->
+            <div class="upr-actions">
+              <div class="upr-tuition">
+                <span class="upr-tuition-label">Tuition</span>
+                <span class="upr-tuition-value"><?php
+                  if(isset($university['discounted_fee']) && $university['discounted_fee'] != '' && $university['discounted_fee'] != '0'){
+                    echo esc_html($university['Tuition_Currency']) . ' ' . esc_html($university['discounted_fee']);
+                  } else {
+                    echo esc_html($university['Tuition_Currency']) . ' ' . esc_html($university['fee']);
+                  }
+                ?></span>
+              </div>
+              <a href="<?= isset($university['guid']) ? $university['guid'] : $university['link'] ?>" class="upr-view-btn">
+                View
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
             </div>
-          </div> -->
+          </div>
+          <?php
+            endforeach;
+            $total_pages = ceil(count($other_uni) / $items_per_page);
+          ?>
+
+          <div id="noResultsMessage" class="uni-no-results" style="display: none;">
+            <div class="uni-no-results-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h3>No matching programs found</h3>
+            <p>Try a different keyword or clear your search.</p>
+            <button id="clearSearch" class="uni-clear-button">Clear Search</button>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <?php if ($total_pages > 1): ?>
+        <div class="uni-pagination">
+          <button class="uni-pagination-button" id="prevPage" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Previous
+          </button>
+          <div class="uni-pagination-pages">
+            <?php
+            $max_buttons = 8;
+            if ($total_pages <= $max_buttons) {
+              $start_page = 1; $end_page = $total_pages;
+            } else {
+              $start_page = max(1, min($total_pages - $max_buttons + 1, 1));
+              $end_page = min($total_pages, $max_buttons);
+            }
+            for ($i = $start_page; $i <= $end_page; $i++):
+            ?>
+            <button class="uni-pagination-page <?= ($i == 1) ? 'active' : '' ?>" data-page="<?= $i ?>"><?= $i ?></button>
+            <?php endfor; ?>
+            <?php if ($total_pages > $max_buttons): ?>
+            <span class="uni-pagination-dots">...</span>
+            <button class="uni-pagination-page" data-page="<?= $total_pages ?>"><?= $total_pages ?></button>
+            <?php endif; ?>
+          </div>
+          <button class="uni-pagination-button" id="nextPage" <?= ($total_pages <= 1) ? 'disabled' : '' ?>>
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="16" height="16"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+        </div>
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php endif; ?>
+
+    <!-- ══════════════════════════════════════════════
+         GEO: COMPARISON TABLE — Structured data for AI engines
+         ══════════════════════════════════════════════ -->
+    <div class="up-card" id="comparison-table">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></rect><line x1="3" y1="9" x2="21" y2="9" stroke-width="2"></line><line x1="3" y1="15" x2="21" y2="15" stroke-width="2"></line><line x1="12" y1="3" x2="12" y2="21" stroke-width="2"></line></svg>
+        <?= esc_html($title) ?> — At a Glance
+      </div>
+      <div class="up-card-body">
+        <table class="up-compare-table" role="table">
+          <thead>
+            <tr><th scope="col">Attribute</th><th scope="col">Details</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>University Name</td><td><strong><?= esc_html($title) ?></strong></td></tr>
+            <tr><td>Location</td><td><?= esc_html($location_str) ?></td></tr>
+            <?php if ($year_founded): ?><tr><td>Year Founded</td><td><?= esc_html($year_founded) ?></td></tr><?php endif; ?>
+            <?php if ($total_students): ?><tr><td>Total Students</td><td><?= esc_html($total_students) ?></td></tr><?php endif; ?>
+            <tr><td>QS World Ranking</td><td>#<?= esc_html($ranking) ?></td></tr>
+            <tr><td>Accommodation</td><td>Available</td></tr>
+            <?php if (!empty($other_uni)): ?><tr><td>Number of Programs</td><td><?= count($other_uni) ?></td></tr><?php endif; ?>
+            <?php
+            $geo_fees = []; $geo_langs = [];
+            if (!empty($other_uni)) {
+                foreach ($other_uni as $p) {
+                    $f = !empty($p['discounted_fee']) ? (float)$p['discounted_fee'] : (float)($p['fee'] ?? 0);
+                    if ($f > 0) $geo_fees[] = $f;
+                    if (!empty($p['language'])) $geo_langs[$p['language']] = true;
+                }
+                if (!empty($geo_fees)) {
+                    echo '<tr><td>Tuition Range (USD/yr)</td><td>$' . number_format(min($geo_fees)) . ' – $' . number_format(max($geo_fees)) . '</td></tr>';
+                }
+                if (!empty($geo_langs)) {
+                    echo '<tr><td>Teaching Languages</td><td>' . esc_html(implode(', ', array_keys($geo_langs))) . '</td></tr>';
+                }
+            }
+            ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+         GEO: FAQ SECTION — Schema.org microdata
+         ══════════════════════════════════════════════ -->
+    <div class="up-card" id="university-faq">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        Frequently Asked Questions
+      </div>
+      <div class="up-card-body">
+        <div class="up-faq-list" itemscope itemtype="https://schema.org/FAQPage">
+          <?php
+          $uni_faqs = [];
+          $uni_faqs[] = ['q' => "Where is {$title} located?", 'a' => "{$title} is located in {$location_str}." . ($year_founded ? " It was founded in {$year_founded}." : "")];
+          $uni_faqs[] = ['q' => "What is the QS ranking of {$title}?", 'a' => "{$title} is ranked #{$ranking} in the QS World University Rankings."];
+          if ($total_students) {
+              $uni_faqs[] = ['q' => "How many students study at {$title}?", 'a' => "{$title} has approximately {$total_students} students enrolled across its undergraduate and graduate programs."];
+          }
+          if (!empty($other_uni)) {
+              $uni_faqs[] = ['q' => "How many programs does {$title} offer?", 'a' => "{$title} offers " . count($other_uni) . " academic programs across various faculties and disciplines."];
+          }
+          if (!empty($geo_fees)) {
+              $uni_faqs[] = ['q' => "What are the tuition fees at {$title}?", 'a' => "Tuition fees at {$title} range from $" . number_format(min($geo_fees)) . " to $" . number_format(max($geo_fees)) . " USD per year, depending on the program and degree level."];
+          }
+          if (!empty($geo_langs)) {
+              $uni_faqs[] = ['q' => "What languages are programs taught in at {$title}?", 'a' => "Programs at {$title} are taught in " . implode(', ', array_keys($geo_langs)) . "."];
+          }
+          $uni_faqs[] = ['q' => "Does {$title} offer student accommodation?", 'a' => "Yes, {$title} provides on-campus accommodation options for both domestic and international students."];
+
+          foreach ($uni_faqs as $i => $faq):
+          ?>
+          <article class="up-faq-item" itemscope itemtype="https://schema.org/Question">
+            <button class="up-faq-trigger" onclick="this.closest('.up-faq-item').classList.toggle('open')" itemprop="name">
+              <span><?= esc_html($faq['q']) ?></span>
+              <svg class="up-faq-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="6 9 12 15 18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
+            </button>
+            <div class="up-faq-answer" itemscope itemtype="https://schema.org/Answer">
+              <div itemprop="text"><p><?= esc_html($faq['a']) ?></p></div>
+            </div>
+          </article>
           <?php endforeach; ?>
         </div>
       </div>
     </div>
+
+    <!-- ── Campuses ── -->
+    <?php if(!empty($campuses)): ?>
+    <div class="up-card" id="university-campus">
+      <div class="up-card-heading">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <?= esc_html($title) ?> Campuses
+      </div>
+      <div class="up-card-body">
+        <div class="uni-carousel">
+          <?php foreach ($campuses as $campus):
+            \SIT\Search\Services\Template::render('shortcodes/uni-campus', ['university' => $campus]);
+          endforeach; ?>
+        </div>
+      </div>
+    </div>
     <?php endif; ?>
   </div>
-  
-  <!-- Sidebar -->
-  <div class="uni-sidebar">
-    <!-- Navigation Menu -->
-    <div class="uni-nav">
-      <div class="uni-nav-header">
-        <h3 class="uni-nav-title">Quick Navigation</h3>
-      </div>
-      
-      <ul class="uni-nav-list">
-        <li class="uni-nav-item">
-          <a href="#key-information" class="uni-nav-link active">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Key Information
-          </a>
-        </li>
-        
-        <li class="uni-nav-item">
-          <a href="#course-overview" class="uni-nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-            </svg>
-            <?= $program['title'] ?> Overview
-          </a>
-        </li>
-        
-        <li class="uni-nav-item">
-          <a href="#university-detail" class="uni-nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            <?= $program['title'] ?> Details
-          </a>
-        </li>
-        
-        <?php if(!empty($other_uni)): ?>
-        <li class="uni-nav-item">
-          <a href="#other-university" class="uni-nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-            </svg>
-            Programs
-          </a>
-        </li>
+
+  <!-- ──── SIDEBAR ──── -->
+  <aside class="up-sidebar">
+
+    <!-- Contents Navigation -->
+    <div class="up-sidebar-nav">
+      <div class="up-sidebar-nav-title">CONTENTS</div>
+      <ul class="up-sidebar-links">
+        <li><a href="#key-information" class="up-sidebar-link active">University Details</a></li>
+        <?php if ($description): ?>
+        <li><a href="#course-overview" class="up-sidebar-link">About <?= esc_html($title) ?></a></li>
         <?php endif; ?>
-        
+        <li><a href="#university-detail" class="up-sidebar-link">World Rankings</a></li>
+        <?php if(!empty($other_uni)): ?>
+        <li><a href="#other-university" class="up-sidebar-link">Programs</a></li>
+        <?php endif; ?>
+        <li><a href="#comparison-table" class="up-sidebar-link">At a Glance</a></li>
+        <li><a href="#university-faq" class="up-sidebar-link">FAQ</a></li>
         <?php if(!empty($campuses)): ?>
-        <li class="uni-nav-item">
-          <a href="#university-campus" class="uni-nav-link">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            Campuses
-          </a>
-        </li>
+        <li><a href="#university-campus" class="up-sidebar-link">Campuses</a></li>
         <?php endif; ?>
       </ul>
     </div>
-    
+
     <!-- Help Card -->
-    <div class="uni-help-card">
-      <div class="uni-help-content">
-        <div class="uni-help-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
-          </svg>
-        </div>
-        
-        <h3 class="uni-help-title">Unsure where to start? Get end-to-end study abroad assistance, for FREE!</h3>
-        
-        <button class="uni-button primary uni-help-button trigger-modal">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          Help Me Decide
-        </button>
-      </div>
+    <div class="up-sidebar-help">
+      <div class="up-sidebar-help-icon">❓</div>
+      <h4>Unsure where to start?</h4>
+      <p>Get end-to-end study abroad assistance, for FREE!</p>
+      <button class="up-sidebar-help-btn trigger-modal">Help me Decide</button>
     </div>
-  </div>
+
+    <!-- Callback Card -->
+    <div class="up-sidebar-callback">
+      <div class="up-sidebar-help-icon">📞</div>
+      <h4>Need help applying?</h4>
+      <p>Our counselors will guide you through the process.</p>
+      <button class="up-sidebar-callback-btn trigger-modal">Request Callback</button>
+    </div>
+
+  </aside>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Program search functionality
-  const filterForm = document.querySelector('.uni-filter-form');
-  const filterResetBtn = document.querySelector('.uni-filter-button.secondary');
-  const filterSearchBtn = document.querySelector('.uni-filter-button.primary');
-  
-  if (filterForm && filterSearchBtn) {
-    filterSearchBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      // In a real implementation, you would collect all form values and submit
-      // For this demo, we'll just simulate filtering
-      console.log('Searching programs...');
-      
-      // Example for collecting form data
-      const keyword = filterForm.querySelector('input[type="text"]').value;
-      const fieldOfStudy = filterForm.querySelector('select[name="field"]') ? 
-                          filterForm.querySelector('select[name="field"]').value : '';
-      const language = filterForm.querySelector('select[name="language"]') ? 
-                      filterForm.querySelector('select[name="language"]').value : '';
-      const studyMode = filterForm.querySelector('select[name="mode"]') ? 
-                       filterForm.querySelector('select[name="mode"]').value : '';
-      
-      console.log(`Search params: keyword=${keyword}, field=${fieldOfStudy}, language=${language}, mode=${studyMode}`);
-      
-      // Here you would typically make an AJAX request or redirect with search parameters
-      // For demo purposes, we'll update the results count only
-      document.querySelector('.uni-programs-count span:first-child').textContent = '4';
-    });
-  }
-  
-  if (filterResetBtn) {
-    filterResetBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      
-      // Reset all form fields
-      if (filterForm) {
-        const inputs = filterForm.querySelectorAll('input, select');
-        inputs.forEach(input => {
-          if (input.type === 'text') {
-            input.value = '';
-          } else if (input.tagName === 'SELECT') {
-            input.selectedIndex = 0;
-          }
-        });
-      }
-      
-      console.log('Filters reset');
-    });
-  }
-  
-  // Program sorting
-  const sortSelect = document.querySelector('.uni-programs-sort-select');
-  if (sortSelect) {
-    sortSelect.addEventListener('change', function() {
-      const sortValue = this.value;
-      console.log(`Sorting programs by: ${sortValue}`);
-      
-      // Here you would implement the actual sorting logic
-      // For demo purposes, we'll just log the sort value
-    });
-  }
-});
-
-
-document.addEventListener('DOMContentLoaded', function() {
-  // Elements
-  const programCards = document.querySelectorAll('.uni-program-card');
+  const programCards = document.querySelectorAll('.uni-program-row');
   const keywordInput = document.getElementById('programKeyword');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
   const clearSearch = document.getElementById('clearSearch');
@@ -671,28 +523,18 @@ document.addEventListener('DOMContentLoaded', function() {
   const paginationContainer = document.querySelector('.uni-pagination-pages');
   const prevPageBtn = document.getElementById('prevPage');
   const nextPageBtn = document.getElementById('nextPage');
-  
-  // Set total count
-  if (totalCount) {
-    totalCount.textContent = programCards.length;
-  }
-  
-  // Get maximum page number from program cards
+
+  if (totalCount) totalCount.textContent = programCards.length;
+
   let maxPage = 1;
   programCards.forEach(card => {
     const cardPage = parseInt(card.dataset.page);
-    if (cardPage > maxPage) {
-      maxPage = cardPage;
-    }
+    if (cardPage > maxPage) maxPage = cardPage;
   });
-  
-  // Current page
+
   let currentPage = 1;
-  
-  // Configuration for pagination
-  const maxVisibleButtons = 5; // Number of page buttons to show
-  
-  // Function to create a page button
+  const maxVisibleButtons = 5;
+
   function createPageButton(pageNum, isActive = false) {
     const button = document.createElement('button');
     button.className = `uni-pagination-page${isActive ? ' active' : ''}`;
@@ -703,216 +545,100 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     return button;
   }
-  
-  // Function to update pagination buttons based on current page
+
   function updatePaginationButtons() {
     if (!paginationContainer) return;
-    
-    // Clear existing buttons
     paginationContainer.innerHTML = '';
-    
-    // Calculate range of buttons to show
     let startPage, endPage;
-    
     if (maxPage <= maxVisibleButtons) {
-      // If we have fewer pages than max buttons, show all pages
-      startPage = 1;
-      endPage = maxPage;
+      startPage = 1; endPage = maxPage;
     } else {
-      // Calculate the sliding window
-      const halfButtons = Math.floor(maxVisibleButtons / 2);
-      
-      if (currentPage <= halfButtons + 1) {
-        // Near the start
-        startPage = 1;
-        endPage = maxVisibleButtons;
-      } else if (currentPage >= maxPage - halfButtons) {
-        // Near the end
-        startPage = maxPage - maxVisibleButtons + 1;
-        endPage = maxPage;
-      } else {
-        // In the middle
-        startPage = currentPage - halfButtons;
-        endPage = currentPage + halfButtons;
-      }
+      const half = Math.floor(maxVisibleButtons / 2);
+      if (currentPage <= half + 1) { startPage = 1; endPage = maxVisibleButtons; }
+      else if (currentPage >= maxPage - half) { startPage = maxPage - maxVisibleButtons + 1; endPage = maxPage; }
+      else { startPage = currentPage - half; endPage = currentPage + half; }
     }
-    
-    // Add first page button if not in range
     if (startPage > 1) {
       paginationContainer.appendChild(createPageButton(1, currentPage === 1));
-      
-      // Add ellipsis if there's a gap
       if (startPage > 2) {
-        const ellipsis = document.createElement('span');
-        ellipsis.className = 'uni-pagination-dots';
-        ellipsis.textContent = '...';
-        paginationContainer.appendChild(ellipsis);
+        const el = document.createElement('span');
+        el.className = 'uni-pagination-dots'; el.textContent = '...';
+        paginationContainer.appendChild(el);
       }
     }
-    
-    // Add page buttons in range
-    for (let i = startPage; i <= endPage; i++) {
-      paginationContainer.appendChild(createPageButton(i, i === currentPage));
-    }
-    
-    // Add last page button if not in range
+    for (let i = startPage; i <= endPage; i++) paginationContainer.appendChild(createPageButton(i, i === currentPage));
     if (endPage < maxPage) {
-      // Add ellipsis if there's a gap
       if (endPage < maxPage - 1) {
-        const ellipsis = document.createElement('span');
-        ellipsis.className = 'uni-pagination-dots';
-        ellipsis.textContent = '...';
-        paginationContainer.appendChild(ellipsis);
+        const el = document.createElement('span');
+        el.className = 'uni-pagination-dots'; el.textContent = '...';
+        paginationContainer.appendChild(el);
       }
-      
       paginationContainer.appendChild(createPageButton(maxPage, currentPage === maxPage));
     }
   }
-  
-  // Show programs based on current page and filter
+
   function updateProgramDisplay() {
     const keyword = keywordInput ? keywordInput.value.toLowerCase().trim() : '';
-    let visibleItems = 0;
-    let foundMatch = false;
-    
-    // Filter logic
+    let vis = 0;
     programCards.forEach(card => {
-      // Get program title for filtering
-      const title = card.querySelector('.uni-program-title').textContent.toLowerCase();
-      const cardPage = parseInt(card.dataset.page);
-      
-      // Check if card matches keyword filter
-      const matchesKeyword = keyword === '' || title.includes(keyword);
-      
-      // Show card if it matches keyword filter and is on current page (or if keyword filter is active)
-      if (matchesKeyword) {
-        if (keyword !== '' || cardPage === currentPage) {
-          card.style.display = '';
-          visibleItems++;
-          foundMatch = true;
-        } else {
-          card.style.display = 'none';
-        }
-      } else {
-        card.style.display = 'none';
-      }
+      const title = card.querySelector('.upr-title').textContent.toLowerCase();
+      const pg = parseInt(card.dataset.page);
+      const match = keyword === '' || title.includes(keyword);
+      if (match) {
+        if (keyword !== '' || pg === currentPage) { card.style.display = ''; vis++; }
+        else { card.style.display = 'none'; }
+      } else { card.style.display = 'none'; }
     });
-    
-    // Update visible count
-    if (visibleCount) {
-      visibleCount.textContent = visibleItems;
-    }
-    
-    // Show/hide no results message
-    if (programCards.length > 0 && visibleItems === 0) {
-      if (noResultsMessage) noResultsMessage.style.display = 'block';
-    } else {
-      if (noResultsMessage) noResultsMessage.style.display = 'none';
-    }
-    
-    // Update pagination visibility
+    if (visibleCount) visibleCount.textContent = vis;
+    if (programCards.length > 0 && vis === 0) { if (noResultsMessage) noResultsMessage.style.display = 'block'; }
+    else { if (noResultsMessage) noResultsMessage.style.display = 'none'; }
     const pagination = document.querySelector('.uni-pagination');
-    if (pagination) {
-      if (keyword !== '') {
-        // Hide pagination when filtering
-        pagination.style.display = 'none';
-      } else {
-        // Show pagination when not filtering
-        pagination.style.display = '';
-      }
-    }
-    
-    // Update pagination state
+    if (pagination) pagination.style.display = keyword !== '' ? 'none' : '';
     updatePaginationState();
   }
-  
-  // Update pagination state
+
   function updatePaginationState() {
-    // Update pagination buttons
     updatePaginationButtons();
-    
-    // Update prev/next buttons
     if (prevPageBtn) prevPageBtn.disabled = currentPage === 1;
     if (nextPageBtn) nextPageBtn.disabled = currentPage === maxPage;
   }
-  
-  // Change page
+
   function changePage(pageNum) {
     currentPage = pageNum;
     updateProgramDisplay();
-    
-    // Scroll to top of programs section
-    const programsSection = document.getElementById('other-university');
-    if (programsSection) {
-      window.scrollTo({
-        top: programsSection.offsetTop - 50,
-        behavior: 'smooth'
-      });
-    }
+    const sec = document.getElementById('other-university');
+    if (sec) window.scrollTo({ top: sec.offsetTop - 50, behavior: 'smooth' });
   }
-  
-  // Search functionality
+
   if (keywordInput) {
-    keywordInput.addEventListener('input', function() {
-      updateProgramDisplay();
-    });
-    
-    // Enter key support
-    keywordInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        updateProgramDisplay();
-      }
-    });
+    keywordInput.addEventListener('input', updateProgramDisplay);
+    keywordInput.addEventListener('keypress', function(e) { if (e.key === 'Enter') { e.preventDefault(); updateProgramDisplay(); } });
   }
-  
-  // Clear search functionality
-  if (clearSearchBtn) {
-    clearSearchBtn.addEventListener('click', function() {
-      keywordInput.value = '';
-      updateProgramDisplay();
-    });
-  }
-  
-  if (clearSearch) {
-    clearSearch.addEventListener('click', function() {
-      keywordInput.value = '';
-      updateProgramDisplay();
-    });
-  }
-  
-  // Previous page button
-  if (prevPageBtn) {
-    prevPageBtn.addEventListener('click', function() {
-      if (currentPage > 1) {
-        changePage(currentPage - 1);
-      }
-    });
-  }
-  
-  // Next page button
-  if (nextPageBtn) {
-    nextPageBtn.addEventListener('click', function() {
-      if (currentPage < maxPage) {
-        changePage(currentPage + 1);
-      }
-    });
-  }
-  
-  // Initial count update
-  let initialVisibleItems = 0;
-  programCards.forEach(card => {
-    if (parseInt(card.dataset.page) === 1) {
-      initialVisibleItems++;
-    }
-  });
-  
-  if (visibleCount) {
-    visibleCount.textContent = initialVisibleItems;
-  }
-  
-  // Initial display
+  if (clearSearchBtn) clearSearchBtn.addEventListener('click', function() { keywordInput.value = ''; updateProgramDisplay(); });
+  if (clearSearch) clearSearch.addEventListener('click', function() { keywordInput.value = ''; updateProgramDisplay(); });
+  if (prevPageBtn) prevPageBtn.addEventListener('click', function() { if (currentPage > 1) changePage(currentPage - 1); });
+  if (nextPageBtn) nextPageBtn.addEventListener('click', function() { if (currentPage < maxPage) changePage(currentPage + 1); });
+
+  // Initial
+  let initVis = 0;
+  programCards.forEach(card => { if (parseInt(card.dataset.page) === 1) initVis++; });
+  if (visibleCount) visibleCount.textContent = initVis;
   updatePaginationButtons();
   updateProgramDisplay();
+
+  // Sticky sidebar nav highlight
+  const sidebarLinks = document.querySelectorAll('.up-sidebar-link');
+  const sections = [];
+  sidebarLinks.forEach(link => {
+    const id = link.getAttribute('href').replace('#', '');
+    const sec = document.getElementById(id);
+    if (sec) sections.push({ el: sec, link: link });
+  });
+  window.addEventListener('scroll', function() {
+    let cur = sections[0];
+    sections.forEach(s => { if (s.el.offsetTop - 120 <= window.scrollY) cur = s; });
+    sidebarLinks.forEach(l => l.classList.remove('active'));
+    if (cur) cur.link.classList.add('active');
+  });
 });
 </script>
