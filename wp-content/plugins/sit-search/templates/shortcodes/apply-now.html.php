@@ -1,21 +1,5 @@
 <?php
-// TEMP DEBUG - remove after testing
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  echo '<div style="padding:12px;border:2px solid #f00;background:#fff; margin:12px 0;">';
-  echo '<strong>UTM DEBUG (SERVER RECEIVED):</strong><pre style="white-space:pre-wrap;">';
-  print_r([
-    'utm_source'   => $_POST['utm_source'] ?? null,
-    'utm_medium'   => $_POST['utm_medium'] ?? null,
-    'utm_campaign' => $_POST['utm_campaign'] ?? null,
-    'utm_content'  => $_POST['utm_content'] ?? null,
-    'utm_term'     => $_POST['utm_term'] ?? null,
-    'landing_page' => $_POST['landing_page'] ?? null,
-    'referrer'     => $_POST['referrer'] ?? null,
-  ]);
-  echo '</pre></div>';
-  // IMPORTANT: comment this out only during testing if you want to stop sending to Zoho:
-  // exit;
-}
+// UTM tracking is handled site-wide by assets/js/utm-tracker.js
 ?>
 
 
@@ -213,8 +197,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input type="hidden" name="utm_term" id="utm_term" value="">
         <input type="hidden" name="landing_page" id="landing_page" value="">
         <input type="hidden" name="referrer" id="referrer" value="">
-        <input type="hidden" name="landing_page" id="landing_page" value="">
-        <input type="hidden" name="referrer" id="referrer" value="">
 
 
         <!-- Personal Information Section -->
@@ -350,7 +332,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
 
         <img id="loader" class="loadar" src="/wp-content/uploads/2025/05/fade-stagger-circles-1.svg" alt="">
-        <button type="submit" class="apply-submit-btn" id="pay-button">Submit Application</button>
+        <button type="submit" class="apply-submit-btn" id="pay-button">
+          <span class="apply-btn-text">Submit Application</span>
+          <span class="apply-btn-spinner" style="display:none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg>
+            Submitting...
+          </span>
+        </button>
+
+        <!-- Submission overlay to prevent double-click -->
+        <div class="apply-submit-overlay" id="submit-overlay" style="display:none;">
+          <div class="apply-submit-overlay-content">
+            <svg width="48" height="48" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#e20a17" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.2"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg>
+            <p>Submitting your application...</p>
+            <small>Please wait, uploading your documents</small>
+          </div>
+        </div>
       </form>
 
       <div class="apply-form-footer">
@@ -506,6 +503,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Setup both file inputs
     setupFileInput('passport-input', 'passport-label', 'passport-filename');
     setupFileInput('transcript-input', 'transcript-label', 'transcript-filename');
+
+    // Prevent double-submit: show spinner + overlay
+    var applyForm = document.getElementById('apply-form-body');
+    var payBtn = document.getElementById('pay-button');
+    var overlay = document.getElementById('submit-overlay');
+
+    if (applyForm && payBtn && overlay) {
+      applyForm.addEventListener('submit', function(e) {
+        // Don't block Stripe-handled forms (they handle it separately)
+        if (payBtn.dataset.stripeHandled) return;
+
+        // Show spinner in button
+        var btnText = payBtn.querySelector('.apply-btn-text');
+        var btnSpinner = payBtn.querySelector('.apply-btn-spinner');
+        if (btnText) btnText.style.display = 'none';
+        if (btnSpinner) btnSpinner.style.display = 'inline-flex';
+
+        // Disable button
+        payBtn.disabled = true;
+        payBtn.style.opacity = '0.7';
+        payBtn.style.cursor = 'not-allowed';
+
+        // Show overlay
+        overlay.style.display = 'flex';
+      });
+    }
 });
 </script>
 

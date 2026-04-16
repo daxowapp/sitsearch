@@ -112,8 +112,44 @@ class Supabase
             'Prefer' => 'count=exact'
         ]);
         
-        // Count is returned in response header, but we can also parse from body
         return is_array($response) ? count($response) : 0;
+    }
+    
+    /**
+     * Get exact count of records matching filters using content-range header
+     */
+    public function count_filtered(string $table, array $query = []): int
+    {
+        $query['select'] = 'id';
+        $query['limit'] = 1;
+        $url = $this->build_url($table, $query);
+        
+        $headers = [
+            'apikey' => $this->anon_key,
+            'Authorization' => 'Bearer ' . $this->anon_key,
+            'Content-Type' => 'application/json',
+            'Prefer' => 'count=exact',
+        ];
+        
+        $response = wp_remote_request($url, [
+            'method' => 'GET',
+            'headers' => $headers,
+            'timeout' => 15,
+        ]);
+        
+        if (is_wp_error($response)) {
+            return 0;
+        }
+        
+        // Parse count from content-range header: "0-0/1234"
+        $content_range = wp_remote_retrieve_header($response, 'content-range');
+        if ($content_range && preg_match('/\/(\d+)$/', $content_range, $matches)) {
+            return (int) $matches[1];
+        }
+        
+        // Fallback: count body array
+        $body = json_decode(wp_remote_retrieve_body($response), true);
+        return is_array($body) ? count($body) : 0;
     }
     
     /**
@@ -321,6 +357,64 @@ class Supabase
         }
         
         return $url;
+    }
+
+    /**
+     * Upload a file to Supabase Storage
+     *
+     * @param string $file_path Local path to the file
+     * @param string $file_name Target filename in the bucket
+     * @param string $file_type MIME type of the file
+     * @param string $bucket Bucket name (optional, defaults to SUPABASE_BUCKET)
+     * @return array|null Response data containing Key/id or null on failure
+     */
+    public function upload_file(string $file_path, string $file_name, string $file_type, string $bucket = ''): ?array
+    {
+        if (empty($bucket)) {
+            $bucket = defined('SUPABASE_BUCKET') ? SUPABASE_BUCKET : 'uploads';
+        }
+        
+        $url = rtrim($this->url, '/') . '/storage/v1/object/' . $bucket . '/' . $file_name;
+        
+        $file_content = file_get_contents($file_path);
+        
+        if ($file_content === false) {
+            $this->logger->log_message('error', 'Supabase file upload error: Cannot read local file ' . $file_path);
+            return null;
+        }
+
+        $headers = [
+            'apikey' => $this->anon_key,
+            'Authorization' => 'Bearer ' . $this->anon_key,
+            'Content-Type' => $file_type,
+        ];
+        
+        $args = [
+            'method' => 'POST',
+            'headers' => $headers,
+            'body' => $file_content,
+            'timeout' => 60,
+        ];
+        
+        $this->logger->log_message('info', "Supabase uploading file to: {$url}");
+        
+        $response = wp_remote_request($url, $args);
+        
+        if (is_wp_error($response)) {
+            $this->logger->log_message('error', 'Supabase upload request error: ' . $response->get_error_message());
+            return null;
+        }
+        
+        $http_code = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
+        
+        if ($http_code >= 400) {
+            $this->logger->log_message('error', "Supabase HTTP error {$http_code} during upload: {$body}");
+            return null;
+        }
+        
+        $decoded = json_decode($body, true);
+        return $decoded;
     }
     
     /**

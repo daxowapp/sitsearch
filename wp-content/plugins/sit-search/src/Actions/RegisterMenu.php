@@ -52,6 +52,26 @@ class RegisterMenu extends Hook
             'sit-search-ai-settings',
             array($this, 'aiSettingsPage')
         );
+
+        // Search Queries Page
+        add_submenu_page(
+            'sit-search',
+            'Search Queries',
+            'Search Queries',
+            'manage_options',
+            'sit-search-queries',
+            array($this, 'searchQueriesPage')
+        );
+
+        // GEO Settings Page
+        add_submenu_page(
+            'sit-search',
+            'GEO Settings',
+            'GEO (AI Visibility)',
+            'manage_options',
+            'sit-search-geo',
+            array($this, 'geoSettingsPage')
+        );
     }
 
     public function menuPage()
@@ -67,5 +87,15 @@ class RegisterMenu extends Hook
     public function mappingPage()
     {
         Template::render('admin/mapping');
+    }
+
+    public function searchQueriesPage()
+    {
+        Template::render('admin/search-queries');
+    }
+
+    public function geoSettingsPage()
+    {
+        Template::render('admin/geo-settings');
     }
 }

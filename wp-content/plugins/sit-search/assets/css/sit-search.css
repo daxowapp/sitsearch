@@ -7041,29 +7041,32 @@ a.uni-link:hover {
 .uni-filters {
   display: flex;
   margin-bottom: 20px;
-  gap: 16px;
+  gap: 16px !important; /* Force gap against theme overrides */
   align-items: center;
 }
 
 .uni-level-filter select {
-  height: 48px;
-  padding: 0 15px;
-  border-radius: 8px;
-  border: 1px solid #e6eaf1;
-  background-color: white;
-  color: #1a1a1a;
+  height: 48px !important;
+  padding: 0 15px !important;
+  border-radius: 8px !important; /* Overcome native iOS/generic theme rounding */
+  border: 1px solid #e6eaf1 !important;
+  background-color: white !important;
+  color: #1a1a1a !important;
   font-size: 15px;
   font-family: inherit;
   cursor: pointer;
   outline: none;
   width: 200px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  max-width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s ease;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 .uni-level-filter select:focus {
-  border-color: var(--uni-primary, #e20a17);
-  box-shadow: 0 4px 15px rgba(226, 10, 23, 0.1);
+  border-color: var(--uni-primary, #e20a17) !important;
+  box-shadow: 0 4px 15px rgba(226, 10, 23, 0.1) !important;
 }
 
 .uni-search-input {
@@ -7071,12 +7074,12 @@ a.uni-link:hover {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: white;
-  border: 1px solid #e6eaf1;
-  border-radius: 8px;
-  padding: 0 15px;
-  height: 48px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  background: white !important;
+  border: 1px solid #e6eaf1 !important;
+  border-radius: 8px !important;
+  padding: 0 15px !important;
+  height: 48px !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03) !important;
   transition: all 0.3s ease;
 }
 
@@ -7277,10 +7280,11 @@ a.uni-link:hover {
   .uni-filters {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px !important;
   }
   
   .uni-level-filter select {
-    width: 100%;
+    width: 100% !important;
   }
 
   .uni-program-row {
@@ -8099,6 +8103,192 @@ a.uni-link:hover {
   color: var(--pp-primary-dark);
 }
 
+/* ═══════ UP CAMPUS CARD ═══════ */
+.up-campus-card {
+  background: white;
+  border: 1px solid #e6eaf1;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+  position: relative;
+}
+
+.up-campus-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+}
+
+.up-campus-image {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: white;
+  padding: 16px;
+  border-bottom: 1px solid #e6eaf1;
+}
+
+.up-campus-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.up-campus-card:hover .up-campus-image img {
+  transform: scale(1.05);
+}
+
+.up-campus-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.up-campus-card:hover .up-campus-overlay {
+  opacity: 1;
+}
+
+.up-campus-content {
+  padding: 20px 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.up-campus-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a202c;
+  text-decoration: none;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.up-campus-title:hover {
+  color: var(--uni-primary, #e20a17);
+}
+
+.up-campus-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #718096;
+}
+
+.up-campus-meta svg {
+  color: #a0aec0;
+}
+
+.up-campus-footer {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: auto;
+}
+
+.up-campus-actions {
+  display: flex;
+  gap: 16px;
+  padding-top: 6px;
+}
+
+.up-campus-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--uni-primary, #e20a17);
+  text-decoration: none;
+  transition: opacity 0.2s ease;
+}
+
+.up-campus-action:hover {
+  opacity: 0.8;
+}
+
+.up-campus-action svg {
+  stroke-width: 2.5;
+}
+
+.up-campus-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #f7fafc;
+  color: #2d3748;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.up-campus-btn span {
+  transition: transform 0.2s ease;
+}
+
+.up-campus-btn:hover {
+  background: #edf2f7;
+}
+
+.up-campus-btn:hover span {
+  transform: translateX(4px);
+}
+
+.up-campus-btn-full {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--uni-primary, #e20a17);
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(226, 10, 23, 0.2);
+}
+
+.up-campus-btn-full span {
+  transition: transform 0.2s ease;
+}
+
+.up-campus-btn-full:hover {
+  background: #cc0000;
+  box-shadow: 0 6px 15px rgba(226, 10, 23, 0.3);
+}
+
+.up-campus-btn-full:hover span {
+  transform: translateX(4px);
+}
+
 /* ═══════ UNIVERSITY META ═══════ */
 .pp-uni-meta {
   display: flex;
@@ -8155,134 +8345,6 @@ a.uni-link:hover {
   gap: 16px;
 }
 
-.programPage-campus-card,
-.programPage-university-card {
-  background: #fff;
-  border: 1px solid var(--pp-border);
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  transition: box-shadow 0.3s ease;
-}
-
-.programPage-campus-card:hover,
-.programPage-university-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.programPage-campus-image,
-.programPage-university-image {
-  width: 100%;
-  height: 130px;
-  overflow: hidden;
-  background: #fff;
-  border-bottom: 1px solid var(--pp-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.programPage-campus-image img,
-.programPage-university-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-
-.programPage-campus-content,
-.programPage-university-content {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex-grow: 1;
-}
-
-.programPage-campus-title,
-.programPage-university-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--pp-dark);
-  margin: 0;
-  line-height: 1.4;
-}
-
-/* Remove default link underline inside title wrapper */
-a.programPage-university-title-link {
-  text-decoration: none;
-}
-
-.programPage-campus-location,
-.programPage-university-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--pp-gray);
-  margin-top: -6px;
-}
-
-.programPage-campus-location svg,
-.programPage-university-location svg {
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.programPage-campus-actions,
-.programPage-university-actions {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 8px;
-}
-
-.programPage-campus-link,
-.programPage-university-link {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: var(--pp-primary);
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.2s;
-}
-
-.programPage-campus-link:hover,
-.programPage-university-link:hover {
-  color: var(--pp-dark);
-}
-
-.programPage-campus-button,
-.programPage-university-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 10px;
-  margin-top: auto;
-  background: var(--pp-light-gray);
-  color: var(--pp-dark);
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  text-decoration: none;
-  transition: background-color 0.2s ease;
-}
-
-.programPage-campus-button:hover,
-.programPage-university-button:hover {
-  background: #e8ecf1;
-}
-
-.programPage-campus-button svg,
-.programPage-university-button svg {
-  width: 16px;
-  height: 16px;
-}
 
 .uni-carousel {
   display: grid;
@@ -8985,8 +9047,8 @@ body.page .elementor-sticky--active:has(.sit-search-container-wrapper) {
 
 /* --- Program Card Grid (ProgramBoxUni) --- */
 .filter-results {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
     width: 100%;
     min-height: 200px;

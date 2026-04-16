@@ -26,6 +26,17 @@ class AiSearchEndpoint
             return new \WP_REST_Response(['terms' => [$query]], 200);
         }
 
+        // Rate limiting (max 15 requests per minute per IP) to protect OpenAI credits
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+        $rate_limit_key = 'sit_ai_rl_' . md5($ip);
+        $attempts = (int) get_transient($rate_limit_key);
+
+        if ($attempts >= 15) {
+            // Fallback gracefully without throwing HTTP 429 to keep UI functional
+            return new \WP_REST_Response(['terms' => [$query]], 200);
+        }
+        set_transient($rate_limit_key, $attempts + 1, MINUTE_IN_SECONDS);
+
         $system_prompt = "You are an AI search assistant for a university program database (study abroad portal). Follow these 3 rules:
 1. Typo Correction: Fix spelling mistakes in the user query.
 2. Translation: Translate any non-English query into English. (Our database expects English terms).

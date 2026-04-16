@@ -9,7 +9,7 @@ class OpenAI
     
     public function __construct()
     {
-        $this->api_key = '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';
+        $this->api_key = Constants::get_openai_api_key();
     }
     
     /**
@@ -72,7 +72,8 @@ class OpenAI
         $magnitude1 = 0.0;
         $magnitude2 = 0.0;
         
-        for ($i = 0; $i < count($vector1); $i++) {
+        $count = count($vector1);
+        for ($i = 0; $i < $count; $i++) {
             $dotProduct += $vector1[$i] * $vector2[$i];
             $magnitude1 += $vector1[$i] * $vector1[$i];
             $magnitude2 += $vector2[$i] * $vector2[$i];
@@ -89,40 +90,38 @@ class OpenAI
     }
     
     /**
-     * Make HTTP request to OpenAI API
+     * Make HTTP request to OpenAI API using WordPress HTTP API
      */
     private function makeRequest(string $url, array $data): ?array
     {
-        $headers = [
-            'Authorization: Bearer ' . $this->api_key,
-            'Content-Type: application/json',
-        ];
-        
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-        
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
-        curl_close($ch);
-        
-        if ($error) {
-            error_log('OpenAI API cURL error: ' . $error);
+        if (empty($this->api_key)) {
+            error_log('OpenAI API key not configured. Set it under SIT Search > AI Settings.');
             return null;
         }
+
+        $response = wp_remote_post($url, [
+            'headers' => [
+                'Authorization' => 'Bearer ' . $this->api_key,
+                'Content-Type'  => 'application/json',
+            ],
+            'body'    => json_encode($data),
+            'timeout' => 30,
+        ]);
+
+        if (is_wp_error($response)) {
+            error_log('OpenAI API error: ' . $response->get_error_message());
+            return null;
+        }
+        
+        $httpCode = wp_remote_retrieve_response_code($response);
+        $body = wp_remote_retrieve_body($response);
         
         if ($httpCode !== 200) {
-            error_log('OpenAI API HTTP error: ' . $httpCode . ' - ' . $response);
+            error_log('OpenAI API HTTP error: ' . $httpCode . ' - ' . $body);
             return null;
         }
         
-        $decoded = json_decode($response, true);
+        $decoded = json_decode($body, true);
         
         if (json_last_error() !== JSON_ERROR_NONE) {
             error_log('OpenAI API JSON decode error: ' . json_last_error_msg());

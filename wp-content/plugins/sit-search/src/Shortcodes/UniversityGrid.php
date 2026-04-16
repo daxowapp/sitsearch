@@ -200,6 +200,18 @@ class UniversityGrid {
             </div>
             <?php endif; ?>
 
+            <div class="university-grid-header">
+                <div class="university-results-count-container"></div>
+                <div class="university-layout-toggle hide-on-mobile">
+                    <button type="button" class="layout-btn layout-grid active" data-layout="grid" aria-label="Grid View" title="Grid View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </button>
+                    <button type="button" class="layout-btn layout-list" data-layout="list" aria-label="List View" title="List View">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    </button>
+                </div>
+            </div>
+
             <div class="university-grid-loading" style="display: none;">
                 <div class="loading-spinner"></div>
                 <p>Loading universities...</p>
@@ -255,6 +267,13 @@ class UniversityGrid {
     }
 
     private function get_cities_from_db($country = '') {
+        // Check transient cache first (12-hour TTL, keyed by country)
+        $transient_key = 'sit_cities_cache_' . sanitize_key($country ?: 'all');
+        $cached = get_transient($transient_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
         // Get cities from sit-city taxonomy, optionally filtered by country
         $cities = [];
         
@@ -326,10 +345,19 @@ class UniversityGrid {
             }
         }
 
-        return array_values($cities);
+        $result = array_values($cities);
+        set_transient($transient_key, $result, 12 * HOUR_IN_SECONDS);
+        return $result;
     }
 
     private function get_sectors_from_db() {
+        // Check transient cache first (24-hour TTL)
+        $transient_key = 'sit_sectors_cache';
+        $cached = get_transient($transient_key);
+        if (is_array($cached)) {
+            return $cached;
+        }
+
         global $wpdb;
         
         // Use only the 'Sector' field (without underscore) since that's where the data is
@@ -346,7 +374,9 @@ class UniversityGrid {
             ORDER BY pm.meta_value
         ");
 
-        return array_filter($sectors);
+        $result = array_filter($sectors);
+        set_transient($transient_key, $result, DAY_IN_SECONDS);
+        return $result;
     }
 
     private function get_universities($args = []) {
@@ -446,9 +476,37 @@ class UniversityGrid {
 
     private function render_university_items($query) {
         if ($query->have_posts()) {
+            
+            // 1. Bulk prime post caches and taxonomy terms
+            $university_ids = wp_list_pluck($query->posts, 'ID');
+            _prime_post_caches($university_ids, true, true);
+            update_object_term_cache($university_ids, ['sit-country', 'sit-city']);
+            
+            // 2. Pre-calculate program counts for ALL universities on this page in one query
+            global $wpdb;
+            $id_list = implode(',', array_map('intval', $university_ids));
+            $program_counts_raw = $wpdb->get_results("
+                SELECT pm.meta_value as uni_id, COUNT(p.ID) as p_count
+                FROM {$wpdb->postmeta} pm
+                INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+                WHERE pm.meta_key = 'zh_university'
+                AND pm.meta_value IN ({$id_list})
+                AND p.post_type = 'sit-program'
+                AND p.post_status = 'publish'
+                GROUP BY pm.meta_value
+            ");
+            
+            $program_counts = [];
+            foreach ($program_counts_raw as $row) {
+                $program_counts[(int)$row->uni_id] = (int)$row->p_count;
+            }
+
+            // 3. Render items without triggering database queries
             while ($query->have_posts()) {
                 $query->the_post();
-                $this->render_university_card(get_the_ID());
+                $uid = get_the_ID();
+                $p_count = isset($program_counts[$uid]) ? $program_counts[$uid] : 0;
+                $this->render_university_card($uid, $p_count);
             }
             wp_reset_postdata();
         } else {
@@ -459,7 +517,7 @@ class UniversityGrid {
         }
     }
 
-    private function render_university_card($university_id) {
+    private function render_university_card($university_id, $program_count = 0) {
         $university = get_post($university_id);
         if (!$university) return;
 
@@ -467,7 +525,7 @@ class UniversityGrid {
         $country = '';
         $city = '';
         
-        // Get country from taxonomy
+        // Get country from taxonomy (Already cached via update_object_term_cache)
         $country_terms = get_the_terms($university_id, 'sit-country');
         if (!is_wp_error($country_terms) && !empty($country_terms)) {
             $country = $country_terms[0]->name;
@@ -479,24 +537,13 @@ class UniversityGrid {
             $city = $city_terms[0]->name;
         }
         
+        // Get meta strictly from cached objects
         $sector = get_post_meta($university_id, 'Sector', true);
         $website = get_post_meta($university_id, 'Website', true);
         $logo = get_post_meta($university_id, 'uni_image', true);
 
         // Build Apply Now URL to the programs page (NEW)
         $apply_url = esc_url( add_query_arg( 'uni-id', (int) $university_id, \SIT\Search\Services\URLHelper::university() ) );
-
-        // Get program count
-        $programs_query = new \WP_Query([
-            'post_type' => 'sit-program',
-            'post_status' => 'publish',
-            'posts_per_page' => 1,
-            'meta_query' => [
-                ['key' => 'zh_university', 'value' => $university_id, 'compare' => '=']
-            ]
-        ]);
-        $program_count = $programs_query->found_posts;
-        wp_reset_postdata();
 
         // Clean up placeholder values
         if ($sector === 'sector') $sector = '';
@@ -525,26 +572,31 @@ class UniversityGrid {
                     </h3>
 
                     <div class="university-meta">
-                        <?php if ($country || $city): ?>
+                        <?php if ($city || $country): ?>
                         <div class="university-location">
-                            <span class="location-icon">📍</span>
-                            <?php 
-                            $location_parts = array_filter([$city, $country]);
-                            echo esc_html(implode(', ', $location_parts)); 
-                            ?>
+                            <span class="meta-icon">📍</span>
+                            <span class="meta-label">Location:</span>
+                            <span class="meta-value">
+                                <?php 
+                                $location_parts = array_filter([$city, $country]);
+                                echo esc_html(implode(', ', $location_parts)); 
+                                ?>
+                            </span>
                         </div>
                         <?php endif; ?>
 
                         <?php if ($sector): ?>
                         <div class="university-sector">
-                            <span class="sector-icon">🏛️</span>
+                            <span class="meta-icon">🏛️</span>
+                            <span class="meta-label">Type:</span>
                             <span class="meta-value"><?php echo esc_html($sector); ?></span>
                         </div>
                         <?php endif; ?>
 
                         <?php if ($program_count > 0): ?>
                         <div class="university-programs">
-                            <span class="programs-icon">📚</span>
+                            <span class="meta-icon">📚</span>
+                            <span class="meta-label">Programs:</span>
                             <span class="meta-value">
                                 <?php printf($program_count === 1 ? '%d Program' : '%d Programs', $program_count); ?>
                             </span>
@@ -568,9 +620,11 @@ class UniversityGrid {
     }
 
     public function ajax_filter_universities() {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'university_filter_nonce')) {
-            wp_send_json_error(['message' => 'Security check failed']);
-            return;
+        // Relaxed security check for read-only public search to handle cached pages (WP Rocket nonce expiration)
+        $nonce = $_POST['nonce'] ?? '';
+        if (!wp_verify_nonce($nonce, 'university_filter_nonce')) {
+            // Log warning but allow request if it's a valid public search
+            error_log('SIT Search: Nonce verification failed for filter_universities, but allowing public search.');
         }
 
         $filters = [
@@ -635,9 +689,10 @@ class UniversityGrid {
     }
 
     public function ajax_get_cities_by_country() {
-        if (!wp_verify_nonce($_POST['nonce'] ?? '', 'university_filter_nonce')) {
-            wp_send_json_error(['message' => 'Security check failed']);
-            return;
+        // Relaxed security check for read-only public search to handle cached pages (WP Rocket nonce expiration)
+        $nonce = $_POST['nonce'] ?? '';
+        if (!wp_verify_nonce($nonce, 'university_filter_nonce')) {
+            error_log('SIT Search: Nonce verification failed for get_cities_by_country, but allowing public search.');
         }
 
         $country = sanitize_text_field($_POST['country'] ?? '');

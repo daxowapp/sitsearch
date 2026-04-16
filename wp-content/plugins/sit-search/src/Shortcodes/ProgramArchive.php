@@ -487,9 +487,22 @@ class ProgramArchive
                 'discounted_fee' => get_post_meta($post->ID, 'Discounted_Tuition', true),
                 'Advanced_Discount' => get_post_meta($post->ID, 'Advanced_Discount', true),
                 'Tuition_Currency' => get_post_meta($post->ID, 'Tuition_Currency', true) ?: 'USD',
-                'image_url' => !empty(get_post_meta($oth_uniid, 'uni_image', true)) ?
-                    esc_url(get_post_meta($oth_uniid, 'uni_image', true))
-                    : 'https://placehold.co/714x340?text=University',
+                'image_url' => (function() use ($oth_uniid) {
+                    $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
+                    foreach ($keys as $key) {
+                        $img = get_post_meta($oth_uniid, $key, true);
+                        if (!empty($img)) return esc_url($img);
+                    }
+                    return 'https://placehold.co/714x340?text=University';
+                })(),
+                'logo_url' => (function() use ($oth_uniid) {
+                    $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                    foreach ($keys as $key) {
+                        $img = get_post_meta($oth_uniid, $key, true);
+                        if (!empty($img)) return esc_url($img);
+                    }
+                    return 'https://placehold.co/128x128?text=U';
+                })(),
             ];
         }, $query->posts);
 
@@ -586,9 +599,22 @@ class ProgramArchive
                     'discounted_fee' => get_post_meta($post_id, 'Discounted_Tuition', true),
                     'Advanced_Discount' => get_post_meta($post_id, 'Advanced_Discount', true),
                     'Tuition_Currency' => get_post_meta($post_id, 'Tuition_Currency', true) ?: 'USD',
-                    'image_url' => !empty(get_post_meta($oth_uniid, 'uni_image', true)) ?
-                        esc_url(get_post_meta($oth_uniid, 'uni_image', true))
-                        : 'https://placehold.co/714x340?text=University',
+                    'image_url' => (function() use ($oth_uniid) {
+                        $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
+                        foreach ($keys as $key) {
+                            $img = get_post_meta($oth_uniid, $key, true);
+                            if (!empty($img)) return esc_url($img);
+                        }
+                        return 'https://placehold.co/714x340?text=University';
+                    })(),
+                    'logo_url' => (function() use ($oth_uniid) {
+                        $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                        foreach ($keys as $key) {
+                            $img = get_post_meta($oth_uniid, $key, true);
+                            if (!empty($img)) return esc_url($img);
+                        }
+                        return 'https://placehold.co/128x128?text=U';
+                    })(),
                 ];
             }, $pdf_query->posts);
         }

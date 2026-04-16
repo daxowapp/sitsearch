@@ -58,10 +58,21 @@ class SearchEndpoint {
      */
     public function handle_search($request): \WP_REST_Response
     {
-        // Get all filter parameters
-        $page = intval($request->get_param('page') ?: 1);
-        $per_page = intval($request->get_param('per_page') ?: 21);
-        $sort = $request->get_param('sort') ?: 'featured';
+        // Parameter caching key
+        $params = $request->get_params();
+        ksort($params);
+        $cache_version = get_option('sit_search_cache_version', '1');
+        $cache_key = 'sit_search_v2_' . md5($cache_version . json_encode($params));
+
+        $cached_response = get_transient($cache_key);
+        if ($cached_response !== false) {
+            return rest_ensure_response($cached_response);
+        }
+
+        // Get all filter parameters with sanitization
+        $page = absint($request->get_param('page') ?: 1);
+        $per_page = absint($request->get_param('per_page') ?: 21);
+        $sort = sanitize_text_field($request->get_param('sort') ?: 'featured');
         $search = sanitize_text_field($request->get_param('search') ?: '');
         
         // Taxonomy filters
@@ -206,6 +217,30 @@ class SearchEndpoint {
         $query = new \WP_Query($args);
         $programs_raw = $query->get_posts();
 
+        // --- OPTIMIZATION: BATCH CACHE PROGRAMS & UNIVERSITIES ---
+        $program_ids = wp_list_pluck($programs_raw, 'ID');
+        if (!empty($program_ids)) {
+            update_meta_cache('post', $program_ids);
+            update_object_term_cache($program_ids, ['sit-degree', 'sit-language', 'sit-speciality', 'sit-faculty', 'sit-city']);
+        }
+
+        $uni_ids = [];
+        foreach ($programs_raw as $program) {
+            $u_id = get_post_meta($program->ID, 'zh_university', true);
+            if ($u_id) {
+                $uni_ids[] = $u_id;
+            }
+        }
+        $unique_uni_ids = array_unique($uni_ids);
+        
+        if (!empty($unique_uni_ids)) {
+            // Bulk cache university post objects, post meta, and terms in minimal queries
+            _prime_post_caches($unique_uni_ids, true, true);
+            update_object_term_cache($unique_uni_ids, ['sit-country', 'sit-city']);
+        }
+
+        $featured_service = new FeaturedUniversity();
+
         // Map and filter by university if needed
         $mapped_programs = [];
         $seen_ids = [];
@@ -215,7 +250,7 @@ class SearchEndpoint {
             if (in_array($program->ID, $seen_ids)) continue;
 
             $uni_id = get_post_meta($program->ID, 'zh_university', true);
-            $uni = get_post($uni_id);
+            $uni = get_post($uni_id); // Now instantly loads from memory cache
             if (!$uni) continue;
 
             // Filter by university name if specified
@@ -223,7 +258,7 @@ class SearchEndpoint {
                 continue;
             }
 
-            $is_featured = (new FeaturedUniversity())->isFeatured($uni_id);
+            $is_featured = $featured_service->isFeatured($uni_id);
             
             // Get effective fee for sorting
             $official_fee = get_post_meta($program->ID, 'official_tuition', true) ?: get_post_meta($program->ID, 'Official_Tuition', true);
@@ -300,7 +335,7 @@ class SearchEndpoint {
         // Extract available filters from results
         $available_filters = $this->extract_available_filters($mapped_programs);
 
-        return rest_ensure_response([
+        $response_data = [
             'status' => 200,
             'data' => [
                 'programs' => $programs_slice,
@@ -312,7 +347,11 @@ class SearchEndpoint {
                 ],
                 'available_filters' => $available_filters,
             ],
-        ]);
+        ];
+
+        set_transient($cache_key, $response_data, 15 * MINUTE_IN_SECONDS);
+
+        return rest_ensure_response($response_data);
     }
 
     /**
@@ -320,7 +359,7 @@ class SearchEndpoint {
      */
     public function handle_get_program_by_slug($request): \WP_REST_Response
     {
-        $slug = $request->get_param('slug');
+        $slug = sanitize_title($request->get_param('slug') ?: '');
         
         $args = [
             'post_type' => 'sit-program',
@@ -382,7 +421,7 @@ class SearchEndpoint {
      */
     public function handle_get_university_by_slug($request): \WP_REST_Response
     {
-        $slug = $request->get_param('slug');
+        $slug = sanitize_title($request->get_param('slug') ?: '');
         
         $args = [
             'post_type' => 'sit-university',
@@ -406,12 +445,20 @@ class SearchEndpoint {
         $programs_query = new \WP_Query([
             'post_type' => 'sit-program',
             'posts_per_page' => -1,
+            'no_found_rows' => true,
             'meta_query' => [
                 ['key' => 'zh_university', 'value' => $uni->ID],
             ],
         ]);
 
         $programs = [];
+        
+        $program_ids = wp_list_pluck($programs_query->posts, 'ID');
+        if (!empty($program_ids)) {
+            update_meta_cache('post', $program_ids);
+            update_object_term_cache($program_ids, ['sit-degree', 'sit-language']);
+        }
+
         foreach ($programs_query->posts as $program) {
             $programs[] = [
                 'id' => $program->ID,
@@ -460,6 +507,12 @@ class SearchEndpoint {
         $featured = (new FeaturedUniversity())->getFeatured();
         
         $universities = [];
+        
+        $featured_ids = wp_list_pluck($featured, 'ID');
+        if (!empty($featured_ids)) {
+            update_object_term_cache($featured_ids, ['sit-country', 'sit-city']);
+        }
+
         foreach ($featured as $uni) {
             $universities[] = [
                 'id' => $uni->ID,

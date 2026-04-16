@@ -580,9 +580,9 @@ if (!empty($faq_display)):
     </div>
     <?php endif; ?>
 
-    <div class="programPage-faq-list" id="faq-list">
+    <div class="programPage-faq-list" id="faq-list" itemscope itemtype="https://schema.org/FAQPage">
       <?php foreach ($faq_display as $i => $faq): ?>
-      <article class="programPage-faq-item" itemscope itemtype="https://schema.org/Question"
+      <article class="programPage-faq-item" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question"
                data-category="<?= esc_attr($faq['category'] ?? 'general') ?>">
         <details>
           <summary class="programPage-faq-question">

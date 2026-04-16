@@ -2,6 +2,7 @@
 
 namespace SIT\Search\Handlers;
 
+use SIT\Search\Services\CachedData;
 use SIT\Search\Services\Functions;
 use SIT\Search\Services\SIT_Logger;
 use SIT\Search\Services\Webhook;
@@ -187,6 +188,9 @@ class University extends Webhook
 
                     $this->logger->log_message('info', 'University post created with ID: ' . $post_id);
                 }
+
+                // Clear caches after successful sync
+                CachedData::clear_all();
 
                 return [
                     'status' => 'success',

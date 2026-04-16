@@ -129,7 +129,6 @@ class ProgramCity
         );
 
         // Filter programs by university's Active_in_Search status
-        $active_university_ids = array();
         $all_universities = get_posts(array(
             'post_type' => 'sit-university',
             'post_status' => 'publish',
@@ -137,12 +136,9 @@ class ProgramCity
             'fields' => 'ids'
         ));
         
-        foreach ($all_universities as $uni_id) {
-            $active_in_search = get_field('Active_in_Search', $uni_id);
-            if ($active_in_search == '1' || $active_in_search === true) {
-                $active_university_ids[] = $uni_id;
-            }
-        }
+        // Use CachedData for active university lookups instead of looping
+        $globally_active_ids = \SIT\Search\Services\CachedData::get_active_university_ids();
+        $active_university_ids = array_intersect($all_universities, $globally_active_ids);
         
         if (!empty($active_university_ids)) {
             $meta_query[] = array(
@@ -210,13 +206,7 @@ class ProgramCity
             
             if (!empty($university_ids)) {
                 // Filter university IDs to only include those with Active_in_Search = 1
-                $active_university_ids_filtered = array();
-                foreach ($university_ids as $uni_id) {
-                    $active_in_search = get_field('Active_in_Search', $uni_id);
-                    if ($active_in_search == '1' || $active_in_search === true) {
-                        $active_university_ids_filtered[] = $uni_id;
-                    }
-                }
+                $active_university_ids_filtered = array_intersect($university_ids, $globally_active_ids);
                 
                 if (!empty($active_university_ids_filtered)) {
                     $meta_query[] = array(
@@ -241,6 +231,7 @@ class ProgramCity
             $university_query = new \WP_Query(array(
                 'post_type'      => 'sit-university',
                 'posts_per_page' => -1,
+                'no_found_rows'  => true,
                 'post_status'    => 'publish',
                 'meta_query'     => array(
                     array(
@@ -314,6 +305,26 @@ class ProgramCity
 //        echo '</pre>';
         $query = new \WP_Query($args);
 
+        // Pre-warm meta and term caches for all posts in this page
+        $page_post_ids = wp_list_pluck($query->posts, 'ID');
+        if (!empty($page_post_ids)) {
+            update_meta_cache('post', $page_post_ids);
+            update_object_term_cache($page_post_ids, 'sit-program');
+            
+            // Also pre-warm university meta and post objects
+            $uni_ids_for_page = [];
+            foreach ($page_post_ids as $pid) {
+                $uid = intval(get_post_meta($pid, 'zh_university', true));
+                if ($uid && !in_array($uid, $uni_ids_for_page)) {
+                    $uni_ids_for_page[] = $uid;
+                }
+            }
+            if (!empty($uni_ids_for_page)) {
+                _prime_post_caches($uni_ids_for_page, true, true);
+                update_object_term_cache($uni_ids_for_page, 'sit-university');
+            }
+        }
+
         $programs = array_map(function ($post) {
 
             $oth_uniid = get_post_meta($post->ID, 'zh_university', true);
@@ -370,27 +381,36 @@ class ProgramCity
 
         // Create a separate query to get ALL programs for filter options (not paginated)
         $filter_args = $args;
-        $filter_args['posts_per_page'] = -1; // Get all posts
+        $filter_args['posts_per_page'] = 1000; // Limit to 1000 for filters to prevent memory issues
+        $filter_args['fields'] = 'ids'; // Only get IDs
+        $filter_args['no_found_rows'] = true;
         unset($filter_args['paged']); // Remove pagination
         $filter_query = new \WP_Query($filter_args);
         
         // Get all data from ALL results for filters
-        $all_program_posts = $filter_query->get_posts();
+        $all_program_ids = $filter_query->posts;
         $all_universities_for_filter = [];
         $all_durations_for_filter = [];
         
-        foreach ($all_program_posts as $program_post) {
+        // Pre-warm caches for the filter extraction loop
+        if (!empty($all_program_ids)) {
+            update_meta_cache('post', $all_program_ids);
+            update_object_term_cache($all_program_ids, 'sit-program');
+        }
+
+        foreach ($all_program_ids as $program_id) {
             // Extract universities
-            $university_id = get_post_meta($program_post->ID, 'university', true);
+            $university_id = intval(get_post_meta($program_id, 'zh_university', true));
             if ($university_id) {
-                $university = get_post($university_id);
-                if ($university && !in_array($university->post_title, $all_universities_for_filter)) {
-                    $all_universities_for_filter[] = $university->post_title;
+                // Fast cache access
+                $university_title = get_the_title($university_id);
+                if ($university_title && !in_array($university_title, $all_universities_for_filter)) {
+                    $all_universities_for_filter[] = $university_title;
                 }
             }
             
             // Extract durations
-            $duration = get_post_meta($program_post->ID, 'Duration', true);
+            $duration = get_post_meta($program_id, 'Study_Years', true);
             if ($duration && !in_array($duration, $all_durations_for_filter)) {
                 $all_durations_for_filter[] = $duration;
             }

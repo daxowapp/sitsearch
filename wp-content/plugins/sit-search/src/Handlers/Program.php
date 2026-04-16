@@ -2,6 +2,7 @@
 
 namespace SIT\Search\Handlers;
 
+use SIT\Search\Services\CachedData;
 use SIT\Search\Services\Functions;
 use SIT\Search\Services\SIT_Logger;
 use SIT\Search\Services\Webhook;
@@ -276,6 +277,9 @@ class Program extends Webhook
                 $this->logger->log_message('info', 'Program post created with ID: ' . $post_id);
             }
 
+            // Clear caches after successful sync
+            CachedData::clear_all();
+
             return [
                 'status' => 'success',
                 'data' => $program['data'],
@@ -288,3 +292,4 @@ class Program extends Webhook
         ];
     }
 }
+

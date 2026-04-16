@@ -15,6 +15,14 @@
             <form enctype="multipart/form-data" action="?" method="post">
 
                 <input type="hidden" name="uni_id" value="<?= $uni_details['uni_id'] ?>">
+                <!-- UTM Tracking (auto-filled by sit-utm-tracker.js) -->
+                <input type="hidden" name="utm_source" value="">
+                <input type="hidden" name="utm_medium" value="">
+                <input type="hidden" name="utm_campaign" value="">
+                <input type="hidden" name="utm_content" value="">
+                <input type="hidden" name="utm_term" value="">
+                <input type="hidden" name="landing_page" value="">
+                <input type="hidden" name="referrer" value="">
 
                 <div class="row g-3">
 

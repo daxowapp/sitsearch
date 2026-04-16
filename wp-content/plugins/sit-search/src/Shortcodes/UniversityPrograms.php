@@ -111,6 +111,7 @@ class UniversityPrograms
                 $university_query = new \WP_Query(array(
                     'post_type'      => 'sit-university',
                     'posts_per_page' => -1,
+                    'no_found_rows'  => true,
                     'post_status'    => 'publish',
                     'meta_query'     => array(
                         array(
@@ -146,6 +147,7 @@ class UniversityPrograms
             $pdf_args=array(
                 'post_type'      => 'sit-program',
                 'posts_per_page' => -1,
+                'no_found_rows'  => true,
                 'post_status'    => 'publish',
                 'meta_query'     => $meta_query,
             );
@@ -193,8 +195,24 @@ class UniversityPrograms
             $uni_query = new \WP_Query($args);
             $universities = $uni_query->get_posts();
 
-            $pdf_query = new \WP_Query($pdf_args);
-            $pdf = $pdf_query->get_posts();
+            // Pre-warm caches to prevent N+1 queries during mapping
+            $page_post_ids = wp_list_pluck($universities, 'ID');
+            if (!empty($page_post_ids)) {
+                update_meta_cache('post', $page_post_ids);
+                update_object_term_cache($page_post_ids, 'sit-program');
+                
+                $uni_ids_for_page = [];
+                foreach ($page_post_ids as $pid) {
+                    $uid = intval(get_post_meta($pid, 'zh_university', true));
+                    if ($uid && !in_array($uid, $uni_ids_for_page)) {
+                        $uni_ids_for_page[] = $uid;
+                    }
+                }
+                if (!empty($uni_ids_for_page)) {
+                    _prime_post_caches($uni_ids_for_page, true, true);
+                    update_object_term_cache($uni_ids_for_page, 'sit-country');
+                }
+            }
 
             $universities = array_map(function ($university) {
                 $oth_uniid = get_post_meta($university->ID, 'zh_university', true);
@@ -234,36 +252,86 @@ class UniversityPrograms
                     'Tuition_Currency' => get_post_meta($university->ID, 'Tuition_Currency', true),
                     'discounted_fee' => get_post_meta($university->ID, 'Discounted_Tuition', true),
                     'Advanced_Discount' => get_post_meta($university->ID, 'Advanced_Discount', true),
-                    'image_url' => !empty(get_post_meta($oth_uniid, 'uni_image', true)) ?
-                        esc_url(get_post_meta($oth_uniid, 'uni_image', true))
-                        : 'https://placehold.co/714x340?text=University',
+                    'image_url' => (function() use ($oth_uniid) {
+                        $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
+                        foreach ($keys as $key) {
+                            $img = get_post_meta($oth_uniid, $key, true);
+                            if (!empty($img)) return esc_url($img);
+                        }
+                        return 'https://placehold.co/714x340?text=University';
+                    })(),
+                    'logo_url' => (function() use ($oth_uniid) {
+                        $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                        foreach ($keys as $key) {
+                            $img = get_post_meta($oth_uniid, $key, true);
+                            if (!empty($img)) return esc_url($img);
+                        }
+                        return 'https://placehold.co/128x128?text=U';
+                    })(),
                 ];
             }, $universities);
 
-            $pdf = array_map(function ($university) {
-                $oth_uniid = get_post_meta($university->ID, 'zh_university', true);
-                $uni_title = get_the_title($oth_uniid);
-                $country_terms = get_the_terms($university->ID, 'sit-country');
-                return [
-                    'uni_id'        => $university->ID,
-                    'title' => $university->post_title,
-                    'link' => $university->guid,
-                    'uni_title' => $uni_title,
-                    'country' => (!empty($country_terms) && !is_wp_error($country_terms)) ? $country_terms[0]->name : '',
-                    'description' => !empty(get_post_meta($university->ID, 'Description', true)) ?
-                        get_post_meta($university->ID, 'Description', true)
-                        : 'Empty',
-                    'ranking' => get_post_meta($oth_uniid, 'QS_Rank', true),
-                    'duration' => get_post_meta($university->ID, 'Study_Years', true),
-                    'students' => get_post_meta($oth_uniid, 'Number_Of_Students', true),
-                    'fee' => get_post_meta($university->ID, 'Official_Tuition', true),
-                    'discounted_fee' => get_post_meta($university->ID, 'Discounted_Tuition', true),
-                    'Advanced_Discount' => get_post_meta($university->ID, 'Advanced_Discount', true),
-                    'image_url' => !empty(get_post_meta($oth_uniid, 'uni_image', true)) ?
-                        esc_url(get_post_meta($oth_uniid, 'uni_image', true))
-                        : 'https://placehold.co/714x340?text=University',
-                ];
-            }, $pdf);
+            $pdf = [];
+            if (isset($_GET['download']) && $_GET['download'] == 1) {
+                $pdf_query = new \WP_Query($pdf_args);
+                $pdf_posts = $pdf_query->get_posts();
+                
+                // Pre-warm caches for PDF mapping
+                $pdf_post_ids = wp_list_pluck($pdf_posts, 'ID');
+                if (!empty($pdf_post_ids)) {
+                    update_meta_cache('post', $pdf_post_ids);
+                    
+                    $pdf_uni_ids = [];
+                    foreach ($pdf_post_ids as $pid) {
+                        $uid = intval(get_post_meta($pid, 'zh_university', true));
+                        if ($uid && !in_array($uid, $pdf_uni_ids)) {
+                            $pdf_uni_ids[] = $uid;
+                        }
+                    }
+                    if (!empty($pdf_uni_ids)) {
+                        _prime_post_caches($pdf_uni_ids, true, true);
+                        update_object_term_cache($pdf_uni_ids, 'sit-country');
+                    }
+                }
+                
+                $pdf = array_map(function ($university) {
+                    $oth_uniid = get_post_meta($university->ID, 'zh_university', true);
+                    $uni_title = get_the_title($oth_uniid);
+                    $country_terms = get_the_terms($university->ID, 'sit-country');
+                    return [
+                        'uni_id'        => $university->ID,
+                        'title' => $university->post_title,
+                        'link' => $university->guid,
+                        'uni_title' => $uni_title,
+                        'country' => (!empty($country_terms) && !is_wp_error($country_terms)) ? $country_terms[0]->name : '',
+                        'description' => !empty(get_post_meta($university->ID, 'Description', true)) ?
+                            get_post_meta($university->ID, 'Description', true)
+                            : 'Empty',
+                        'ranking' => get_post_meta($oth_uniid, 'QS_Rank', true),
+                        'duration' => get_post_meta($university->ID, 'Study_Years', true),
+                        'students' => get_post_meta($oth_uniid, 'Number_Of_Students', true),
+                        'fee' => get_post_meta($university->ID, 'Official_Tuition', true),
+                        'discounted_fee' => get_post_meta($university->ID, 'Discounted_Tuition', true),
+                        'Advanced_Discount' => get_post_meta($university->ID, 'Advanced_Discount', true),
+                        'image_url' => (function() use ($oth_uniid) {
+                            $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
+                            foreach ($keys as $key) {
+                                $img = get_post_meta($oth_uniid, $key, true);
+                                if (!empty($img)) return esc_url($img);
+                            }
+                            return 'https://placehold.co/714x340?text=University';
+                        })(),
+                        'logo_url' => (function() use ($oth_uniid) {
+                            $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                            foreach ($keys as $key) {
+                                $img = get_post_meta($oth_uniid, $key, true);
+                                if (!empty($img)) return esc_url($img);
+                            }
+                            return 'https://placehold.co/128x128?text=U';
+                        })(),
+                    ];
+                }, $pdf_posts);
+            }
 
             $disstr='';
             if($post_title != ''){

@@ -134,7 +134,7 @@ class SearchProgramAjax extends Hook
     private function aiSearch(string $keyword): array
     {
         try {
-            $openai = new \SIT\Search\Services\SIT_OpenAI_Service();
+            $openai = new \SIT\Search\Services\OpenAI();
             $embeddings = new \SIT\Search\Services\ProgramEmbeddings($openai);
             
             // Enhance query with synonyms and variations
@@ -161,9 +161,12 @@ class SearchProgramAjax extends Hook
                 return $b['similarity'] <=> $a['similarity'];
             });
             
+            $top_results = array_slice($unique_results, 0, 50);
+            $this->primeProgramCaches(array_column($top_results, 'program_id'));
+            
             // Convert to program data format
             $data = [];
-            foreach (array_slice($unique_results, 0, 50) as $result) {
+            foreach ($top_results as $result) {
                 $program_data = $this->getProgramData($result['program_id']);
                 if ($program_data) {
                     $program_data['ai_similarity'] = round($result['similarity'], 3);
@@ -277,15 +280,16 @@ class SearchProgramAjax extends Hook
         $data = [];
 
         if ($query->have_posts()) {
-            while ($query->have_posts()) {
-                $query->the_post();
-                $program_data = $this->getProgramData(get_the_ID());
+            $program_ids = wp_list_pluck($query->posts, 'ID');
+            $this->primeProgramCaches($program_ids);
+            
+            foreach ($program_ids as $program_id) {
+                $program_data = $this->getProgramData($program_id);
                 if ($program_data) {
                     $program_data['source'] = 'wordpress';
                     $data[] = $program_data;
                 }
             }
-            wp_reset_postdata();
         }
 
         return $data;
@@ -327,5 +331,28 @@ class SearchProgramAjax extends Hook
             'period'     => get_post_meta($program_id, 'Study_Years', true),
             'level'      => strip_tags(get_the_term_list($program_id, 'sit-degree', '', ', ')),
         ];
+    }
+
+    /**
+     * Prime caches to prevent N+1 queries during mapping
+     */
+    private function primeProgramCaches(array $program_ids): void
+    {
+        if (empty($program_ids)) return;
+        
+        update_meta_cache('post', $program_ids);
+        update_object_term_cache($program_ids, ['sit-language', 'sit-degree']);
+        
+        $uni_ids = [];
+        foreach ($program_ids as $pid) {
+            $uid = get_post_meta($pid, 'zh_university', true);
+            if ($uid) {
+                $uni_ids[] = (int)$uid;
+            }
+        }
+        
+        if (!empty($uni_ids)) {
+            _prime_post_caches(array_unique($uni_ids), false, false);
+        }
     }
 }

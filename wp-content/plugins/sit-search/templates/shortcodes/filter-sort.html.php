@@ -1,6 +1,9 @@
 <?php
+// Security Check
+if (!defined('ABSPATH')) {
+    exit;
+}
 // Session should be started in App.php init hook, not here
-// Removed session_start() to prevent "headers already sent" warning
 
 $degree_term = get_term($degreeid, 'sit-degree');
 $country_term = get_term($countryid, 'sit-country');
@@ -40,12 +43,564 @@ if ($speciality_valid && $degree_valid && $country_valid) {
 
 ?>
 
-<!-- Filter styles are embedded in this file for now -->
+<!-- Load shared filter layout styles -->
+<link rel="stylesheet" href="<?= plugin_dir_url(__FILE__) ?>../shared/filter-styles.css">
+
+<!-- Search Results Header v2 Styles -->
+<style>
+/* ═══════════════════════════════════════════
+   SEARCH RESULTS PAGE — sr-* Design System
+   Matches pp-*/up-* aesthetic
+   ═══════════════════════════════════════════ */
+
+/* --- Results Header Bar --- */
+.results-header-v2 {
+    background: #ffffff;
+    border-bottom: 1px solid #e9ecef;
+    padding: 16px 24px;
+    margin-bottom: 0;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    margin: 0 auto 20px;
+    max-width: 1400px;
+}
+
+.results-header-inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* Results Count Badge */
+.results-count-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #fef2f2, #fff5f5);
+    border: 1px solid rgba(226, 10, 23, 0.15);
+    padding: 8px 16px;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.results-count-number {
+    font-size: 22px;
+    font-weight: 700;
+    color: #E20A17;
+    line-height: 1;
+}
+
+.results-count-label {
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+/* Search Bar */
+.results-search-container {
+    flex: 1;
+    min-width: 200px;
+}
+
+.results-search-box {
+    display: flex;
+    align-items: center;
+    background: #f8f9fa;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 4px 4px 4px 14px;
+    transition: all 0.2s ease;
+}
+
+.results-search-box:focus-within {
+    border-color: #E20A17;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(226, 10, 23, 0.08);
+}
+
+.results-search-icon {
+    color: #9ca3af;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.results-search-input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    color: #1a1a2e;
+    padding: 8px 4px;
+    outline: none;
+    font-family: inherit;
+}
+
+.results-search-input::placeholder {
+    color: #9ca3af;
+}
+
+.results-search-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: #E20A17;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.results-search-btn:hover {
+    background: #c00912;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(226, 10, 23, 0.25);
+}
+
+/* Right Side Actions */
+.results-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.results-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.results-action-btn:hover {
+    border-color: #E20A17;
+    color: #E20A17;
+    background: #fef7f7;
+}
+
+/* Sort Dropdown */
+.results-sort-wrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}
+
+.results-sort-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding: 8px 32px 8px 12px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.results-sort-select:hover,
+.results-sort-select:focus {
+    border-color: #E20A17;
+}
+
+.results-sort-chevron {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6b7280;
+}
+
+/* View Toggle */
+.results-view-toggle {
+    display: inline-flex;
+    align-items: center;
+    background: #f3f4f6;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+}
+
+.results-view-btn {
+    padding: 7px 10px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.results-view-btn.active {
+    background: #E20A17;
+    color: #fff;
+}
+
+.results-view-btn:hover:not(.active) {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* Export Button */
+.results-export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.results-export-btn:hover {
+    border-color: #E20A17;
+    color: #E20A17;
+    background: #fef7f7;
+}
+
+/* --- Pagination --- */
+.filter-pagination {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.filter-pagination .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.filter-pagination .pagination .page-numbers {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    padding: 0 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.filter-pagination .pagination .page-numbers:hover {
+    border-color: #E20A17;
+    color: #E20A17;
+    background: #fef7f7;
+}
+
+.filter-pagination .pagination .page-numbers.current {
+    background: #E20A17;
+    color: #fff;
+    border-color: #E20A17;
+    font-weight: 600;
+}
+
+.filter-pagination .pagination .page-numbers img {
+    width: 16px;
+    height: 16px;
+}
+
+/* --- Related Searches --- */
+.related-result {
+    max-width: 1400px;
+    margin: 30px auto;
+    padding: 24px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.related-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 16px 0;
+}
+
+.related-row {
+    margin-bottom: 20px;
+}
+
+.related-row h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.related-row h3 img {
+    width: 20px;
+    height: 20px;
+}
+
+.related-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.related-list li {
+    margin: 0;
+}
+
+.related-list li a {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 13px;
+    color: #4b5563;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.related-list li a:hover {
+    background: #fef7f7;
+    border-color: #E20A17;
+    color: #E20A17;
+}
+
+/* --- Export Modal --- */
+.export-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.export-popup {
+    background: #fff;
+    border-radius: 16px;
+    width: 95%;
+    max-width: 900px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+.export-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.export-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+}
+
+.generated-date {
+    font-size: 13px;
+    color: #6b7280;
+    margin: 4px 0 0 0;
+}
+
+.header-action {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.print-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #E20A17;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.print-btn:hover {
+    background: #c00912;
+}
+
+.close-export {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 4px 8px;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.close-export:hover {
+    color: #E20A17;
+}
+
+.program-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.program-table thead th {
+    background: #f8fafc;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.program-table tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #374151;
+}
+
+.program-table tbody tr:hover {
+    background: #fef7f7;
+}
+
+.footer-popup {
+    text-align: center;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid #f1f5f9;
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+/* --- Mobile Responsive for Results Header --- */
+@media (max-width: 768px) {
+    .results-header-v2 {
+        padding: 12px 16px;
+        border-radius: 0;
+        margin: 0 0 16px;
+    }
+
+    .results-header-inner {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+
+    .results-count-badge {
+        justify-content: center;
+    }
+
+    .results-search-container {
+        min-width: auto;
+    }
+
+    .results-actions {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .results-export-btn span,
+    .results-filter-toggle span {
+        display: none;
+    }
+
+    .filter-results {
+        grid-template-columns: 1fr !important;
+        gap: 16px;
+    }
+
+    .ProgramBoxUni-image-container {
+        height: 160px;
+    }
+
+    .ProgramBoxUni-attributes {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .ProgramBoxUni-attributes {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Filter sidebar mobile toggle improvements */
+@media (max-width: 768px) {
+    .filter-sidebar {
+        display: none;
+    }
+    
+    .filter-sidebar.show-mobile {
+        display: flex;
+    }
+    
+    .results-filter-toggle {
+        display: inline-flex !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .results-filter-toggle {
+        display: none !important;
+    }
+}
+</style>
 
 <?php
 // Prepare data for shared templates
-$results_count = isset($query) ? $query->found_posts : 0;
-$search_value = isset($_GET['ai_query']) ? sanitize_text_field($_GET['ai_query']) : (isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '');
+$results_count = isset($found_posts) ? $found_posts : (isset($query) ? $query->found_posts : 0);
+$search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : '';
 
 // Configure which filters to show for this page
 $filter_config = [
@@ -69,7 +624,7 @@ $filter_data = [
     <div class="results-header-inner">
         <!-- Left: Results Count Badge -->
         <div class="results-count-badge">
-            <span class="results-count-number"><?= $query->found_posts ?></span>
+            <span class="results-count-number"><?= isset($found_posts) ? $found_posts : (isset($query) ? $query->found_posts : 0) ?></span>
             <span class="results-count-label">Programs Found</span>
         </div>
 
@@ -82,7 +637,10 @@ $filter_data = [
                 </svg>
                 <input type="text" id="search-university" class="results-search-input" value="<?= esc_attr($search_value) ?>" placeholder="Search programs, universities..." />
                 <button class="results-search-btn">
-                    <span>Search</span>
+                    <span class="btn-text">Search</span>
+                    <div class="sit-btn-dots">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M5 12h14"></path>
                         <path d="m12 5 7 7-7 7"></path>
@@ -191,13 +749,42 @@ $filter_data = [
                     $degrees_to_show = isset($available_degrees) && !empty($available_degrees) ? $available_degrees : (isset($all_degrees) ? $all_degrees : []);
                     
                     if (!empty($degrees_to_show)) {
+                        $primary_degrees = ['associate', 'bachelor', 'master', 'phd'];
+                        $visible_html = '';
+                        $hidden_html = '';
+                        $has_hidden = false;
+
                         foreach ($degrees_to_show as $degree_term) {
                             $is_checked = in_array($degree_term->term_id, $selected_degrees) ? 'checked' : '';
                             $active_class = in_array($degree_term->term_id, $selected_degrees) ? 'active' : '';
-                            echo '<label class="filter-checkbox-label ' . $active_class . '">';
-                            echo '<input type="checkbox" class="degree-checkbox" value="' . esc_attr($degree_term->term_id) . '" ' . $is_checked . '>';
-                            echo '<span class="filter-checkbox-text">' . esc_html($degree_term->name) . '</span>';
-                            echo '</label>';
+                            
+                            $html = '<label class="filter-checkbox-label ' . $active_class . '">';
+                            $html .= '<input type="checkbox" class="degree-checkbox" value="' . esc_attr($degree_term->term_id) . '" ' . $is_checked . '>';
+                            $html .= '<span class="filter-checkbox-text">' . esc_html($degree_term->name) . '</span>';
+                            $html .= '</label>';
+                            
+                            $term_name_lower = strtolower($degree_term->name);
+                            $is_primary = false;
+                            foreach ($primary_degrees as $pd) {
+                                if (strpos($term_name_lower, $pd) !== false) {
+                                    $is_primary = true;
+                                    break;
+                                }
+                            }
+                            
+                            if ($is_primary || !empty($is_checked)) {
+                                $visible_html .= $html;
+                            } else {
+                                $has_hidden = true;
+                                $hidden_html .= $html;
+                            }
+                        }
+                        
+                        echo $visible_html;
+                        if ($has_hidden) {
+                            $hidden_html .= '<button type="button" class="show-less-btn" onclick="this.parentElement.style.display=\'none\'; this.parentElement.nextElementSibling.style.display=\'block\'; return false;" style="font-size:13px; color:var(--sit-primary); font-weight:600; padding:8px 0 0 0; margin-top:4px; background:none; border:none; cursor:pointer; width:100%; text-align:left;">- Show less</button>';
+                            echo '<div class="hidden-options hidden-degree-options" style="display:none; margin-top:8px;">' . $hidden_html . '</div>';
+                            echo '<button type="button" class="show-more-btn" onclick="this.previousElementSibling.style.display=\'block\'; this.style.display=\'none\'; return false;" style="font-size:13px; color:var(--sit-primary); font-weight:600; padding:8px 0 0 0; background:none; border:none; cursor:pointer; width:100%; text-align:left;">+ Show more</button>';
                         }
                     } else {
                         echo '<p class="filter-empty-message">No degree options for current results</p>';
@@ -243,22 +830,43 @@ $filter_data = [
                         ));
                     }
                     
-                    $allowed_languages = ['Arabic', 'English', 'Turkish'];
+                    $primary_languages = ['english', 'turkish'];
                     $current_language = isset($_GET['language']) ? $_GET['language'] : '';
                     
                     $has_languages = false;
                     if (!empty($languages_to_show) && !is_wp_error($languages_to_show)) {
+                        $visible_html = '';
+                        $hidden_html = '';
+                        $has_hidden = false;
+
                         foreach ($languages_to_show as $language) {
                             $language_name = str_replace('%', ' ', $language->name);
-                            if (in_array($language_name, $allowed_languages)) {
-                                $has_languages = true;
-                                $is_checked = ($current_language == $language->term_id) ? 'checked' : '';
-                                $active_class = ($current_language == $language->term_id) ? 'active' : '';
-                                echo '<label class="filter-checkbox-label ' . $active_class . '">';
-                                echo '<input type="checkbox" class="language-checkbox" value="' . esc_attr($language->term_id) . '" ' . $is_checked . '>';
-                                echo '<span class="filter-checkbox-text">' . esc_html($language_name) . '</span>';
-                                echo '</label>';
+                            $has_languages = true;
+                            
+                            $is_checked = ($current_language == $language->term_id) ? 'checked' : '';
+                            $active_class = ($current_language == $language->term_id) ? 'active' : '';
+                            
+                            $html = '<label class="filter-checkbox-label ' . $active_class . '">';
+                            $html .= '<input type="checkbox" class="language-checkbox" value="' . esc_attr($language->term_id) . '" ' . $is_checked . '>';
+                            $html .= '<span class="filter-checkbox-text">' . esc_html($language_name) . '</span>';
+                            $html .= '</label>';
+
+                            $is_primary = in_array(strtolower($language_name), $primary_languages);
+                            
+                            // If it's a primary language, or it's currently selected, show it immediately.
+                            if ($is_primary || !empty($is_checked)) {
+                                $visible_html .= $html;
+                            } else {
+                                $has_hidden = true;
+                                $hidden_html .= $html;
                             }
+                        }
+                        
+                        echo $visible_html;
+                        if ($has_hidden) {
+                            $hidden_html .= '<button type="button" class="show-less-btn" onclick="this.parentElement.style.display=\'none\'; this.parentElement.nextElementSibling.style.display=\'block\'; return false;" style="font-size:13px; color:var(--sit-primary); font-weight:600; padding:8px 0 0 0; margin-top:4px; background:none; border:none; cursor:pointer; width:100%; text-align:left;">- Show less</button>';
+                            echo '<div class="hidden-options hidden-language-options" style="display:none; margin-top:8px;">' . $hidden_html . '</div>';
+                            echo '<button type="button" class="show-more-btn" onclick="this.previousElementSibling.style.display=\'block\'; this.style.display=\'none\'; return false;" style="font-size:13px; color:var(--sit-primary); font-weight:600; padding:8px 0 0 0; background:none; border:none; cursor:pointer; width:100%; text-align:left;">+ Show more</button>';
                         }
                     }
                     
@@ -372,7 +980,9 @@ $filter_data = [
                 <div class="program-list-badge-recommended">⭐ Recommended</div>
             <?php endif; ?>
             <div class="program-list-image">
-                <?php if (!empty($program['image_url'])): ?>
+                <?php if (!empty($program['logo_url'])): ?>
+                    <img src="<?php echo $program['logo_url']; ?>" alt="<?php echo $program['title']; ?>">
+                <?php elseif (!empty($program['image_url'])): ?>
                     <img src="<?php echo $program['image_url']; ?>" alt="<?php echo $program['title']; ?>">
                 <?php else: ?>
                     <div class="program-list-placeholder">🏫</div>
@@ -602,7 +1212,300 @@ $filter_data = [
     }
     ?>
 </div>
-<!-- Export Popup -->
+<!-- Load jsPDF + autoTable (text-based PDF, no html2canvas) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+
+
+<script>
+    function downloadPDF() {
+        if (typeof jspdf === 'undefined') {
+            alert('PDF library is loading, please try again in a moment.');
+            return;
+        }
+
+        var previewTable = document.querySelector('#exportModal .program-table');
+        if (!previewTable) {
+            alert('No program data found!');
+            return;
+        }
+        var rows = Array.from(previewTable.querySelectorAll('tbody tr'));
+        var totalPrograms = rows.length;
+        var today = new Date().toISOString().split('T')[0];
+
+        // Extract table data + track discount info separately
+        var tableData = [];
+        var discountMap = {};
+
+        rows.forEach(function(row, rowIdx) {
+            var cells = row.querySelectorAll('td');
+            var rowData = [];
+            for (var i = 0; i < cells.length; i++) {
+                if (i === cells.length - 1) {
+                    var crossed = cells[i].querySelector('s, del, strike, span[style*="line-through"]');
+                    var bold = cells[i].querySelector('b, strong');
+                    if (crossed && bold) {
+                        var oldP = crossed.textContent.trim();
+                        var newP = bold.textContent.trim();
+                        rowData.push(newP);
+                        discountMap[rowIdx] = { oldPrice: oldP, newPrice: newP };
+                    } else {
+                        rowData.push(cells[i].textContent.trim());
+                    }
+                } else {
+                    rowData.push(cells[i].textContent.trim());
+                }
+            }
+            tableData.push(rowData);
+        });
+
+        var btn = document.querySelector('#exportModal .print-btn');
+        var originalText = btn.innerHTML;
+        btn.innerHTML = '<svg style="animation:spin 1s linear infinite" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Generating PDF...';
+        btn.disabled = true;
+
+        var logoUrl = 'https://search.studyinturkiye.com/wp-content/uploads/2025/02/image-1-1-e1738931290741.png';
+        var fontRegUrl = 'https://cdn.jsdelivr.net/gh/googlefonts/roboto/src/hinted/Roboto-Regular.ttf';
+        var fontBoldUrl = 'https://cdn.jsdelivr.net/gh/googlefonts/roboto/src/hinted/Roboto-Bold.ttf';
+
+        Promise.all([
+            pdfLoadImage(logoUrl),
+            pdfLoadFont(fontRegUrl),
+            pdfLoadFont(fontBoldUrl)
+        ]).then(function(res) {
+            pdfBuild(res[0], res[1], res[2]);
+        }).catch(function(err) {
+            console.warn('PDF resource load error:', err);
+            pdfBuild(null, null, null);
+        });
+
+        function pdfLoadImage(url) {
+            return new Promise(function(resolve) {
+                var img = new Image();
+                img.crossOrigin = 'anonymous';
+                img.onload = function() {
+                    try {
+                        var c = document.createElement('canvas');
+                        c.width = img.naturalWidth;
+                        c.height = img.naturalHeight;
+                        c.getContext('2d').drawImage(img, 0, 0);
+                        resolve({ data: c.toDataURL('image/png'), w: img.naturalWidth, h: img.naturalHeight });
+                    } catch(e) { resolve(null); }
+                };
+                img.onerror = function() { resolve(null); };
+                img.src = url;
+            });
+        }
+
+        function pdfLoadFont(url) {
+            return fetch(url).then(function(r) {
+                if (!r.ok) throw new Error('Font fetch ' + r.status);
+                return r.arrayBuffer();
+            }).then(function(buf) {
+                var bin = '';
+                var u8 = new Uint8Array(buf);
+                for (var i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+                return btoa(bin);
+            }).catch(function() { return null; });
+        }
+
+        function pdfBuild(logo, fontReg, fontBold) {
+            var doc = new jspdf.jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+            var pw = doc.internal.pageSize.getWidth();
+            var ph = doc.internal.pageSize.getHeight();
+            var mx = 14;
+            var fn = 'helvetica';
+
+            if (fontReg) {
+                doc.addFileToVFS('Roboto-Regular.ttf', fontReg);
+                doc.addFont('Roboto-Regular.ttf', 'Roboto', 'normal');
+                fn = 'Roboto';
+            }
+            if (fontBold) {
+                doc.addFileToVFS('Roboto-Bold.ttf', fontBold);
+                doc.addFont('Roboto-Bold.ttf', 'Roboto', 'bold');
+            }
+
+            // ===== PAGE 1 HEADER =====
+            var logoW = 45;
+            var logoH = 18;
+            if (logo) {
+                logoH = logoW * (logo.h / logo.w);
+                doc.addImage(logo.data, 'PNG', pw - mx - logoW, 8, logoW, logoH);
+            }
+
+            doc.setFont(fn, 'bold');
+            doc.setFontSize(18);
+            doc.setTextColor(26, 26, 46);
+            doc.text('Academic Programs in Turkey', mx, 20);
+
+            doc.setFont(fn, 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(107, 114, 128);
+            doc.text('Generated on: ' + today + '  |  Total Programs: ' + totalPrograms, mx, 26);
+
+            doc.setDrawColor(226, 10, 23);
+            doc.setLineWidth(0.8);
+            doc.line(mx, 30, pw - mx, 30);
+
+            // ===== PROGRAM TABLE =====
+            doc.autoTable({
+                startY: 34,
+                head: [['Program', 'University', 'Duration', 'Language', 'Tuition']],
+                body: tableData,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [226, 10, 23],
+                    textColor: 255,
+                    fontStyle: 'bold',
+                    fontSize: 8,
+                    font: fn,
+                    cellPadding: 3,
+                    halign: 'left'
+                },
+                bodyStyles: {
+                    fontSize: 7.5,
+                    cellPadding: 2.5,
+                    textColor: [55, 65, 81],
+                    font: fn,
+                    lineColor: [229, 231, 235],
+                    lineWidth: 0.2
+                },
+                alternateRowStyles: {
+                    fillColor: [248, 249, 250]
+                },
+                columnStyles: {
+                    0: { cellWidth: 52, fontStyle: 'bold', textColor: [26, 26, 46] },
+                    1: { cellWidth: 44 },
+                    2: { cellWidth: 18, halign: 'center' },
+                    3: { cellWidth: 20, halign: 'center' },
+                    4: { cellWidth: 'auto' }
+                },
+                styles: {
+                    overflow: 'linebreak',
+                    font: fn
+                },
+                showHead: 'everyPage',
+                margin: { top: 22, right: mx, bottom: 18, left: mx },
+
+                didParseCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 4 && discountMap[data.row.index]) {
+                        data.cell.styles.cellPadding = { top: 5, bottom: 4, left: 2.5, right: 2.5 };
+                    }
+                },
+
+                didDrawCell: function(data) {
+                    if (data.section === 'body' && data.column.index === 4 && discountMap[data.row.index]) {
+                        var info = discountMap[data.row.index];
+                        var cell = data.cell;
+                        var x = cell.x + 2.5;
+                        var bg = data.row.index % 2 === 0 ? [255, 255, 255] : [248, 249, 250];
+                        doc.setFillColor(bg[0], bg[1], bg[2]);
+                        doc.rect(cell.x + 0.3, cell.y + 0.3, cell.width - 0.6, cell.height - 0.6, 'F');
+
+                        doc.setFont(fn, 'normal');
+                        doc.setFontSize(7);
+                        doc.setTextColor(170, 170, 170);
+                        var oldY = cell.y + 5;
+                        doc.text(info.oldPrice, x, oldY);
+                        var oldW = doc.getTextWidth(info.oldPrice);
+                        doc.setDrawColor(170, 170, 170);
+                        doc.setLineWidth(0.3);
+                        doc.line(x, oldY - 0.8, x + oldW, oldY - 0.8);
+
+                        doc.setFont(fn, 'bold');
+                        doc.setFontSize(8);
+                        doc.setTextColor(26, 26, 46);
+                        doc.text(info.newPrice, x, oldY + 5);
+                    }
+                },
+
+                didDrawPage: function(data) {
+                    var pn = doc.internal.getCurrentPageInfo().pageNumber;
+
+                    if (pn > 1) {
+                        if (logo) {
+                            var lw2 = 32;
+                            var lh2 = lw2 * (logo.h / logo.w);
+                            doc.addImage(logo.data, 'PNG', pw - mx - lw2, 4, lw2, lh2);
+                        }
+                        doc.setFont(fn, 'bold');
+                        doc.setFontSize(11);
+                        doc.setTextColor(26, 26, 46);
+                        doc.text('Academic Programs in Turkey', mx, 12);
+                        doc.setFont(fn, 'normal');
+                        doc.setFontSize(8);
+                        doc.setTextColor(156, 163, 175);
+                        doc.text('Page ' + pn, mx, 17);
+                        doc.setDrawColor(226, 10, 23);
+                        doc.setLineWidth(0.4);
+                        doc.line(mx, 19, pw - mx, 19);
+                    }
+
+                    doc.setDrawColor(229, 231, 235);
+                    doc.setLineWidth(0.3);
+                    doc.line(mx, ph - 12, pw - mx, ph - 12);
+                    doc.setFont(fn, 'normal');
+                    doc.setFontSize(7);
+                    doc.setTextColor(156, 163, 175);
+                    doc.text('StudyinTurkiye.com \u2014 Powered by Sitconnect', mx, ph - 8);
+                    doc.text('Page ' + pn, pw - mx, ph - 8, { align: 'right' });
+                }
+            });
+
+            // ===== CONTACT INFO =====
+            var finalY = doc.lastAutoTable.finalY + 12;
+            if (finalY > ph - 55) {
+                doc.addPage();
+                finalY = 22;
+            }
+
+            doc.setDrawColor(226, 10, 23);
+            doc.setLineWidth(0.5);
+            doc.line(mx, finalY, pw - mx, finalY);
+
+            doc.setFont(fn, 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(26, 26, 46);
+            doc.text('Contact Information', mx, finalY + 8);
+
+            doc.setFillColor(248, 249, 250);
+            doc.roundedRect(mx, finalY + 12, pw - 2 * mx, 22, 2, 2, 'F');
+
+            doc.setFont(fn, 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(55, 65, 81);
+            doc.text('For more information about these programs, please contact our support team.', mx + 5, finalY + 20);
+
+            doc.setFont(fn, 'bold');
+            doc.setTextColor(226, 10, 23);
+            doc.text('info@studyinturkiye.com  |  www.studyinturkiye.com', mx + 5, finalY + 28);
+
+            var bY = finalY + 42;
+            doc.setDrawColor(229, 231, 235);
+            doc.setLineWidth(0.3);
+            doc.line(mx, bY, pw - mx, bY);
+
+            doc.setFont(fn, 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text('StudyinTurkiye.com \u2014 Powered by Sitconnect', pw / 2, bY + 6, { align: 'center' });
+
+            doc.setFontSize(7);
+            doc.setTextColor(156, 163, 175);
+            doc.text('This document was generated for informational purposes only.', pw / 2, bY + 11, { align: 'center' });
+
+            doc.save('Academic_Programs_Turkey_' + today + '.pdf');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+</script>
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<!-- Export Popup (Preview Modal) -->
 <div class="export-overlay" id="exportModal">
     <div class="export-popup">
         <div class="export-header">
@@ -611,16 +1514,20 @@ $filter_data = [
                 <p class="generated-date">Generated on: <?php echo date('Y-m-d'); ?></p>
             </div>
             <div class="header-action">
-                <button onclick="downloadPDF()" class="print-btn"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-printer h-4 w-4"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"></path><rect x="6" y="14" width="12" height="8" rx="1"></rect></svg> Print/Save PDF</button>
-                <p>Total Programs:<?= is_array($pdf_program) ? count($pdf_program) : 0; ?></p>
+                <button onclick="downloadPDF()" class="print-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download PDF
+                </button>
+                <p>Total Programs: <?= is_array($pdf_program) ? count($pdf_program) : 0; ?></p>
             </div>
-            <button class="export-btn" onclick="exportToPDF()">Export PDF</button>
             <button class="close-export" onclick="closeExportPopup()">×</button>
         </div>
 
-        <p><?= $disstr ?></p>
+        <?php if (!empty($disstr)): ?>
+        <p style="color: #6b7280; font-size: 14px; margin-bottom: 20px;"><?= $disstr ?></p>
+        <?php endif; ?>
 
-        <h3>Program Listing</h3>
+        <h3 style="margin-bottom: 15px;">Program Listing</h3>
         <table class="program-table" id="table-program">
             <thead>
             <tr>
@@ -628,7 +1535,6 @@ $filter_data = [
                 <th>University</th>
                 <th>Duration</th>
                 <th>Language</th>
-                <th>Deadline</th>
                 <th>Tuition</th>
             </tr>
             </thead>
@@ -636,156 +1542,39 @@ $filter_data = [
             <?php
             if (is_array($pdf_program)) {
             foreach ($pdf_program as $program) {
+                $currency = !empty($program['Tuition_Currency']) ? $program['Tuition_Currency'] : 'USD';
                 if(!empty($program['discounted_fee'])){
-                    $fee='<span>'.$program['fee'].' USD</span>'.$program['discounted_fee'].' USD';
+                    $fee='<span style="text-decoration:line-through;color:#999;">'.$program['fee'].' '.$currency.'</span> <strong>'.$program['discounted_fee'].' '.$currency.'</strong>';
+                } else {
+                    $fee=$program['fee'].' '.$currency;
                 }
-                else{
-                    $fee=$program['fee'].' USD';
-                }
+                $lang = !empty($program['language']) ? $program['language'] : 'English';
+                $dur = !empty($program['duration']) ? $program['duration'] . ' Year' . ($program['duration'] > 1 ? 's' : '') : '-';
                 ?>
                 <tr>
                     <td><?= $program['title'] ?></td>
                     <td><?= $program['uni_title'] ?></td>
-                    <td><?= $program['duration'] ?></td>
-                    <td>English</td>
-                    <td>May 15, 2024</td>
+                    <td><?= $dur ?></td>
+                    <td><?= $lang ?></td>
                     <td><?= $fee ?></td>
                 </tr>
                 <?php
             }
             }
             ?>
-            <!-- Add more rows as needed -->
             </tbody>
         </table>
 
-        <h3>Program Details</h3>
-        <?php
-        if (is_array($pdf_program)) {
-        foreach ($pdf_program as $program) {
-        ?>
-            <div class="program-card">
-                <div class="university-image">
-                    <img src="<?= $program['image_url'] ?>" alt="">
-                </div>
-                <div class="program-detail">
-                    <div class="program-title"><?= $program['title'] ?></div>
-                    <div class="uni-name"><?= $program['uni_title'] ?></div>
-                    <div class="program-info-grid">
-                        <div class="info-item">
-                            <span class="icon">🕒</span>
-                            <span><?= $program['duration'] ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="icon">🌐</span>
-                            <span>English</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="icon">📍</span>
-                            <span><?= $program['country'] ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="icon">💲</span>
-                            <span><?= $program['fee'] ?> USD</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="icon">💳</span>
-                            <span>Rankings: <?= $program['ranking'] ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="icon">📅</span>
-                            <span>Students: <?= $program['students'] ?></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        <?php
-        }
-        }
-        ?>
-        <!-- Repeat .program-card blocks for other programs -->
-
-        <div class="contact-info">
-            <h4>Contact Information</h4>
-            <p>
-                For more information about these programs or assistance with your application, please contact our support team.<br>
-                Email: support@studyinturkey.com<br>
-                Website: www.studyinturkey.com
-            </p>
-        </div>
         <div class="footer-popup">
-            <p>© 2025 Study in Turkey. All rights reserved.</p>
-            <p>This document was generated for informational purposes only.</p>
+            <p>StudyinTurkiye.com — Powered by <strong>Sitconnect</strong></p>
+            <p style="font-size: 11px; color: #9ca3af; margin-top: 4px;">This document was generated for informational purposes only.</p>
         </div>
     </div>
 </div>
-<div id="expoting-download" >
-    <div class="export-popup">
-        <div class="export-header">
-            <div class="headers-info">
-                <h2>Academic Programs in Turkey</h2>
-                <p class="generated-date">Generated on: <?php echo date('Y-m-d'); ?></p>
-            </div>
-            <div class="header-action">
-                <p>Total Programs:<?= is_array($pdf_program) ? count($pdf_program) : 0; ?></p>
-            </div>
-        </div>
 
-        <p><?= $disstr ?></p>
+<!-- Hidden PDF Source (used by downloadPDF) -->
+<div id="expoting-download" style="display:none;"></div>
 
-        <h3>Program Listing</h3>
-        <table class="program-table" id="table-program">
-            <thead>
-            <tr>
-                <th>Program</th>
-                <th>University</th>
-                <th>Duration</th>
-                <th>Language</th>
-                <th>Deadline</th>
-                <th>Tuition</th>
-            </tr>
-            </thead>
-            <tbody>
-            <?php
-            if (is_array($pdf_program)) {
-            foreach ($pdf_program as $program) {
-                if(!empty($program['discounted_fee'])){
-                    $fee='<span style=" text-decoration: line-through;display: block;">'.$program['fee'].' USD</span>'.$program['discounted_fee'].' USD';
-                }
-                else{
-                    $fee=$program['fee'].' USD';
-                }
-                ?>
-                <tr>
-                    <td><?= $program['title'] ?></td>
-                    <td><?= $program['uni_title'] ?></td>
-                    <td><?= $program['duration'] ?></td>
-                    <td>English</td>
-                    <td>May 15, 2024</td>
-                    <td><?= $fee ?></td>
-                </tr>
-                <?php
-            }
-            }
-            ?>
-            <!-- Add more rows as needed -->
-            </tbody>
-        </table>
-
-        <div class="contact-info">
-            <h4>Contact Information</h4>
-            <p>
-                For more information about these programs or assistance with your application, please contact our support team.<br>
-                Email: support@studyinturkey.com<br>
-                Website: www.studyinturkey.com
-            </p>
-        </div>
-        <div class="footer-popup">
-            <p>© 2025 Study in Turkey. All rights reserved.</p>
-            <p>This document was generated for informational purposes only.</p>
-        </div>
-    </div>
-</div>
 <script>
     function closeExportPopup() {
         document.getElementById("exportModal").style.display = "none";
@@ -795,137 +1584,7 @@ $filter_data = [
         document.getElementById("exportModal").style.display = "flex";
     }
 </script>
-<script>
-    function downloadPDF() {
-        const originalElement = document.getElementById("expoting-download");
 
-        // Clone the original element
-        const clone = originalElement.cloneNode(true);
-
-        // Remove contact info and footer if present in the clone
-        const contactInfo = clone.querySelector('.contact-info');
-        const footer = clone.querySelector('.footer-popup');
-        const table = clone.querySelector("table");
-
-        if (contactInfo) contactInfo.remove();
-        if (footer) footer.remove();
-
-        if (!table) {
-            alert("No table found!");
-            return;
-        }
-
-        // Extract the table's thead and tbody rows
-        const rows = Array.from(table.querySelectorAll("tbody tr"));
-        const thead = table.querySelector("thead")?.cloneNode(true);
-
-        // Remove the original table from the cloned content
-        table.remove();
-
-        // --- Get header content (before the table) ---
-        const headerContent = document.createElement("div");
-        let reachedTable = false;
-        Array.from(clone.childNodes).forEach(node => {
-            if (node.nodeType === 1 && node.tagName === "TABLE") {
-                reachedTable = true;
-            }
-            if (!reachedTable) {
-                headerContent.appendChild(node.cloneNode(true));
-            }
-        });
-
-        // --- Add logo to top-right of headerContent ---
-        const logoWrapper = document.createElement("div");
-        logoWrapper.style.display = "flex";
-        logoWrapper.style.justifyContent = "space-between";
-        logoWrapper.style.alignItems = "center";
-
-        const spacer = document.createElement("div");
-        const logo = document.createElement("img");
-        logo.src = "https://search.studyinturkiye.com/wp-content/uploads/2025/02/image-1-1-e1738931290741.png";
-        logo.style.maxWidth = "120px";
-        logo.style.marginBottom = "20px";
-
-        logoWrapper.appendChild(spacer);
-        logoWrapper.appendChild(logo);
-        headerContent.insertBefore(logoWrapper, headerContent.firstChild);
-
-        // Create wrapper for all pages
-        const wrapper = document.createElement("div");
-
-        let i = 0;
-        let pageIndex = 0;
-
-        while (i < rows.length) {
-            const newTable = document.createElement("table");
-            newTable.style.width = "100%";
-            newTable.style.borderCollapse = "collapse";
-            if (thead) newTable.appendChild(thead.cloneNode(true));
-
-            const tbody = document.createElement("tbody");
-
-            // Determine how many rows this page should have
-            const rowsPerPage = pageIndex === 0 ? 4 : 8;
-
-            for (let j = i; j < i + rowsPerPage && j < rows.length; j++) {
-                tbody.appendChild(rows[j].cloneNode(true));
-            }
-
-            newTable.appendChild(tbody);
-
-            const pageDiv = document.createElement("div");
-            pageDiv.style.pageBreakAfter = "always";
-
-            if (pageIndex === 0) {
-                pageDiv.appendChild(headerContent.cloneNode(true));
-            }
-
-            pageDiv.appendChild(newTable);
-            wrapper.appendChild(pageDiv);
-
-            i += rowsPerPage;
-            pageIndex++;
-        }
-
-        // Final page: contact info + footer
-        const finalPage = document.createElement("div");
-        finalPage.style.padding = "20px";
-        finalPage.innerHTML = `
-            <div class="contact-info">
-                <h4>Contact Information</h4>
-                <p>
-                    For more information about these programs or assistance with your application, please contact our support team.<br>
-                    Email: support@studyinturkey.com<br>
-                    Website: www.studyinturkey.com
-                </p>
-            </div>
-            <div class="footer-popup" style="margin-top: 40px; text-align: center;">
-                <p>© 2025 Study in Turkey. All rights reserved.</p>
-                <p style="font-style: italic; font-size: 12px;">This document was generated for informational purposes only.</p>
-            </div>
-        `;
-        wrapper.appendChild(finalPage);
-
-        // Generate the PDF
-        const options = {
-            margin: 10,
-            filename: 'Academic_Programs_Turkey.pdf',
-            image: { type: 'png', quality: 1 },
-            html2canvas: {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                letterRendering: true
-            },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-        };
-
-        html2pdf().from(wrapper).set(options).save().catch(function (error) {
-            console.error("Error generating PDF:", error);
-        });
-    }
-
-</script>
 
 <style>
 /* View Toggle Styles */

@@ -490,7 +490,9 @@ $search_value = isset($_GET['search']) ? $_GET['search'] : '';
             ?>
             <div class="program-list-item">
                 <div class="program-list-image">
-                    <?php if (!empty($program['image_url'])): ?>
+                    <?php if (!empty($program['logo_url'])): ?>
+                        <img src="<?php echo $program['logo_url']; ?>" alt="<?php echo $program['title']; ?>">
+                    <?php elseif (!empty($program['image_url'])): ?>
                         <img src="<?php echo $program['image_url']; ?>" alt="<?php echo $program['title']; ?>">
                     <?php else: ?>
                         <div class="program-list-placeholder">🏫</div>

@@ -8,11 +8,9 @@ class TopUniversities
 {
     public function __invoke()
     {
-        // Temporarily disable cache for debugging
         // Check cache first
         $cache_key = 'sit_top_universities_data';
-        // $universities = wp_cache_get($cache_key);
-        $universities = false; // Force cache miss for now
+        $universities = get_transient($cache_key);
         
         if (false === $universities) {
             $args = array(
@@ -43,9 +41,10 @@ class TopUniversities
             // Get all post IDs for batch queries
             $post_ids = wp_list_pluck($posts, 'ID');
             
-            // Batch load all meta data at once
+            // Batch load all meta data and terms at once
             if (!empty($post_ids)) {
                 update_meta_cache('post', $post_ids);
+                update_object_term_cache($post_ids, 'sit-country');
             }
             
             $universities = array_map(function ($university) {
@@ -81,8 +80,8 @@ class TopUniversities
                 ];
             }, $posts);
             
-            // Cache for 1 hour
-            wp_cache_set($cache_key, $universities, '', 3600);
+            // Cache for 12 hours
+            set_transient($cache_key, $universities, 12 * HOUR_IN_SECONDS);
         }
 
         ob_start();

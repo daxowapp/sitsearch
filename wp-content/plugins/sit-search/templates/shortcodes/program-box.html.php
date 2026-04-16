@@ -1,4 +1,5 @@
-<div class="ProgramBoxUni-card <?php echo (!empty($program['is_featured'])) ? 'is-recommended' : ''; ?>">
+<?php $delay_style = isset($animation_delay) ? 'transition-delay: ' . esc_attr($animation_delay) . ';' : ''; ?>
+<div class="ProgramBoxUni-card sit-ui-card sit-reveal <?php echo (!empty($program['is_featured'])) ? 'is-recommended' : ''; ?>" style="<?php echo $delay_style; ?>">
   <div class="ProgramBoxUni-image-container">
     <a href="<?= $program['link'] ?>" class="ProgramBoxUni-image-link">
       <img src="<?= $program['image_url'] ?>" alt="<?= $program['title'] ?>" class="ProgramBoxUni-image">

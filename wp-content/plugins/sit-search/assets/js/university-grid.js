@@ -14,11 +14,36 @@ jQuery(document).ready(function($) {
         },
         currentPage: 1,
         postsPerPage: 12,
+        currentLayout: 'grid',
 
         init: function() {
             this.bindEvents();
             this.getPostsPerPage();
             this.initializeFilters();
+            this.initializeLayout();
+        },
+
+        initializeLayout: function() {
+            const savedLayout = localStorage.getItem('sit_university_layout') || 'grid';
+            this.setLayout(savedLayout);
+        },
+
+        setLayout: function(layout) {
+            this.currentLayout = layout;
+            localStorage.setItem('sit_university_layout', layout);
+
+            // Update UI buttons
+            $('.layout-btn').removeClass('active');
+            $('.layout-btn[data-layout="' + layout + '"]').addClass('active');
+
+            // Update Grid class
+            if (layout === 'list') {
+                this.grid.addClass('layout-list');
+                this.grid.removeClass('columns-' + this.container.data('columns'));
+            } else {
+                this.grid.removeClass('layout-list');
+                this.grid.addClass('columns-' + this.container.data('columns'));
+            }
         },
 
         initializeFilters: function() {
@@ -32,6 +57,13 @@ jQuery(document).ready(function($) {
 
             // Use document delegation for all events to ensure they work with dynamic content
             
+            // Layout toggle logic
+            $(document).on('click', '.layout-btn', function(e) {
+                e.preventDefault();
+                const layout = $(this).data('layout');
+                self.setLayout(layout);
+            });
+
             // Country change - load cities for selected country
             $(document).on('change', '#country-filter', function() {
                 const selectedCountry = $(this).val();
@@ -220,6 +252,9 @@ jQuery(document).ready(function($) {
                         // Update grid content
                         self.grid.html(response.data.html);
                         
+                        // Ensure layout is preserved upon AJAX refresh
+                        self.setLayout(self.currentLayout);
+                        
                         // Update pagination
                         self.pagination.html(response.data.pagination);
                         
@@ -244,7 +279,13 @@ jQuery(document).ready(function($) {
                 error: function(xhr, status, error) {
                     console.error('AJAX Error:', error);
                     console.error('Response:', xhr.responseText);
-                    self.showError('Network error. Please check your connection and try again.');
+                    
+                    // Specific handling for non-critical errors or cache issues
+                    if (xhr.status === 403 && xhr.responseText === "-1") {
+                        self.showError('Search timed out or session expired. Please refresh the page and try again.');
+                    } else {
+                        self.showError('Unable to load universities at the moment. Please check your connection or try again later.');
+                    }
                     self.hideLoading();
                 }
             });
@@ -289,10 +330,15 @@ jQuery(document).ready(function($) {
                     count + ' university found' : 
                     count + ' universities found';
                 
-                this.container.prepend(
-                    '<div class="university-results-count" style="margin-bottom: 1rem; font-weight: 600; color: #E10B17; font-size: 1.1rem; text-align: center; padding: 0.5rem; background: rgba(225, 11, 23, 0.05); border-radius: 4px; border-left: 4px solid #E10B17;">' + 
-                    countText + '</div>'
-                );
+                const countHtml = '<div class="university-results-count" style="font-weight: 600; color: #E10B17; font-size: 1.1rem; padding: 0.5rem; background: rgba(225, 11, 23, 0.05); border-radius: 4px; border-left: 4px solid #E10B17;">' + countText + '</div>';
+                
+                if ($('.university-results-count-container').length > 0) {
+                    $('.university-results-count-container').html(countHtml);
+                } else {
+                    this.container.prepend(countHtml);
+                }
+            } else if ($('.university-results-count-container').length > 0) {
+                $('.university-results-count-container').empty();
             }
         },
 
@@ -340,104 +386,4 @@ jQuery(document).ready(function($) {
         UniversityGrid.filterUniversities();
     };
     
-    // Force apply clean styles via JavaScript
-function forceCleanStyles() {
-    // Apply card styles
-    $('.university-card').each(function() {
-        $(this).css({
-            'background': '#ffffff',
-            'border': '1px solid #e5e7eb',
-            'border-radius': '8px',
-            'box-shadow': 'none',
-            'transform': 'none'
-        });
-    });
-
-    // Apply logo styles
-    $('.university-logo').each(function() {
-        $(this).css({
-            'background': '#fafafa',
-            'padding': '2rem 1.5rem 1rem',
-            'border-bottom': '1px solid #f0f0f0'
-        });
-    });
-
-    // Apply button styles
-    $('.university-actions .btn').each(function() {
-        $(this).css({
-            'border-radius': '4px',
-            'text-transform': 'none',
-            'letter-spacing': 'normal',
-            'font-weight': '500',
-            'padding': '0.75rem 1rem'
-        });
-    });
-
-    // Apply hover effects
-    $('.university-card').off('mouseenter mouseleave').on('mouseenter', function() {
-        $(this).css('border-color', '#E10B17');
-    }).on('mouseleave', function() {
-        $(this).css('border-color', '#e5e7eb');
-    });
-}
-
-// Apply styles when page loads and after filtering
-$(document).ready(function() {
-    forceCleanStyles();
-});
-
-// Reapply styles after AJAX filtering
-$(document).on('universityGridFiltered', function() {
-    setTimeout(forceCleanStyles, 100);
-});
-// Apply clean styles via JavaScript - permanent solution
-function applyCleanStyles() {
-    $('.university-card').each(function() {
-        this.style.setProperty('background', '#ffffff', 'important');
-        this.style.setProperty('border', '1px solid #e5e7eb', 'important');
-        this.style.setProperty('border-radius', '8px', 'important');
-        this.style.setProperty('box-shadow', 'none', 'important');
-        this.style.setProperty('transform', 'none', 'important');
-        this.style.setProperty('overflow', 'hidden', 'important');
-        this.style.setProperty('height', '100%', 'important');
-    });
-    
-    $('.university-logo').each(function() {
-        this.style.setProperty('background', '#fafafa', 'important');
-        this.style.setProperty('padding', '2rem 1.5rem 1rem', 'important');
-        this.style.setProperty('border-bottom', '1px solid #f0f0f0', 'important');
-        this.style.setProperty('min-height', '100px', 'important');
-    });
-    
-    $('.university-content').each(function() {
-        this.style.setProperty('padding', '1.5rem', 'important');
-    });
-    
-    $('.university-actions .btn').each(function() {
-        this.style.setProperty('border-radius', '4px', 'important');
-        this.style.setProperty('text-transform', 'none', 'important');
-        this.style.setProperty('letter-spacing', 'normal', 'important');
-        this.style.setProperty('font-weight', '500', 'important');
-        this.style.setProperty('padding', '0.75rem 1rem', 'important');
-        this.style.setProperty('font-size', '0.875rem', 'important');
-    });
-    
-    // Add hover effects
-    $('.university-card').off('mouseenter mouseleave').on('mouseenter', function() {
-        this.style.setProperty('border-color', '#E10B17', 'important');
-        this.style.setProperty('box-shadow', '0 4px 12px rgba(0, 0, 0, 0.08)', 'important');
-    }).on('mouseleave', function() {
-        this.style.setProperty('border-color', '#e5e7eb', 'important');
-        this.style.setProperty('box-shadow', 'none', 'important');
-    });
-}
-
-// Apply styles when page loads and after filtering
-$(document).ready(function() {
-    setTimeout(applyCleanStyles, 500); // Small delay to ensure elements are ready
-});
-
-$(document).on('universityGridFiltered', function() {
-    setTimeout(applyCleanStyles, 200); // Reapply after AJAX filtering
-});
 });

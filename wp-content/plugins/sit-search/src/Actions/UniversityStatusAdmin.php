@@ -25,13 +25,32 @@ class UniversityStatusAdmin {
 
     public function render_page() {
         // Fetch all universities (publish status)
-        $universities = get_posts([
+        $allowed_countries = [];
+        $turkey_term = get_term_by('name', 'Turkey', 'sit-country');
+        if ($turkey_term) $allowed_countries[] = $turkey_term->term_id;
+        
+        $nc_term = get_term_by('name', 'Northern Cyprus', 'sit-country');
+        if ($nc_term) $allowed_countries[] = $nc_term->term_id;
+
+        $args = [
             'post_type' => 'sit-university',
             'post_status' => 'publish',
             'posts_per_page' => -1,
             'orderby' => 'title',
-            'order' => 'ASC'
-        ]);
+            'order' => 'ASC',
+        ];
+
+        if (!empty($allowed_countries)) {
+            $args['tax_query'] = [
+                [
+                    'taxonomy' => 'sit-country',
+                    'field'    => 'term_id',
+                    'terms'    => $allowed_countries,
+                ]
+            ];
+        }
+
+        $universities = get_posts($args);
 
         $processed_ids = [];
         ?>
@@ -99,9 +118,13 @@ class UniversityStatusAdmin {
                                 
                                 foreach($group_ids as $gid) {
                                     $s_active = get_post_meta($gid, 'Active_in_Search', true);
-                                    $a_active = get_post_meta($gid, 'Active_in_New_Apps', true);
-                                    if ($s_active == '1' || $s_active === 'true') $is_search_active = true;
-                                    if ($a_active == '1' || $a_active === 'true') $is_apps_active = true;
+                                    // Check both meta keys for compatibility (sync writes Active_in_Apps)
+                                    $a_active = get_post_meta($gid, 'Active_in_Apps', true);
+                                    if (empty($a_active)) {
+                                        $a_active = get_post_meta($gid, 'Active_in_New_Apps', true);
+                                    }
+                                    if ($s_active == '1' || $s_active === 'true' || $s_active === true) $is_search_active = true;
+                                    if ($a_active == '1' || $a_active === 'true' || $a_active === true) $is_apps_active = true;
                                 }
 
                                 // Calculate Total Programs across ALL linked IDs

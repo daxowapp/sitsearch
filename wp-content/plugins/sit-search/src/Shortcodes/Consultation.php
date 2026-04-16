@@ -18,22 +18,20 @@ class Consultation
 
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-
-            echo "<pre>";print_r($_POST);exit;
-
             $first_name = isset($_POST['first_name']) ? trim($_POST['first_name']) : '';
-
             $last_name = isset($_POST['last_name']) ? trim($_POST['last_name']) : '';
-
             $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-
             $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
-
             $uni_id = isset($_POST['uni_id']) ? trim($_POST['uni_id']) : '';
-
             $study_level = isset($_POST['study_level']) ? trim($_POST['study_level']) : '';
-
             $study_year = isset($_POST['study_year']) ? trim($_POST['study_year']) : '';
+
+            // UTM Attribution fields
+            $utm_source   = isset($_POST['utm_source']) ? trim($_POST['utm_source']) : '';
+            $utm_medium   = isset($_POST['utm_medium']) ? trim($_POST['utm_medium']) : '';
+            $utm_campaign = isset($_POST['utm_campaign']) ? trim($_POST['utm_campaign']) : '';
+            $utm_content  = isset($_POST['utm_content']) ? trim($_POST['utm_content']) : '';
+            $utm_term     = isset($_POST['utm_term']) ? trim($_POST['utm_term']) : '';
 
 
 
@@ -58,11 +56,15 @@ class Consultation
                         "Phone" => $phone,
 
                         "Study_year" => $study_year,
-
                         "Study_level" => $study_level,
+                        "Lead_Source" => $utm_source ? "Website - " . $utm_source : "Consultation",
 
-                        "Lead_Source" => "Consultation",
-
+                        // UTM Attribution
+                        "UTM_Source"   => $utm_source,
+                        "UTM_Medium"   => $utm_medium,
+                        "UTM_Campaign" => $utm_campaign,
+                        "UTM_Content"  => $utm_content,
+                        "UTM_Term"     => $utm_term,
                     )
 
                 ),

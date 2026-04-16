@@ -4,10 +4,10 @@ namespace SIT\Search\Services;
 
 class ProgramEmbeddings
 {
-    private SIT_OpenAI_Service $openai;
+    private OpenAI $openai;
     private string $cache_table = 'sit_program_embeddings';
     
-    public function __construct(SIT_OpenAI_Service $openai)
+    public function __construct(OpenAI $openai)
     {
         $this->openai = $openai;
     }

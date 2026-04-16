@@ -1,0 +1,14 @@
+{
+  "name": "sit-geo-faq-generator",
+  "version": "1.0.0",
+  "description": "Generate AI-powered FAQs for university programs using OpenRouter API",
+  "main": "generate-faqs.js",
+  "scripts": {
+    "generate": "node generate-faqs.js",
+    "generate:test": "node generate-faqs.js --limit 5",
+    "generate:program": "node generate-faqs.js --post-id"
+  },
+  "dependencies": {
+    "mysql2": "^3.11.0"
+  }
+}

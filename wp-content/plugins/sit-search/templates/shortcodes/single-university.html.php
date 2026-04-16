@@ -455,7 +455,7 @@ $location_str    = $city ? "$city, $country" : $country;
 
           foreach ($uni_faqs as $i => $faq):
           ?>
-          <article class="up-faq-item" itemscope itemtype="https://schema.org/Question">
+          <article class="up-faq-item" itemprop="mainEntity" itemscope itemtype="https://schema.org/Question">
             <button class="up-faq-trigger" onclick="this.closest('.up-faq-item').classList.toggle('open')" itemprop="name">
               <span><?= esc_html($faq['q']) ?></span>
               <svg class="up-faq-chevron" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><polyline points="6 9 12 15 18 9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline></svg>
@@ -485,6 +485,12 @@ $location_str    = $city ? "$city, $country" : $country;
       </div>
     </div>
     <?php endif; ?>
+
+    <!-- ── Data Correction Disclaimer ── -->
+    <div class="up-disclaimer" style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #e9ecef; border-left: 4px solid #E20A17; border-radius: 8px; font-size: 14px; color: #6c757d; line-height: 1.6;">
+      <strong>Information for University Management:</strong> The data presented on this profile is gathered from public sources and our partner network. If you represent the administration or management of <strong><?= esc_html($title) ?></strong> and notice any outdated or incorrect information, please contact us immediately at <a href="mailto:webmaster@studyinturkiye.com" style="color: #E20A17; font-weight: 500; text-decoration: none;">webmaster@studyinturkiye.com</a>. We are committed to maintaining accurate, high-quality university profiles and will process your requested corrections promptly to protect your institution's representation.
+    </div>
+
   </div>
 
   <!-- ──── SIDEBAR ──── -->

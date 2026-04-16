@@ -27,7 +27,7 @@ class GenerateEmbeddingsAjax extends Hook
         $this->send_progress('Starting embedding generation...');
 
         try {
-            $openai = new \SIT\Search\Services\SIT_OpenAI_Service();
+            $openai = new \SIT\Search\Services\OpenAI();
             $this->send_progress('OpenAI service instantiated.');
 
             $embeddings = new \SIT\Search\Services\ProgramEmbeddings($openai);

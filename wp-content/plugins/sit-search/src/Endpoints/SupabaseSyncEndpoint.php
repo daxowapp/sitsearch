@@ -256,14 +256,28 @@ class SupabaseSyncEndpoint
         $supabase_id = $record[$mapping['id_field']] ?? '';
         $post_type = $mapping['post_type'];
         
-        // Check if post already exists
+        // Check if post already exists — try supabase_id first, then zoho_account_id
         $existing = get_posts([
             'post_type' => $post_type,
             'meta_key' => $mapping['meta_key'],
             'meta_value' => $supabase_id,
             'posts_per_page' => 1,
+            'post_status' => 'any',
             'lang' => '' // Query all languages
         ]);
+        
+        // Fallback: try zoho_account_id / zoho_product_id
+        if (empty($existing)) {
+            $fallback_key = ($post_type === 'sit-university') ? 'zoho_account_id' : 'zoho_product_id';
+            $existing = get_posts([
+                'post_type' => $post_type,
+                'meta_key' => $fallback_key,
+                'meta_value' => $supabase_id,
+                'posts_per_page' => 1,
+                'post_status' => 'any',
+                'lang' => ''
+            ]);
+        }
         
         $post_id = !empty($existing) ? $existing[0]->ID : 0;
         
@@ -273,6 +287,8 @@ class SupabaseSyncEndpoint
         if ($post_id) {
             $post_data['ID'] = $post_id;
             wp_update_post($post_data);
+            // Ensure supabase_id is set for future lookups
+            update_post_meta($post_id, $mapping['meta_key'], $supabase_id);
         } else {
             $post_id = wp_insert_post($post_data);
             update_post_meta($post_id, $mapping['meta_key'], $supabase_id);
@@ -291,6 +307,35 @@ class SupabaseSyncEndpoint
         // Update taxonomy relationships
         $this->update_post_taxonomies($post_id, $post_type, $record);
         
+        // Sync status to ALL Polylang translations (same zoho_account_id)
+        if ($post_type === 'sit-university' || $post_type === 'sit-program') {
+            $compat_key = ($post_type === 'sit-university') ? 'zoho_account_id' : 'zoho_product_id';
+            $sibling_posts = get_posts([
+                'post_type' => $post_type,
+                'meta_key' => $compat_key,
+                'meta_value' => $supabase_id,
+                'posts_per_page' => -1,
+                'post_status' => 'any',
+                'lang' => ''
+            ]);
+            
+            foreach ($sibling_posts as $sibling) {
+                if ($sibling->ID === $post_id) continue; // Already updated above
+                
+                // Sync post_status
+                wp_update_post([
+                    'ID' => $sibling->ID,
+                    'post_status' => $post_data['post_status'],
+                ]);
+                
+                // Sync critical meta fields to translations
+                $this->update_post_meta_from_record($sibling->ID, $post_type, $record);
+                
+                // Ensure supabase_id is set on translations too
+                update_post_meta($sibling->ID, $mapping['meta_key'], $supabase_id);
+            }
+        }
+        
         return [
             'post_id' => $post_id,
             'action' => !empty($existing) ? 'updated' : 'created'
@@ -302,9 +347,13 @@ class SupabaseSyncEndpoint
      */
     private function prepare_post_data(string $post_type, array $record, int $post_id = 0): array
     {
+        $active = $record['active'] ?? true;
+        // Normalize: Supabase may send boolean true/false, string 'true'/'false', or '1'/'0'
+        $is_active = ($active === true || $active === 'true' || $active === '1' || $active === 1);
+        
         $data = [
             'post_type' => $post_type,
-            'post_status' => ($record['active'] ?? true) ? 'publish' : 'draft'
+            'post_status' => $is_active ? 'publish' : 'draft'
         ];
         
         switch ($post_type) {
@@ -335,13 +384,45 @@ class SupabaseSyncEndpoint
         // Map Supabase fields to post meta
         $field_mappings = $this->get_field_mappings($post_type);
         
+        // Boolean fields that need normalization to '1'/'' for WordPress
+        $boolean_fields = ['active', 'active_in_apps', 'active_applications', 'featured_university'];
+        
+        // Dual-write mappings: Supabase uses lowercase but many templates read old Zoho CamelCase keys
+        // Write BOTH so all templates work without migration
+        $dual_write_aliases = [
+            // University fields
+            'qs_rank'            => 'QS_Rank',
+            'year_founded'       => 'Year_Founded',
+            'acomodation'        => 'Accommodation',
+            'description'        => 'Description',
+            // Program fields
+            'official_tuition'   => 'Official_Tuition',
+            'discounted_tuition' => 'Discounted_Tuition',
+            'tuition_currency'   => 'Tuition_Currency',
+            'study_years'        => 'Study_Years',
+            'advanced_discount'  => 'Advanced_Discount',
+        ];
+        
         foreach ($field_mappings as $supabase_field => $meta_key) {
             if (isset($record[$supabase_field])) {
-                update_post_meta($post_id, $meta_key, $record[$supabase_field]);
+                $value = $record[$supabase_field];
+                
+                // Normalize boolean values to '1' or '' for WP meta compatibility
+                if (in_array($supabase_field, $boolean_fields)) {
+                    $value = ($value === true || $value === 'true' || $value === '1' || $value === 1) ? '1' : '';
+                }
+                
+                update_post_meta($post_id, $meta_key, $value);
                 
                 // Also update ACF field if it exists
                 if (function_exists('update_field')) {
-                    update_field($meta_key, $record[$supabase_field], $post_id);
+                    update_field($meta_key, $value, $post_id);
+                }
+                
+                // Write alias meta key for old Zoho CamelCase compatibility
+                if (isset($dual_write_aliases[$supabase_field])) {
+                    $alias = $dual_write_aliases[$supabase_field];
+                    update_post_meta($post_id, $alias, $value);
                 }
             }
         }
@@ -358,11 +439,11 @@ class SupabaseSyncEndpoint
     {
         $mappings = [
             'sit-university' => [
+                // Actual Supabase columns → WP meta keys
                 'sector' => 'sector',
                 'phone' => 'phone',
-                'wesbite' => 'website',
-                'logo' => 'uni_logo',
-                'profile_image' => 'uni_image',
+                'wesbite' => 'website',      // Typo in Supabase
+                // 'logo' and 'profile_image' excluded — images managed in WordPress
                 'address' => 'address',
                 'year_founded' => 'year_founded',
                 'qs_rank' => 'qs_rank',
@@ -370,16 +451,20 @@ class SupabaseSyncEndpoint
                 'acomodation' => 'acomodation',
                 'active' => 'Active_in_Search',
                 'active_in_apps' => 'Active_in_Apps',
-                'number_of_students' => 'number_of_students', // Added missing field
-                'students' => 'number_of_students' // Fallback for various input names
+                'featured_university' => 'Featured_Univesity',
+                'number_of_students' => 'Number_Of_Students',
+                'description' => 'description',
             ],
             'sit-program' => [
+                'active' => 'Active_in_Search',
+                'active_applications' => 'Active_in_Apps',  // Supabase uses 'active_applications'
                 'official_tuition' => 'official_tuition',
                 'discounted_tuition' => 'discounted_tuition',
                 'tuition_currency' => 'tuition_currency',
                 'study_years' => 'study_years',
                 'university_id' => 'zh_university_supabase_id',
                 'university_name' => 'University',
+                'university_sector' => 'university_sector',
                 'degree_name' => 'Degree',
                 'speciality_name' => 'Speciality',
                 'language_name' => 'Language',
@@ -387,11 +472,13 @@ class SupabaseSyncEndpoint
                 'country_name' => 'Country',
                 'city_name' => 'City',
                 'tuition_fee_usd' => 'tuition_fee_usd',
-                'searchable_content' => 'searchable_content'
+                'searchable_content' => 'searchable_content',
+                'advanced_discount' => 'advanced_discount',  // Will work once column is added to Supabase
             ],
             'sit-campus' => [
                 'address' => 'address',
-                'university_id' => 'zh_university_supabase_id'
+                'university' => 'zh_university_supabase_id',  // Supabase uses 'university' not 'university_id'
+                'Faculty' => 'campus_faculty_ids'             // Array of faculty Zoho IDs
             ]
         ];
         
@@ -403,6 +490,7 @@ class SupabaseSyncEndpoint
      */
     private function update_post_taxonomies(int $post_id, string $post_type, array $record): void
     {
+        // Programs use *_id fields, universities use bare names (city, country)
         $taxonomy_mappings = [
             'country_id' => 'sit-country',
             'city_id' => 'sit-city',
@@ -421,15 +509,101 @@ class SupabaseSyncEndpoint
             }
         }
         
-        // Link to university post for programs
-        if ($post_type === 'sit-program' && !empty($record['university_id'])) {
+        // Universities have 'city' and 'country' columns (without _id suffix)
+        // These contain Supabase/Zoho IDs just like the _id fields on programs
+        if ($post_type === 'sit-university') {
+            $uni_taxonomy_fields = [
+                'country' => 'sit-country',
+                'city' => 'sit-city',
+            ];
+            foreach ($uni_taxonomy_fields as $field => $taxonomy) {
+                if (!empty($record[$field])) {
+                    $term = $this->get_term_by_supabase_id($taxonomy, $record[$field]);
+                    if (!$term) {
+                        // Fallback: try the old zoho meta key
+                        $old_key = 'zoho_' . $field . '_id';
+                        $terms = get_terms([
+                            'taxonomy' => $taxonomy,
+                            'meta_key' => $old_key,
+                            'meta_value' => $record[$field],
+                            'hide_empty' => false
+                        ]);
+                        $term = (!empty($terms) && !is_wp_error($terms)) ? $terms[0] : null;
+                    }
+                    if ($term) {
+                        wp_set_object_terms($post_id, $term->term_id, $taxonomy);
+                    }
+                }
+            }
+        }
+        
+        // Also try name-based taxonomy assignment by looking up term by name
+        $name_taxonomy_mappings = [
+            'country_name' => 'sit-country',
+            'city_name' => 'sit-city',
+            'degree_name' => 'sit-degree',
+            'faculty_name' => 'sit-faculty',
+            'speciality_name' => 'sit-speciality',
+            'language_name' => 'sit-language'
+        ];
+        
+        foreach ($name_taxonomy_mappings as $field => $taxonomy) {
+            $id_field = str_replace('_name', '_id', $field);
+            // Only use name-based if we don't have the ID field
+            if (empty($record[$id_field]) && !empty($record[$field])) {
+                $term = get_term_by('name', $record[$field], $taxonomy);
+                if ($term && !is_wp_error($term)) {
+                    wp_set_object_terms($post_id, $term->term_id, $taxonomy);
+                }
+            }
+        }
+        
+        // Campus: link Faculty array to sit-faculty taxonomy
+        if ($post_type === 'sit-campus' && !empty($record['Faculty']) && is_array($record['Faculty'])) {
+            $faculty_term_ids = [];
+            foreach ($record['Faculty'] as $faculty_supabase_id) {
+                $term = $this->get_term_by_supabase_id('sit-faculty', $faculty_supabase_id);
+                if (!$term) {
+                    // Fallback: old zoho meta key
+                    $terms = get_terms([
+                        'taxonomy' => 'sit-faculty',
+                        'meta_key' => 'zoho_faculty_id',
+                        'meta_value' => $faculty_supabase_id,
+                        'hide_empty' => false
+                    ]);
+                    $term = (!empty($terms) && !is_wp_error($terms)) ? $terms[0] : null;
+                }
+                if ($term) {
+                    $faculty_term_ids[] = $term->term_id;
+                }
+            }
+            if (!empty($faculty_term_ids)) {
+                wp_set_object_terms($post_id, $faculty_term_ids, 'sit-faculty');
+            }
+        }
+        
+        // Link to university post for programs and campuses
+        // Programs use 'university_id', campuses use 'university'
+        $uni_ref = $record['university_id'] ?? $record['university'] ?? null;
+        if (in_array($post_type, ['sit-program', 'sit-campus']) && !empty($uni_ref)) {
+            // Try supabase_id first, then zoho_account_id
             $university_posts = get_posts([
                 'post_type' => 'sit-university',
                 'meta_key' => 'supabase_id',
-                'meta_value' => $record['university_id'],
+                'meta_value' => $uni_ref,
                 'posts_per_page' => 1,
                 'lang' => '' // Query all languages
             ]);
+            
+            if (empty($university_posts)) {
+                $university_posts = get_posts([
+                    'post_type' => 'sit-university',
+                    'meta_key' => 'zoho_account_id',
+                    'meta_value' => $uni_ref,
+                    'posts_per_page' => 1,
+                    'lang' => ''
+                ]);
+            }
             
             if (!empty($university_posts)) {
                 update_post_meta($post_id, 'zh_university', $university_posts[0]->ID);
@@ -484,7 +658,7 @@ class SupabaseSyncEndpoint
         update_term_meta($term_id, $mapping['meta_key'], $supabase_id);
         
         // Store additional fields in term meta
-        $term_meta_fields = ['code', 'active', 'country'];
+        $term_meta_fields = ['code', 'active', 'country', 'country_code', 'active_on_nationalities', 'active_on_university', 'active_in_university', 'faculty_id'];
         foreach ($term_meta_fields as $field) {
             if (isset($record[$field])) {
                 update_term_meta($term_id, $field, $record[$field]);
@@ -539,10 +713,8 @@ class SupabaseSyncEndpoint
         $supabase = new \SIT\Search\Services\Supabase();
         $supabase->clear_cache($table);
         
-        // Clear WordPress object cache if available
-        if (function_exists('wp_cache_delete')) {
-            wp_cache_delete('active_university_ids', 'sit_search');
-        }
+        // Clear all university-related caches (active IDs + top universities shortcode)
+        \SIT\Search\Services\CachedData::clear_university_cache();
         
         // Clear any transients related to the table
         global $wpdb;

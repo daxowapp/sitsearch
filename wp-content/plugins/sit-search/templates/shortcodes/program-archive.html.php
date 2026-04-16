@@ -852,7 +852,7 @@ $search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : 
         </div>
 
         <!-- Program Results Grid -->
-        <div class="all-faculties-program" id="programsGridContainer">
+        <div class="all-faculties-program filter-results" id="programsGridContainer">
             <?php
             $anim_index = 0;
             foreach ($programs as $university) {
@@ -877,7 +877,9 @@ $search_value = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : 
                 ?>
                 <div class="program-list-item sit-reveal" style="transition-delay: <?php echo esc_attr($delay); ?>">
                     <div class="program-list-image">
-                        <?php if (!empty($program['image_url'])): ?>
+                        <?php if (!empty($program['logo_url'])): ?>
+                            <img src="<?php echo $program['logo_url']; ?>" alt="<?php echo $program['title']; ?>">
+                        <?php elseif (!empty($program['image_url'])): ?>
                             <img src="<?php echo $program['image_url']; ?>" alt="<?php echo $program['title']; ?>">
                         <?php else: ?>
                             <div class="program-list-placeholder">🏫</div>
@@ -1432,10 +1434,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Show loading indicator
         const loadingElement = document.getElementById('paginationLoading');
-        const contentElement = document.querySelector('.single-campus-content');
+        const contentElement = document.querySelector('.single-campus-content, .all-faculties-program, .filter-results-container, .program-archive-wrapper');
         
-        loadingElement.style.display = 'flex';
-        contentElement.style.opacity = '0.6';
+        if (loadingElement) loadingElement.style.display = 'flex';
+        if (contentElement) contentElement.style.opacity = '0.6';
         
         // Get current filters and search parameters
         const urlParams = new URLSearchParams(window.location.search);

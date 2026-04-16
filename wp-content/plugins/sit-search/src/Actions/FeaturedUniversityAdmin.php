@@ -180,11 +180,30 @@ class FeaturedUniversityAdmin {
     public function handle_search() {
         check_ajax_referer('sit_featured_nonce', 'nonce');
         $q = sanitize_text_field($_REQUEST['q']);
-        $posts = get_posts([
+        $allowed_countries = [];
+        $turkey_term = get_term_by('name', 'Turkey', 'sit-country');
+        if ($turkey_term) $allowed_countries[] = $turkey_term->term_id;
+        
+        $nc_term = get_term_by('name', 'Northern Cyprus', 'sit-country');
+        if ($nc_term) $allowed_countries[] = $nc_term->term_id;
+
+        $args = [
             'post_type' => 'sit-university',
             's' => $q,
-            'posts_per_page' => 10
-        ]);
+            'posts_per_page' => 10,
+        ];
+
+        if (!empty($allowed_countries)) {
+            $args['tax_query'] = [
+                [
+                    'taxonomy' => 'sit-country',
+                    'field'    => 'term_id',
+                    'terms'    => $allowed_countries,
+                ]
+            ];
+        }
+
+        $posts = get_posts($args);
 
         $results = [];
         foreach($posts as $p) {

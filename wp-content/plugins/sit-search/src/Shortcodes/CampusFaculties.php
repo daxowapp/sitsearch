@@ -30,7 +30,8 @@ class CampusFaculties
             if ($active_in_search != '1' && $active_in_search !== true) {
                 $terms = array(); // Return empty array if university is not active
             } else {
-                $terms = array_map(function ($term) use ($oth_uniid, &$all_programs) {
+                $unii_title = $oth_uniid ? get_the_title($oth_uniid) : '';
+                $terms = array_map(function ($term) use ($oth_uniid, $unii_title, &$all_programs) {
                     $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
                     $degree = isset($_GET['level']) && $_GET['level'] != 0 ? intval($_GET['level']) : '';
                     $country = isset($_GET['country']) && $_GET['country'] != 0 ? intval($_GET['country']) : '';
@@ -157,6 +158,7 @@ class CampusFaculties
                     'posts_per_page' => -1,
                     'post_status'    => 'publish',
                     'meta_query'     => $meta_query,
+                    'no_found_rows'  => true,
                 );
 
                 if (!empty($degree) || !empty($country) || !empty($speciality) || !empty($language)) {
@@ -208,10 +210,18 @@ class CampusFaculties
 //                echo '</pre>';
                 $query = new \WP_Query($args);
 
-                $programs = array_map(function ($post) {
+                // Pre-warm caches to prevent N+1 queries during mapping
+                $page_post_ids = wp_list_pluck($query->posts, 'ID');
+                if (!empty($page_post_ids)) {
+                    update_meta_cache('post', $page_post_ids);
+                    update_object_term_cache($page_post_ids, ['sit-country', 'sit-language']);
+                    
+                    // Note: Since all programs belong to $oth_uniid, we only need to secure that one uni cache
+                    // which is already hit by get_field() above.
+                }
 
-                    $oth_uniid = get_post_meta($post->ID, 'zh_university', true);
-                    $unii_title = get_the_title($oth_uniid);
+                $programs = array_map(function ($post) use ($oth_uniid, $unii_title) {
+
                     $country_terms = get_the_terms($post->ID, 'sit-country');
                     $country_name = !empty($country_terms) && !is_wp_error($country_terms)
                         ? $country_terms[0]->name
@@ -232,9 +242,22 @@ class CampusFaculties
                         'fee' => get_post_meta($post->ID, 'Official_Tuition', true),
                         'discounted_fee' => get_post_meta($post->ID, 'Discounted_Tuition', true),
                         'Advanced_Discount' => get_post_meta($post->ID, 'Advanced_Discount', true),
-                        'image_url' => !empty(get_post_meta($oth_uniid, 'uni_image', true)) ?
-                            esc_url(get_post_meta($oth_uniid, 'uni_image', true))
-                            : 'https://placehold.co/714x340?text=University',
+                        'image_url' => (function() use ($oth_uniid) {
+                            $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
+                            foreach ($keys as $key) {
+                                $img = get_post_meta($oth_uniid, $key, true);
+                                if (!empty($img)) return esc_url($img);
+                            }
+                            return 'https://placehold.co/714x340?text=University';
+                        })(),
+                        'logo_url' => (function() use ($oth_uniid) {
+                            $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                            foreach ($keys as $key) {
+                                $img = get_post_meta($oth_uniid, $key, true);
+                                if (!empty($img)) return esc_url($img);
+                            }
+                            return 'https://placehold.co/128x128?text=U';
+                        })(),
                     ];
                 }, $query->posts);
 
@@ -268,9 +291,8 @@ class CampusFaculties
                 $disstr="This document provides a comprehensive list of programs degrees in ".$post_title.". Each program includes details about duration, tuition fees, language requirements, application deadlines, and more.";
             }
             // Get filter data for sidebar
-            $all_degrees = get_terms(['taxonomy' => 'sit-degree', 'hide_empty' => false]);
-            
-            // Extract unique languages and universities from programs
+            // Extract unique degrees, languages and universities from programs
+            $unique_degrees = [];
             $unique_languages = [];
             $all_universities_for_filter = [];
             
@@ -278,8 +300,18 @@ class CampusFaculties
                 // Programs are arrays, not objects - use array access
                 $program_id = $program['uni_id'] ?? 0;
                 
-                // Extract languages
+                // Extract degrees
                 if ($program_id) {
+                    $degree_terms = get_the_terms($program_id, 'sit-degree');
+                    if ($degree_terms && !is_wp_error($degree_terms)) {
+                        foreach ($degree_terms as $term) {
+                            if (!isset($unique_degrees[$term->term_id])) {
+                                $unique_degrees[$term->term_id] = $term;
+                            }
+                        }
+                    }
+
+                    // Extract languages
                     $language_terms = get_the_terms($program_id, 'sit-language');
                     if ($language_terms && !is_wp_error($language_terms)) {
                         foreach ($language_terms as $term) {
@@ -311,7 +343,7 @@ class CampusFaculties
                 'specialityid' => $speciality_id,
                 'countryid' => $country_id,
                 'filter_data' => [
-                    'degrees' => $all_degrees,
+                    'degrees' => array_values($unique_degrees),
                     'universities' => $all_universities_for_filter
                 ],
                 'available_languages' => $unique_languages

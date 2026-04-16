@@ -2,77 +2,113 @@
 $recent_search = isset($_COOKIE['recent_search']) ? json_decode(stripslashes($_COOKIE['recent_search']), true) : [];
 $recent_search=array_slice($recent_search, -5);
 ?>
-<div class="sit-search" id="sit-search">
-    <form action="<?= home_url('/results/') ?>" method="GET" id="search-bar">
-        <div class="form-group">
-            <img src="<?= STI_SEARCH_URL ?>assets/images/graduation-gown.png"/>
-            <select class="select2" name="speciality">
-                <option value="0" selected>What do you want to study?</option>
-                <?php
-                foreach ($specialities as $speciality) {
-                    if (isset($_GET['speciality'])) {
-                        if ($_GET['speciality'] == $speciality->term_id) {
-                            $sel = 'selected';
-                        } else {
-                            $sel = '';
-                        }
-                    } else {
-                        $sel = '';
-                    }
-                    echo '<option ' . $sel . ' value="' . $speciality->term_id . '">' . $speciality->name . '</option>';
-                }
-                ?>
-            </select>
-        </div>
+<div class="sit-search-container-wrapper" style="max-width: 1200px; margin: 0 auto; width: 100%; position: relative;">
+    <div class="sit-search-tabs">
+        <button class="search-tab-btn active" data-target="traditional-search">Standard Search</button>
+        <button class="search-tab-btn ai-tab" data-target="ai-search-mode">
+            ✨ AI Smart Search
+        </button>
+    </div>
 
-        <div class="form-group">
-            <img src="<?= STI_SEARCH_URL ?>assets/images/accomodation.png"/>
-            <select class="select2" name="country">
-                <option value="0" <?php echo empty($_GET['country']) ? 'selected' : ''; ?>>Where do you want to study?</option>
-                <?php
-                foreach ($countries as $country) {
-                    $sel = '';
-                    if (isset($_GET['country']) && $_GET['country'] == $country->term_id) {
-                        $sel = 'selected';
-                    }
-                    echo '<option ' . $sel . ' value="' . $country->term_id . '">' . $country->name . '</option>';
-                }
-                ?>
-            </select>
-        </div>
-        <div class="form-group">
-            <img src="<?= STI_SEARCH_URL ?>assets/images/ranking.png"/>
-            <select class="select2" name="level">
-                <option value="0" selected>What level do you want to study?</option>
-                <?php
-                foreach ($degrees as $degree) {
-                    if (isset($_GET['level'])) {
-                        if ($_GET['level'] == $degree->term_id) {
-                            $sel = 'selected';
-                        } else {
-                            $sel = '';
+    <div class="sit-search-panels">
+        <!-- Traditional Search Panel -->
+        <div class="sit-search-panel active" id="traditional-search">
+        <div class="sit-search" id="sit-search">
+            <form action="<?= home_url('/results/') ?>" method="GET" id="search-bar">
+                <div class="form-group">
+                    <img src="<?= STI_SEARCH_URL ?>assets/images/graduation-gown.png"/>
+                    <select class="select2" name="speciality">
+                        <option value="0" selected>What do you want to study?</option>
+                        <?php
+                        foreach ($specialities as $speciality) {
+                            if (isset($_GET['speciality'])) {
+                                if ($_GET['speciality'] == $speciality->term_id) {
+                                    $sel = 'selected';
+                                } else {
+                                    $sel = '';
+                                }
+                            } else {
+                                $sel = '';
+                            }
+                            echo '<option ' . $sel . ' value="' . $speciality->term_id . '">' . $speciality->name . '</option>';
                         }
-                    } else {
-                        $sel = '';
-                    }
-                    echo '<option ' . $sel . ' value="' . $degree->term_id . '">' . $degree->name . '</option>';
-                }
-                ?>
-            </select>
+                        ?>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <img src="<?= STI_SEARCH_URL ?>assets/images/accomodation.png"/>
+                    <select class="select2" name="country">
+                        <option value="0" <?php echo empty($_GET['country']) ? 'selected' : ''; ?>>Where do you want to study?</option>
+                        <?php
+                        foreach ($countries as $country) {
+                            $sel = '';
+                            if (isset($_GET['country']) && $_GET['country'] == $country->term_id) {
+                                $sel = 'selected';
+                            }
+                            echo '<option ' . $sel . ' value="' . $country->term_id . '">' . $country->name . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <img src="<?= STI_SEARCH_URL ?>assets/images/ranking.png"/>
+                    <select class="select2" name="level">
+                        <option value="0" selected>What level do you want to study?</option>
+                        <?php
+                        foreach ($degrees as $degree) {
+                            if (isset($_GET['level'])) {
+                                if ($_GET['level'] == $degree->term_id) {
+                                    $sel = 'selected';
+                                } else {
+                                    $sel = '';
+                                }
+                            } else {
+                                $sel = '';
+                            }
+                            echo '<option ' . $sel . ' value="' . $degree->term_id . '">' . $degree->name . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <img src="<?= STI_SEARCH_URL ?>assets/images/accomodation.png"/>
+                    <select class="select2" name="univerity-type">
+                        <option value="0" selected>University Type</option>
+                        <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'All'){ echo 'selected'; }  ?> value="All">All</option>
+                        <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'Public'){ echo 'selected'; }   ?> value="Public">Public</option>
+                        <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'Private'){ echo 'selected'; }  ?> value="Private">Private</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="standard-search-btn">
+                        <span class="btn-text">Search</span>
+                        <div class="sit-btn-dots">
+                            <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                        </div>
+                    </button>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <img src="<?= STI_SEARCH_URL ?>assets/images/accomodation.png"/>
-            <select class="select2" name="univerity-type">
-                <option value="0" selected>University Type</option>
-                <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'All'){ echo 'selected'; }  ?> value="All">All</option>
-                <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'Public'){ echo 'selected'; }   ?> value="Public">Public</option>
-                <option <?php if(isset($_GET['univerity-type']) && $_GET['univerity-type'] == 'Private'){ echo 'selected'; }  ?> value="Private">Private</option>
-            </select>
+    </div> <!-- /traditional-search -->
+
+    <!-- AI Search Panel -->
+    <div class="sit-search-panel" id="ai-search-mode" style="display: none;">
+        <div class="sit-search sit-ai-search-container" style="background: transparent; box-shadow: none; padding: 10px 0;">
+            <form action="<?= home_url('/results/') ?>" method="GET" style="display: flex; width: 100%; position: relative;">
+                <svg style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; fill: #888; z-index:2;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 456.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
+                <input type="text" name="search" placeholder="Type naturally... e.g., 'Medicine in English in Istanbul'" 
+                       class="sit-ui-input" style="width: 100%; padding: 22px 140px 22px 55px; border-radius: var(--sit-radius-full); font-size: 16px;" autocomplete="off" required>
+                <button type="submit" id="ai-search-btn-main" class="sit-ui-btn" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: #E20A17; color: #fff; border: none; padding: 14px 32px; border-radius: var(--sit-radius-full); font-size: 16px; box-shadow: 0 4px 12px rgba(226,10,23,0.3);">
+                    <span class="btn-text">Search</span>
+                    <div class="sit-btn-dots">
+                        <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+                    </div>
+                </button>
+            </form>
         </div>
-        <div class="form-group">
-            <button type="submit">Search</button>
-        </div>
-    </form>
+    </div> <!-- /ai-search-mode -->
+</div> <!-- /sit-search-panels -->
 
     <?php if ($recent_search) : ?>
         <div class="recent-searches">
@@ -80,11 +116,16 @@ $recent_search=array_slice($recent_search, -5);
             <ul>
 
                 <?php
-                foreach ($recent_search as $search) {
-                    // Safely get term data
-                    $speciality_id = isset($search['speciality']) ? $search['speciality'] : 0;
-                    $country_id = isset($search['country']) ? $search['country'] : 0;
-                    $level_id = isset($search['level']) ? $search['level'] : 0;
+                foreach ($recent_search as $recent_item) {
+                    // Safely get term data, handle multiple selections by taking the first one
+                    $speciality_id = isset($recent_item['speciality']) ? $recent_item['speciality'] : 0;
+                    if (is_array($speciality_id)) $speciality_id = current($speciality_id) ?: 0;
+                    
+                    $country_id = isset($recent_item['country']) ? $recent_item['country'] : 0;
+                    if (is_array($country_id)) $country_id = current($country_id) ?: 0;
+                    
+                    $level_id = isset($recent_item['level']) ? $recent_item['level'] : 0;
+                    if (is_array($level_id)) $level_id = current($level_id) ?: 0;
                     
                     $speciality_term = get_term($speciality_id, 'sit-speciality');
                     $country_term = get_term($country_id, 'sit-country');
@@ -116,4 +157,150 @@ $recent_search=array_slice($recent_search, -5);
             </ul>
         </div>
     <?php endif; ?>
+
+    <style>
+        .sit-search-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: -15px; /* Pull the search bar up slightly */
+            position: relative;
+            z-index: 10;
+        }
+        .search-tab-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px 20px 0 0;
+            font-size: 15px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 -3px 10px rgba(0,0,0,0.02);
+            padding-bottom: 25px; /* extend down behind the search bar */
+        }
+        .search-tab-btn.active {
+            background: #fff;
+            color: #E20A17;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.06);
+        }
+        .search-tab-btn.ai-tab {
+            color: #6366f1; /* Special color for AI */
+        }
+        .search-tab-btn.ai-tab.active {
+            color: #4f46e5;
+            background: linear-gradient(to bottom, #f0fdf4, #ffffff);
+        }
+        .sit-search-panels {
+            position: relative;
+            z-index: 20;
+        }
+
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.search-tab-btn');
+            const panels = document.querySelectorAll('.sit-search-panel');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    tabs.forEach(t => t.classList.remove('active'));
+                    panels.forEach(p => p.style.display = 'none');
+                    this.classList.add('active');
+                    const targetId = this.getAttribute('data-target');
+                    document.getElementById(targetId).style.display = 'block';
+                });
+            });
+
+            // ── Empty Search Validation (must run BEFORE main.js) ──
+            var searchForm = document.getElementById('search-bar');
+            if (searchForm) {
+                searchForm.addEventListener('submit', function(e) {
+                    var sp = this.querySelector('select[name="speciality"]');
+                    var co = this.querySelector('select[name="country"]');
+                    var lv = this.querySelector('select[name="level"]');
+                    var ut = this.querySelector('select[name="univerity-type"]');
+
+                    var spVal = sp ? sp.value : '';
+                    var coVal = co ? co.value : '';
+                    var lvVal = lv ? lv.value : '';
+                    var utVal = ut ? ut.value : '';
+
+                    var isEmpty = (spVal === '0' || spVal === '') &&
+                                  (coVal === '0' || coVal === '') &&
+                                  (lvVal === '0' || lvVal === '') &&
+                                  (utVal === '0' || utVal === '' || utVal === 'All');
+
+                    if (isEmpty) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation(); // Block main.js handler from firing
+
+                        // Reset button in case main.js already touched it
+                        var btn = document.getElementById('standard-search-btn');
+                        if (btn) {
+                            btn.disabled = false;
+                            var btnText = btn.querySelector('.btn-text');
+                            if (btnText) btnText.textContent = 'Search';
+                        }
+
+                        // Show / create modern toast
+                        var toast = document.getElementById('sit-search-toast');
+                        if (!toast) {
+                            toast = document.createElement('div');
+                            toast.id = 'sit-search-toast';
+                            toast.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Please select at least one filter before searching.</span>';
+                            Object.assign(toast.style, {
+                                display: 'none',
+                                alignItems: 'center',
+                                gap: '10px',
+                                margin: '14px auto 0',
+                                maxWidth: '520px',
+                                padding: '12px 20px',
+                                fontSize: '14px',
+                                fontWeight: '500',
+                                color: '#b91c1c',
+                                background: 'rgba(254, 242, 242, 0.95)',
+                                backdropFilter: 'blur(8px)',
+                                border: '1px solid #fecaca',
+                                borderRadius: '12px',
+                                boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                                textAlign: 'left',
+                                animation: 'sitToastIn 0.3s ease'
+                            });
+                            // Place toast OUTSIDE the form, right after sit-search container
+                            var sitSearch = document.getElementById('sit-search');
+                            if (sitSearch && sitSearch.parentNode) {
+                                sitSearch.parentNode.insertBefore(toast, sitSearch.nextSibling);
+                            } else {
+                                this.parentNode.insertBefore(toast, this.nextSibling);
+                            }
+                        }
+
+                        toast.style.display = 'flex';
+                        clearTimeout(toast._hideTimer);
+                        toast._hideTimer = setTimeout(function() {
+                            toast.style.animation = 'sitToastOut 0.3s ease forwards';
+                            setTimeout(function() { toast.style.display = 'none'; toast.style.animation = 'sitToastIn 0.3s ease'; }, 300);
+                        }, 4000);
+
+                        return false;
+                    }
+                }, true); // useCapture = true → fires BEFORE jQuery handlers
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes sitToastIn {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes sitToastOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-8px); }
+        }
+    </style>
 </div>

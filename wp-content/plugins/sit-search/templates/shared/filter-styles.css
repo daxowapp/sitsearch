@@ -346,7 +346,7 @@
 /* Ensure filter-results container is visible */
 .filter-results {
     width: 100%;
-    display: block;
+    /* Display properties depend on grid vs list view logic and sit-search.css natively handling it */
     min-height: 200px;
 }
 

@@ -138,7 +138,7 @@ class Zoho
         $this->logger->log_message('info', "Request URL: {$url}");
         $this->logger->log_message('info', "Request method: {$method}");
         $this->logger->log_message('info', "Request data: " . json_encode($data));
-        echo 'in';
+
         $headers = [
             'Authorization' => 'Zoho-oauthtoken ' . $this->access_token,
             'Content-Type'  => 'application/json',
@@ -246,7 +246,7 @@ class Zoho
                 'body' => $data
             )
         );
-        echo $this->base_url . $url;
+
         if (is_wp_error($request)) {
             $this->logger->log_message('error', 'Request failed: ' . $request->get_error_message());
             return null;

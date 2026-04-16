@@ -106,10 +106,14 @@ $current_filters = [
             <h4 class="filter-section-title">🌐 Language</h4>
             <div class="filter-options">
                 <?php
-                $languages = get_terms(array(
-                    'taxonomy' => 'sit-language',
-                    'hide_empty' => true,
-                ));
+                if (isset($available_languages) && !empty($available_languages)) {
+                    $languages = $available_languages;
+                } else {
+                    $languages = get_terms(array(
+                        'taxonomy' => 'sit-language',
+                        'hide_empty' => true,
+                    ));
+                }
                 $allowed_languages = ['Arabic', 'English', 'Turkish'];
                 
                 foreach ($languages as $language) {

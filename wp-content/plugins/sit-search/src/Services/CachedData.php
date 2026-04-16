@@ -180,6 +180,9 @@ class CachedData
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_sit_%'");
         $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_sit_%'");
         
+        // Clear top universities shortcode cache
+        delete_transient('sit_top_universities_data');
+        
         // Clear object cache
         wp_cache_delete('active_university_ids', self::CACHE_GROUP);
         
@@ -196,7 +199,19 @@ class CachedData
      */
     public static function clear_university_cache(): void
     {
+        global $wpdb;
         delete_transient('sit_active_university_ids');
+        delete_transient('sit_top_universities_data');
         wp_cache_delete('active_university_ids', self::CACHE_GROUP);
+        
+        // Bump cache version to globally invalidate all dynamic search result caches
+        // Ensures new featured/active status is instantly reflected on search results
+        update_option('sit_search_cache_version', time(), false);
+        
+        // Clear search endpoints to ensure featured/active updates are visible immediately
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_sit_filtersort_%'");
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_sit_filtersort_%'");
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_sit_search_v2_%'");
+        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_sit_search_v2_%'");
     }
 }

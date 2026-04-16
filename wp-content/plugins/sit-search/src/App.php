@@ -129,6 +129,9 @@ class App
         // Initialize University Status Admin page
         new \SIT\Search\Actions\UniversityStatusAdmin();
 
+        // Initialize University Media Admin page
+        new \SIT\Search\Actions\UniversityMediaAdmin();
+
         // Initialize AI Settings Admin page
         new \SIT\Search\Actions\AiSettingsAdmin();
 

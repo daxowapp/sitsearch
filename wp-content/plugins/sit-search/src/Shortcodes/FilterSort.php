@@ -14,7 +14,7 @@ class FilterSort
         // Removed session_start() to prevent "headers already sent" warning
         
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        $sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '';
         // Handle both single level and multiple levels (level[])
         $degree = '';
         if (isset($_GET['level']) && $_GET['level'] != 0) {
@@ -27,17 +27,45 @@ class FilterSort
         $country = isset($_GET['country']) && $_GET['country'] != 0 ? intval($_GET['country']) : '';
         $speciality = isset($_GET['speciality']) && $_GET['speciality'] != 0 ? intval($_GET['speciality']) : '';
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : ''; // Sanitize input
-        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? $_GET['univerity-type'] : '';
+        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? sanitize_text_field($_GET['univerity-type']) : '';
 
         
-        $feeFilter = $_GET['feeFiter'] ?? '';
-        $duration = $_GET['duration'] ?? '';
-        $isScholarShip = $_GET['isScholarShip'] ?? '';
-        $language = $_GET['language'] ?? '';
-        $city = $_GET['city'] ?? '';
+        $feeFilter = isset($_GET['feeFiter']) ? sanitize_text_field($_GET['feeFiter']) : '';
+        $duration = isset($_GET['duration']) ? sanitize_text_field($_GET['duration']) : '';
+        $isScholarShip = isset($_GET['isScholarShip']) ? sanitize_text_field($_GET['isScholarShip']) : '';
+        $language = isset($_GET['language']) ? sanitize_text_field($_GET['language']) : '';
+        $city = isset($_GET['city']) ? sanitize_text_field($_GET['city']) : '';
 
         if (!empty($duration)) {
             $duration = explode(' ', $duration)[0];
+        }
+
+        // Apply AI Smart Filters
+        $ai_terms = [];
+        $university = isset($_GET['university']) ? sanitize_text_field($_GET['university']) : '';
+        if (!empty($search)) {
+            $ai_result = \SIT\Search\Services\AiSearchHelper::expand_search($search);
+            $ai_terms = $ai_result['terms'];
+            $ai_filters = $ai_result['filters'] ?? [];
+            
+            if (empty($degree) && !empty($ai_filters['degree'])) {
+                $term = get_term_by('name', $ai_filters['degree'], 'sit-degree');
+                if ($term) $degree = $term->term_id;
+            }
+            if (empty($language) && !empty($ai_filters['language'])) {
+                $language = $ai_filters['language']; // handled naturally below
+            }
+            if (empty($city) && !empty($ai_filters['city'])) {
+                $city = $ai_filters['city']; // handled naturally below
+            }
+            if (empty($country) && !empty($ai_filters['country'])) {
+                $term = get_term_by('name', $ai_filters['country'], 'sit-country');
+                if ($term) $country = $term->term_id;
+            }
+            
+            if (empty($university) && !empty($ai_filters['university'])) {
+                $university = is_array($ai_filters['university']) ? $ai_filters['university'] : [$ai_filters['university']];
+            }
         }
 
         $tax_query = array('relation' => 'AND');
@@ -250,7 +278,7 @@ class FilterSort
         }
 
         // Add university filter (supports multiple selections)
-        $university = $_GET['university'] ?? '';
+        $university = $university ?: (isset($_GET['university']) ? sanitize_text_field($_GET['university']) : '');
         if (!empty($university)) {
             $universities = is_array($university) ? $university : [$university];
             $university_ids = array();
@@ -325,47 +353,84 @@ class FilterSort
 
 
 
-        $search_terms = !empty($search) ? array_map('trim', explode(',', $search)) : [];
-        $program_search_conditions = ['relation' => 'OR'];
+        $search_terms = $ai_terms;
+        $search_program_ids = [];
+
         if (!empty($search_terms)) {
+            global $wpdb;
+            $term_sql = [];
             foreach ($search_terms as $term) {
-                $program_search_conditions[] = [
-                    'key'     => 'Product_Name',
-                    'value'   => $term,
-                    'compare' => 'LIKE',
-                ];
+                $term_sql[] = $wpdb->prepare("meta_value LIKE %s", '%' . $wpdb->esc_like(trim($term)) . '%');
+            }
+            $or_clause = implode(' OR ', $term_sql);
+
+            // 1. Find universities that match the AI terms
+            $uni_ids = $wpdb->get_col("SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = 'Account_Name' AND ($or_clause)");
+            
+            $uni_condition = "";
+            if (!empty($uni_ids)) {
+                $escaped_uni_ids = implode(',', array_map('intval', $uni_ids));
+                $uni_condition = " OR (meta_key = 'zh_university' AND meta_value IN ($escaped_uni_ids))";
+            }
+
+            // 1.5 Find programs matching taxonomy terms (speciality/degree)
+            $tax_term_sql = [];
+            foreach ($search_terms as $term) {
+                $tax_term_sql[] = $wpdb->prepare("t.name LIKE %s", '%' . $wpdb->esc_like(trim($term)) . '%');
+            }
+            $tax_or_clause = implode(' OR ', $tax_term_sql);
+
+            $tax_program_ids = $wpdb->get_col("
+                SELECT tr.object_id FROM {$wpdb->term_relationships} tr
+                INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id
+                INNER JOIN {$wpdb->terms} t ON tt.term_id = t.term_id
+                WHERE tt.taxonomy IN ('sit-speciality', 'sit-degree') AND ($tax_or_clause)
+            ");
+
+            $tax_condition = "";
+            if (!empty($tax_program_ids)) {
+                $escaped_tax_prog_ids = implode(',', array_map('intval', $tax_program_ids));
+                $tax_condition = " OR p.post_id IN ($escaped_tax_prog_ids)";
+            }
+
+            // 2. Find all programs that either match the terms directly OR belong to matching universities OR match taxonomy
+            $matched_programs_sql = "
+                SELECT DISTINCT p.post_id FROM {$wpdb->postmeta} p 
+                INNER JOIN {$wpdb->posts} posts ON posts.ID = p.post_id 
+                WHERE posts.post_type = 'sit-program' AND posts.post_status = 'publish'
+                AND (
+                    (meta_key = 'Product_Name' AND ($or_clause))
+                    $uni_condition
+                    $tax_condition
+                )
+            ";
+            $search_program_ids = $wpdb->get_col($matched_programs_sql);
+            
+            if (empty($search_program_ids)) {
+                // If AI terms found nothing, force zero results
+                $search_program_ids = [-1];
             }
         }
 
-        $safe_uni_ids = empty($university_ids) ? [-1] : $university_ids;
-
-        if (!empty($search_terms) && (!empty($type) && $type != 'All')) {
-            $meta_query[] = array(
-                'relation' => 'AND',
-                array(
-                    'key'     => 'zh_university',
-                    'value'   => $safe_uni_ids,
-                    'compare' => 'IN',
-                ),
-                $program_search_conditions,
-            );
-        } elseif(empty($search_terms) && (!empty($type) && $type != 'All')){
+        // Apply country/selected university filters
+        if (!empty($university_ids)) {
+            // There are specific universities from country/city filters
             $meta_query[] = array(
                 'key'     => 'zh_university',
-                'value'   => $safe_uni_ids,
+                'value'   => $university_ids,
                 'compare' => 'IN',
             );
-        } elseif(!empty($search_terms) && empty($type)){
-            $meta_query[] = array(
-                'relation' => 'OR',
-                array(
+        } else {
+            // If the user selected a specific type (Public/Private) and NO universities matched,
+            // we should restrict it. But if they just searched, we shouldn't force 0 results.
+            if (!empty($type) && $type != 'All') {
+                $meta_query[] = array(
                     'key'     => 'zh_university',
-                    'value'   => $safe_uni_ids,
+                    'value'   => [-1],
                     'compare' => 'IN',
-                ),
-                $program_search_conditions,
-            );
-        } 
+                );
+            }
+        }
 
 
 
@@ -377,26 +442,112 @@ class FilterSort
             'post_status'    => 'publish',
             // 'paged'          => $paged, // Removed, we handle paging manually
             'meta_query'     => $meta_query,
-            'no_found_rows'  => false,
+            'no_found_rows'  => true, // Fixed overhead of SQL_CALC_FOUND_ROWS
             'distinct'       => true, 
         );
         $pdf_args = array(
             'post_type'      => 'sit-program',
             'posts_per_page' => -1,
             'post_status'    => 'publish',
+            'no_found_rows'  => true,
             'meta_query'     => $meta_query,
             'distinct'       => true, 
         );
+
+        if (!empty($search_program_ids)) {
+            $args['post__in'] = $search_program_ids;
+            $pdf_args['post__in'] = $search_program_ids;
+        }
 
         if (!empty($degree) || !empty($country) || !empty($speciality) || !empty($city) || !empty($language)) {
             $args['tax_query'] = $tax_query;
             $pdf_args['tax_query'] = $tax_query;
         }
 
-        // Execute Queries
+        // Execute Queries or Grab from Cache
+        $cache_key_array = [
+            'args' => $args,
+            'pdf_args' => $pdf_args,
+            'sort' => $sort,
+            'paged' => $paged
+        ];
+        
+        $cache_version = get_option('sit_search_cache_version', '1');
+        $transient_key = 'sit_filtersort_' . md5($cache_version . serialize($cache_key_array));
+        $cached_result = get_transient($transient_key);
+
+        if (false !== $cached_result) {
+            // Unpack from cache
+            $mapped_programs = $cached_result['mapped_programs'];
+            $all_programs_raw = $cached_result['all_programs_raw'];
+            $pdf_programs = $cached_result['pdf_programs'];
+            // Dynamic filters built from the query
+            $unique_languages = $cached_result['unique_languages'] ?? [];
+            $unique_universities = $cached_result['unique_universities'] ?? [];
+            $unique_durations = $cached_result['unique_durations'] ?? [];
+            $unique_degree_ids = $cached_result['unique_degree_ids'] ?? [];
+            $unique_cities = $cached_result['unique_cities'] ?? [];
+
+            // Just need to apply pagination on the cached mapped programs layer as it relies on simple array slicing
+            $items_per_page = 21;
+            $total_items = count($mapped_programs);
+            $max_num_pages = ceil($total_items / $items_per_page);
+            
+            // Ensure paged is valid
+            if ($paged < 1) $paged = 1;
+            if ($paged > $max_num_pages) $paged = $max_num_pages;
+            if($max_num_pages == 0) $paged = 1;
+
+            $offset = ($paged - 1) * $items_per_page;
+            $programs_slice = array_slice($mapped_programs, $offset, $items_per_page);
+
+            // Build PDF description string
+            $disstr = '';
+            if (!empty($degree_name) || !empty($country_name) || !empty($speciality_name)) {
+                $disstr = "This document provides a comprehensive list of";
+                if (!empty($degree_name)) $disstr .= " " . $degree_name;
+                $disstr .= " programs";
+                if (!empty($speciality_name)) $disstr .= " in " . $speciality_name;
+                if (!empty($country_name)) $disstr .= " from " . $country_name;
+                $disstr .= " universities. Each program includes details about duration, tuition fees, language requirements, application deadlines, and more.";
+            }
+
+            // Render from cache using the same variables as the non-cached path
+            ob_start();
+            Template::render('shortcodes/filter-sort', [
+                'programs'              => $programs_slice,
+                'pdf_program'           => $mapped_programs,
+                'disstr'                => $disstr,
+                'featured_universities' => [],
+                'paged'                 => $paged,
+                'max_num_pages'         => $max_num_pages,
+                'found_posts'           => $total_items,
+                'degree'                => $degree_name,
+                'country'               => $country_name,
+                'speciality'            => $speciality_name,
+                'search_keyword'        => $search,
+                'query'                 => (object) ['found_posts' => $total_items, 'max_num_pages' => $max_num_pages],
+                'degreeid'              => $degree,
+                'countryid'             => $country,
+                'specialityid'          => $speciality,
+                'all_degrees'           => get_terms(['taxonomy' => 'sit-degree', 'hide_empty' => false]),
+                'available_languages'   => [],
+                'available_degrees'     => [],
+                'all_universities_for_filter' => array_keys($unique_universities),
+                'available_durations'   => array_keys($unique_durations),
+                'available_cities'      => [],
+                'cityid'                => [],
+                'city_name'             => $city_name ?? '',
+            ]);
+            return ob_get_clean();
+        }
+
+        // Cache Miss: Database Fetch Loop
         $query = new \WP_Query($args);
         $pdf_query = new \WP_Query($pdf_args);
         
+        $all_programs_raw = $query->get_posts();
+        $pdf_programs = $pdf_query->get_posts();
         $all_programs_raw = $query->get_posts();
         $pdf_programs = $pdf_query->get_posts();
         
@@ -405,18 +556,59 @@ class FilterSort
         $mapped_programs = [];
         $seen_ids = [];
         
+        $program_ids = [];
+        $university_ids_to_fetch = [];
+
+        // Pre-parse the raw posts to gather IDs for optimal bulk caching
+        foreach ($all_programs_raw as $program) {
+            if (!in_array($program->ID, $seen_ids)) {
+                $program_ids[] = $program->ID;
+                $seen_ids[] = $program->ID;
+            }
+        }
+        
+        $seen_ids = []; // Reset seen_ids for the actual iteration
+        $featuredHelper = new FeaturedUniversity();
+
+        if (!empty($program_ids)) {
+            // Pre-warm program post meta and terms
+            update_meta_cache('post', $program_ids);
+            update_object_term_cache($program_ids, 'sit-program');
+
+            // Gather university IDs from the bulk meta we just primed
+            foreach ($program_ids as $pid) {
+                $uid = intval(get_post_meta($pid, 'zh_university', true));
+                if ($uid && !in_array($uid, $university_ids_to_fetch)) {
+                    $university_ids_to_fetch[] = $uid;
+                }
+            }
+
+            // Pre-warm University caches
+            if (!empty($university_ids_to_fetch)) {
+                _prime_post_caches($university_ids_to_fetch, true, true);
+                // Also cache terms commonly used on universities if needed (country)
+                update_object_term_cache($university_ids_to_fetch, 'sit-university');
+            }
+        }
+        
         foreach ($all_programs_raw as $program) {
             if (in_array($program->ID, $seen_ids)) continue;
             
             $uniid = get_post_meta($program->ID, 'zh_university', true);
-            $university = get_post($uniid);
+            
+            // Fast lookup without N+1 thanks to update_post_caches
+            $university = $uniid ? get_post($uniid) : null; 
             if (!$university) continue;
 
-            $is_featured = (new FeaturedUniversity())->isFeatured($uniid);
+            $is_featured = $featuredHelper->isFeatured($uniid);
             $zoho_product_id = get_post_meta($program->ID, 'zoho_product_id', true);
             
-            // Minimal data needed for sorting + display
-            // We map fully here so the sort function has access to everything
+            // Extract terms (fast because we called update_object_term_cache)
+            $prog_lang_terms = get_the_terms($program->ID, 'sit-language');
+            $prog_degree_terms = get_the_term_list($program->ID, 'sit-degree', '', ', ');
+            $prog_city_terms = get_the_terms($program->ID, 'sit-city');
+            $uni_country_terms = get_the_terms($university->ID, 'sit-country');
+            
             $mapped_programs[] = [
                 'id'                => $program->ID,
                 'pro_id'            => $zoho_product_id,
@@ -427,13 +619,13 @@ class FilterSort
                 'link'              => get_permalink($program->ID),
                 'university_name'   => $university->post_title,
                 'uni_title'         => $university->post_title,
-                'country'           => !empty(get_the_terms($university->ID, 'sit-country')) ? get_the_terms($university->ID, 'sit-country')[0]->name : '',
-                'program_lang'      => !empty(get_the_terms($program->ID, 'sit-language')) ? get_the_terms($program->ID, 'sit-language')[0]->name : '',
-                'language'          => !empty(get_the_terms($program->ID, 'sit-language')) ? get_the_terms($program->ID, 'sit-language')[0]->name : '',
+                'country'           => (!empty($uni_country_terms) && !is_wp_error($uni_country_terms)) ? $uni_country_terms[0]->name : '',
+                'program_lang'      => (!empty($prog_lang_terms) && !is_wp_error($prog_lang_terms)) ? $prog_lang_terms[0]->name : '',
+                'language'          => (!empty($prog_lang_terms) && !is_wp_error($prog_lang_terms)) ? $prog_lang_terms[0]->name : '',
                 'program_price'     => get_post_meta($program->ID, 'official_tuition', true) ?: get_post_meta($program->ID, 'Official_Tuition', true),
                 'program_price_dis' => get_post_meta($program->ID, 'advanced_discount', true) ?: get_post_meta($program->ID, 'Advanced_Discount', true),
                 'program_years'     => get_post_meta($program->ID, 'study_years', true) ?: get_post_meta($program->ID, 'Study_Years', true),
-                'program_degree'    => strip_tags(get_the_term_list($program->ID, 'sit-degree', '', ', ')),
+                'program_degree'    => !is_wp_error($prog_degree_terms) ? strip_tags($prog_degree_terms) : '',
                 'university_slug'   => $university->post_name,
                 'is_featured'       => $is_featured,
                 'featured_class'    => $is_featured ? 'sit-featured-program' : '',
@@ -449,14 +641,22 @@ class FilterSort
                 'views_count'       => get_post_meta($program->ID, 'views_count', true),
                 'date'              => $program->post_date,
                 'image_url'         => (function() use ($university) {
-                    $keys = ['uni_image', 'University_Image', 'uni_logo', 'University_Logo', 'Logo', 'uni_banner', 'Banner'];
+                    $keys = ['uni_image', 'University_Image', 'uni_banner', 'Banner', 'uni_logo', 'University_Logo', 'Logo'];
                     foreach ($keys as $key) {
                         $img = get_post_meta($university->ID, $key, true);
                         if (!empty($img)) return esc_url($img);
                     }
                     return \SIT\Search\Services\URLHelper::placeholder(714, 340, 'University');
                 })(),
-                'city'              => !empty(get_the_terms($program->ID, 'sit-city')) ? get_the_terms($program->ID, 'sit-city')[0]->name : '',
+                'logo_url'         => (function() use ($university) {
+                    $keys = ['uni_logo', 'University_Logo', 'Logo', 'uni_image'];
+                    foreach ($keys as $key) {
+                        $img = get_post_meta($university->ID, $key, true);
+                        if (!empty($img)) return esc_url($img);
+                    }
+                    return \SIT\Search\Services\URLHelper::placeholder(128, 128, 'U');
+                })(),
+                'city'              => (!empty($prog_city_terms) && !is_wp_error($prog_city_terms)) ? $prog_city_terms[0]->name : '',
             ];
             $seen_ids[] = $program->ID;
         }
@@ -610,10 +810,36 @@ class FilterSort
             return strcasecmp($a->name, $b->name);
         });
 
+        // Save the entirely processed dataset into a Transient Cache
+        $cache_payload = [
+            'mapped_programs'     => $mapped_programs,
+            'all_programs_raw'    => $all_programs_raw,
+            'pdf_programs'        => $pdf_programs,
+            'unique_languages'    => $unique_languages,
+            'unique_universities' => $unique_universities,
+            'unique_durations'    => $unique_durations,
+            'unique_degree_ids'   => $unique_degree_ids,
+            'unique_cities'       => $unique_cities
+        ];
+        // Cache heavy search results for 15 minutes to handle user pagination bursts without stressing DB
+        set_transient($transient_key, $cache_payload, 15 * MINUTE_IN_SECONDS);
+
+        // Build PDF description string
+        $disstr = '';
+        if (!empty($degree_name) || !empty($country_name) || !empty($speciality_name)) {
+            $disstr = "This document provides a comprehensive list of";
+            if (!empty($degree_name)) $disstr .= " " . $degree_name;
+            $disstr .= " programs";
+            if (!empty($speciality_name)) $disstr .= " in " . $speciality_name;
+            if (!empty($country_name)) $disstr .= " from " . $country_name;
+            $disstr .= " universities. Each program includes details about duration, tuition fees, language requirements, application deadlines, and more.";
+        }
+
         ob_start();
         Template::render('shortcodes/filter-sort', [
             'programs'            => $programs_slice, // Pass the sliced items
-            'pdf_programs'        => $pdf_programs,
+            'pdf_program'         => $mapped_programs, // Use mapped data for PDF (template expects 'pdf_program')
+            'disstr'              => $disstr,
             'featured_universities' => $featured_universities,
             'paged'               => $paged,
             'max_num_pages'       => $max_num_pages, // Pass calculated max pages
@@ -644,7 +870,7 @@ class FilterSort
     public function get_uni_ids(){
 
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        $sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '';
         // Handle both single level and multiple levels (level[])
         $degree = '';
         if (isset($_GET['level']) && $_GET['level'] != 0) {
@@ -657,12 +883,12 @@ class FilterSort
         $country = isset($_GET['country']) && $_GET['country'] != 0 ? intval($_GET['country']) : '';
         $speciality = isset($_GET['speciality']) && $_GET['speciality'] != 0 ? intval($_GET['speciality']) : '';
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : ''; // Sanitize input
-        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? $_GET['univerity-type'] : '';
+        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? sanitize_text_field($_GET['univerity-type']) : '';
 
-        $feeFilter = $_GET['feeFiter'] ?? '';
-        $duration = $_GET['duration'] ?? '';
-        $isScholarShip = $_GET['isScholarShip'] ?? '';
-        $language = $_GET['language'] ?? '';
+        $feeFilter = isset($_GET['feeFiter']) ? sanitize_text_field($_GET['feeFiter']) : '';
+        $duration = isset($_GET['duration']) ? sanitize_text_field($_GET['duration']) : '';
+        $isScholarShip = isset($_GET['isScholarShip']) ? sanitize_text_field($_GET['isScholarShip']) : '';
+        $language = isset($_GET['language']) ? sanitize_text_field($_GET['language']) : '';
 
         if (!empty($duration)) {
             $duration = explode(' ', $duration)[0];
@@ -790,7 +1016,6 @@ class FilterSort
         );
 
         // Filter programs by university's Active_in_Search status
-        $active_university_ids = array();
         $all_universities = get_posts(array(
             'post_type' => 'sit-university',
             'post_status' => 'publish',
@@ -798,12 +1023,8 @@ class FilterSort
             'fields' => 'ids'
         ));
         
-        foreach ($all_universities as $uni_id) {
-            $active_in_search = get_field('Active_in_Search', $uni_id);
-            if ($active_in_search == '1' || $active_in_search === true) {
-                $active_university_ids[] = $uni_id;
-            }
-        }
+        $globally_active_ids = \SIT\Search\Services\CachedData::get_active_university_ids();
+        $active_university_ids = array_intersect($all_universities, $globally_active_ids);
         
         if (!empty($active_university_ids)) {
             $meta_query[] = array(
@@ -848,8 +1069,10 @@ class FilterSort
         $args = array(
             'post_type'      => 'sit-program',
             'posts_per_page' => -1,
+            'no_found_rows'  => true,
             'post_status'    => 'publish',
             'meta_query'     => $meta_query,
+            'fields'         => 'ids',
         );
         if (!empty($degree) || !empty($country) || !empty($speciality)) {
             $args['tax_query'] = $tax_query;
@@ -879,12 +1102,17 @@ class FilterSort
                 break;
         }
         $query = new \WP_Query($args);
-        $programs = $query->get_posts();
+        $program_ids = $query->posts;
+        
+        if (!empty($program_ids)) {
+            update_meta_cache('post', $program_ids);
+        }
+
         $zh_university_values = array();
         $filtered_university_ids = array();
-        if (!empty($programs)) {
-            foreach ($programs as $program) {
-                $value = get_post_meta($program->ID, 'zh_university', true);
+        if (!empty($program_ids)) {
+            foreach ($program_ids as $program_id) {
+                $value = get_post_meta($program_id, 'zh_university', true);
                 if (!empty($value)) {
                     $zh_university_values[] = $value;
                 }
@@ -892,6 +1120,7 @@ class FilterSort
             $zh_university_values = array_unique($zh_university_values);
         }
         if (!empty($zh_university_values)) {
+            update_meta_cache('post', $zh_university_values);
             foreach ($zh_university_values as $university_id) {
                 $sector_value = get_post_meta($university_id, 'Sector', true);
                 if ($sector_value === $type) {
@@ -907,7 +1136,7 @@ class FilterSort
     public function get_uni__search_ids(){
 
         $paged = (get_query_var('paged')) ? get_query_var('paged') : 1;
-        $sort = isset($_GET['sort']) ? $_GET['sort'] : '';
+        $sort = isset($_GET['sort']) ? sanitize_text_field($_GET['sort']) : '';
         // Handle both single level and multiple levels (level[])
         $degree = '';
         if (isset($_GET['level']) && $_GET['level'] != 0) {
@@ -920,12 +1149,12 @@ class FilterSort
         $country = isset($_GET['country']) && $_GET['country'] != 0 ? intval($_GET['country']) : '';
         $speciality = isset($_GET['speciality']) && $_GET['speciality'] != 0 ? intval($_GET['speciality']) : '';
         $search = isset($_GET['search']) ? sanitize_text_field($_GET['search']) : ''; // Sanitize input
-        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? $_GET['univerity-type'] : '';
+        $type = isset($_GET['univerity-type']) && $_GET['univerity-type'] != 0 ? sanitize_text_field($_GET['univerity-type']) : '';
 
-        $feeFilter = $_GET['feeFiter'] ?? '';
-        $duration = $_GET['duration'] ?? '';
-        $isScholarShip = $_GET['isScholarShip'] ?? '';
-        $language = $_GET['language'] ?? '';
+        $feeFilter = isset($_GET['feeFiter']) ? sanitize_text_field($_GET['feeFiter']) : '';
+        $duration = isset($_GET['duration']) ? sanitize_text_field($_GET['duration']) : '';
+        $isScholarShip = isset($_GET['isScholarShip']) ? sanitize_text_field($_GET['isScholarShip']) : '';
+        $language = isset($_GET['language']) ? sanitize_text_field($_GET['language']) : '';
 
         if (!empty($duration)) {
             $duration = explode(' ', $duration)[0];
@@ -1053,7 +1282,6 @@ class FilterSort
         );
 
         // Filter programs by university's Active_in_Search status
-        $active_university_ids = array();
         $all_universities = get_posts(array(
             'post_type' => 'sit-university',
             'post_status' => 'publish',
@@ -1061,12 +1289,8 @@ class FilterSort
             'fields' => 'ids'
         ));
         
-        foreach ($all_universities as $uni_id) {
-            $active_in_search = get_field('Active_in_Search', $uni_id);
-            if ($active_in_search == '1' || $active_in_search === true) {
-                $active_university_ids[] = $uni_id;
-            }
-        }
+        $globally_active_ids = \SIT\Search\Services\CachedData::get_active_university_ids();
+        $active_university_ids = array_intersect($all_universities, $globally_active_ids);
         
         if (!empty($active_university_ids)) {
             $meta_query[] = array(
@@ -1111,8 +1335,10 @@ class FilterSort
         $args = array(
             'post_type'      => 'sit-program',
             'posts_per_page' => -1,
+            'no_found_rows'  => true,
             'post_status'    => 'publish',
             'meta_query'     => $meta_query,
+            'fields'         => 'ids',
         );
         if (!empty($degree) || !empty($country) || !empty($speciality)) {
             $args['tax_query'] = $tax_query;
@@ -1142,12 +1368,17 @@ class FilterSort
                 break;
         }
         $query = new \WP_Query($args);
-        $programs = $query->get_posts();
+        $program_ids = $query->posts;
+        
+        if (!empty($program_ids)) {
+            update_meta_cache('post', $program_ids);
+        }
+
         $zh_university_values = array();
         $filtered_university_ids = array();
-        if (!empty($programs)) {
-            foreach ($programs as $program) {
-                $value = get_post_meta($program->ID, 'zh_university', true);
+        if (!empty($program_ids)) {
+            foreach ($program_ids as $program_id) {
+                $value = get_post_meta($program_id, 'zh_university', true);
                 if (!empty($value)) {
                     $zh_university_values[] = $value;
                 }
@@ -1155,7 +1386,8 @@ class FilterSort
             $zh_university_values = array_unique($zh_university_values);
         }
         if (!empty($zh_university_values)) {
-            $search_terms = !empty($search) ? array_map('trim', explode(',', $search)) : [];
+            $ai_result = !empty($search) ? \SIT\Search\Services\AiSearchHelper::expand_search($search) : ['terms' => []];
+            $search_terms = $ai_result['terms'] ?? [];
             $uni_meta_conditions = ['relation' => 'OR'];
             if (!empty($search_terms)) {
                 foreach ($search_terms as $term) {
@@ -1170,6 +1402,7 @@ class FilterSort
             $university_query = new \WP_Query(array(
                 'post_type'      => 'sit-university',
                 'posts_per_page' => -1,
+                'no_found_rows'  => true,
                 'post_status'    => 'publish',
                 'post__in'       => $zh_university_values,
                 'meta_query'     => array($uni_meta_conditions),

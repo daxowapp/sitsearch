@@ -368,17 +368,9 @@ jQuery(document).ready(function ($) {
         applyAllFilters();
     }
 
-    // Handle search functionality
+    // Handle search functionality (keyword search on results/archive pages)
     function handleSearch() {
-        const searchValue = $('#search-university').val().trim();
-        if (searchValue.length > 1) {
-            // Trigger the global AI search that we will expose from ai-search.js
-            if (typeof window.performGlobalAiSearch === 'function') {
-                window.performGlobalAiSearch(searchValue);
-                return;
-            }
-        }
-        
+        const searchValue = $('#search-university').val()?.trim();
         const currentUrl = new URL(window.location.href);
 
         if (searchValue) {
@@ -387,17 +379,26 @@ jQuery(document).ready(function ($) {
             currentUrl.searchParams.delete('search');
         }
 
-        // Navigate to new URL with search parameter if AI search fails
+        // Show loading state if on results page search
+        const $btns = $('.results-search-btn, .ProgramArchivePage-search-button');
+        $btns.prop('disabled', true);
+        $btns.find('.btn-text').text('Searching');
+        $btns.find('.btn-loader').hide(); // Just in case
+
+        // Remove old ai_query param if present
+        currentUrl.searchParams.delete('ai_query');
+
+        // Simple redirect — server-side PHP handles AI expansion
         window.location.href = currentUrl.toString();
     }
 
-    // Search button click handler
+    // Search button click handler (for results page keyword search)
     $(document).on('click', '.ProgramArchivePage-search-button, .results-search-btn', function (e) {
         e.preventDefault();
         handleSearch();
     });
 
-    // Search on Enter key press
+    // Search on Enter key press for keyword search
     $(document).on('keypress', '#search-university', function (e) {
         if (e.which === 13) { // Enter key
             e.preventDefault();
@@ -405,10 +406,44 @@ jQuery(document).ready(function ($) {
         }
     });
 
+    // Show spinner on standard search form submission (Let form submit naturally)
+    $('#search-bar').on('submit', function (e) {
+        // If the inline validation in search-bar.html.php already blocked this, bail out
+        if (e.isDefaultPrevented()) {
+            return false;
+        }
+
+        // Validation passed — show loading spinner
+        const $btn = $('#standard-search-btn');
+        $btn.prop('disabled', true);
+        $btn.find('.btn-text').text('Searching');
+
+        // Safety net: re-enable after 8s if page doesn't navigate (e.g. network failure)
+        setTimeout(function() {
+            $btn.prop('disabled', false);
+            $btn.find('.btn-text').text('Search');
+        }, 8000);
+    });
+
+    // Show spinner on AI search panel form submission (Let form submit naturally)
+    $('#ai-search-mode form').on('submit', function () {
+        const $btn = $('#ai-search-btn-main');
+        $btn.prop('disabled', true);
+        $btn.find('.btn-text').text('Searching');
+    });
+
     // Also handle other search button classes that might exist
     $(document).on('click', '.search-by-name button, .search-by-name-campus button', function (e) {
         e.preventDefault();
         handleSearch();
+    });
+
+    // Search on Enter key press for AI search in panel
+    $(document).on('keypress', '#ai-search-mode input[name="search"]', function (e) {
+        if (e.which === 13) { 
+            // Trigger form submission which will show loader and submit naturally
+            $(this).closest('form').submit();
+        }
     });
 
     // Use select2:select for better reliability with the library
@@ -457,6 +492,7 @@ jQuery(document).ready(function ($) {
         dots: false,
         autoplay: true,
         autoplayTimeout: 3000,
+        margin: 24,
         items: 3,
         responsive: {
             0: {         // from 0px up

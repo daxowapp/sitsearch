@@ -20,7 +20,7 @@ foreach ($terms as $term) {
 
 // Configure which filters to show for this page (Campus-specific results)
 $filter_config = [
-    'degree' => false,     // Hide degree filter
+    'degree' => true,      // Show degree filter
     'duration' => true,    // Show duration filter
     'language' => true,    // Show language filter
     'price' => false,      // Hide price filter
@@ -37,7 +37,7 @@ $filter_data = [
 // Set page-specific variables
 $results_count = count($programs);
 $search_value = isset($_GET['search']) ? $_GET['search'] : '';
-$heading = $disstr; // Use existing campus description
+$heading = 'Programs at ' . get_the_title();
 ?>
 
 <!-- Include Shared Filter Styles -->
@@ -48,6 +48,13 @@ $heading = $disstr; // Use existing campus description
 $results_count = $pro_to;
 include plugin_dir_path(__FILE__) . '../shared/results-header.php';
 ?>
+
+<?php if (!empty($disstr)): ?>
+<div class="campus-description" style="color: #6b7280; font-size: 16px; margin: 10px auto 24px auto; max-width: 1400px; padding: 0 20px; line-height: 1.6; font-weight: 400;">
+    <?= $disstr ?>
+</div>
+<?php endif; ?>
+
 <!-- Main Container with Sidebar Layout -->
 <div class="filter-results-container">
     <?php
@@ -78,7 +85,9 @@ include plugin_dir_path(__FILE__) . '../shared/results-header.php';
                 ?>
                 <div class="program-list-item">
                     <div class="program-list-image">
-                        <?php if (!empty($program['image_url'])): ?>
+                        <?php if (!empty($program['logo_url'])): ?>
+                            <img src="<?php echo $program['logo_url']; ?>" alt="<?php echo $program['title']; ?>">
+                        <?php elseif (!empty($program['image_url'])): ?>
                             <img src="<?php echo $program['image_url']; ?>" alt="<?php echo $program['title']; ?>">
                         <?php else: ?>
                             <div class="program-list-placeholder">🏫</div>

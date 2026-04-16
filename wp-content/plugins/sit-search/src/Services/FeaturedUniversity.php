@@ -7,6 +7,67 @@ class FeaturedUniversity {
     private const META_KEY_IS_FEATURED = 'sit_is_featured';
     private const META_KEY_PRIORITY = 'sit_featured_priority';
     private const META_KEY_EXPIRY = 'sit_featured_expiry';
+    
+    // In-memory cache to prevent N+1 queries during loops
+    private static $featured_cache = null;
+
+    /**
+     * Load and cache all featured university statuses efficiently
+     */
+    private static function init_cache(): void {
+        if (self::$featured_cache !== null) {
+            return;
+        }
+
+        // Try transient
+        $transient_key = 'sit_all_featured_universities';
+        $cached = get_transient($transient_key);
+        
+        if (is_array($cached)) {
+            self::$featured_cache = $cached;
+            return;
+        }
+
+        // Otherwise query the DB explicitly for all
+        $args = [
+            'post_type' => 'sit-university',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'no_found_rows' => true,
+            'fields' => 'ids',
+            'meta_query' => [
+                [
+                    'key' => self::META_KEY_IS_FEATURED,
+                    'value' => '1',
+                    'compare' => '='
+                ]
+            ]
+        ];
+
+        $post_ids = get_posts($args);
+        $result = [];
+        $now = current_time('timestamp');
+
+        // Prime meta cache to avoid 1x1 lookups
+        if (!empty($post_ids)) {
+            update_meta_cache('post', $post_ids);
+            
+            foreach ($post_ids as $id) {
+                $expiry = get_post_meta($id, self::META_KEY_EXPIRY, true);
+                if ($expiry && strtotime($expiry) < $now) {
+                    continue; // Expired
+                }
+                
+                $result[$id] = [
+                    'priority' => (int) get_post_meta($id, self::META_KEY_PRIORITY, true),
+                    'expiry' => $expiry
+                ];
+            }
+        }
+
+        self::$featured_cache = $result;
+        set_transient($transient_key, $result, HOUR_IN_SECONDS); // Cache for 1 hour
+    }
 
     /**
      * Get all featured universities sorted by priority (Desc)
@@ -15,41 +76,25 @@ class FeaturedUniversity {
      * @return array Array of WP_Post objects
      */
     public function getFeatured($limit = -1): array {
+        self::init_cache();
+        
+        $valid_ids = array_keys(self::$featured_cache);
+        
+        if (empty($valid_ids)) {
+            return [];
+        }
+        
         $args = [
             'post_type' => 'sit-university',
             'post_status' => 'publish',
+            'post__in' => $valid_ids,
             'posts_per_page' => $limit,
-            'meta_query' => [
-                'relation' => 'AND',
-                [
-                    'key' => self::META_KEY_IS_FEATURED,
-                    'value' => '1',
-                    'compare' => '='
-                ]
-            ],
             'meta_key' => self::META_KEY_PRIORITY,
             'orderby' => 'meta_value_num',
             'order' => 'DESC'
         ];
-
-        // Add expiry check if needed, though simpler to filter out expired ones in loop or separate cleanup
-        // For now, let's assume we clean up or check expiry on retrieval
         
-        $posts = get_posts($args);
-        $valid_posts = [];
-        $now = current_time('timestamp');
-
-        foreach ($posts as $post) {
-            $expiry = get_post_meta($post->ID, self::META_KEY_EXPIRY, true);
-            if ($expiry && strtotime($expiry) < $now) {
-                // Expired, maybe auto-remove feature status?
-                // For now, just skip
-                continue;
-            }
-            $valid_posts[] = $post;
-        }
-
-        return $valid_posts;
+        return get_posts($args);
     }
 
     /**
@@ -61,6 +106,8 @@ class FeaturedUniversity {
         update_post_meta($post_id, self::META_KEY_EXPIRY, $expiry_date);
         
         // Clear caches
+        delete_transient('sit_all_featured_universities');
+        self::$featured_cache = null;
         CachedData::clear_university_cache();
     }
 
@@ -72,32 +119,37 @@ class FeaturedUniversity {
         delete_post_meta($post_id, self::META_KEY_PRIORITY);
         delete_post_meta($post_id, self::META_KEY_EXPIRY);
         
+        delete_transient('sit_all_featured_universities');
+        self::$featured_cache = null;
         CachedData::clear_university_cache();
     }
 
     /**
-     * Check if university is featured
+     * Check if university is featured (Now uses O(1) in-memory cache)
      */
     public function isFeatured(int $post_id): bool {
-        $is_featured = get_post_meta($post_id, self::META_KEY_IS_FEATURED, true);
-        if (!$is_featured) return false;
-
-        $expiry = get_post_meta($post_id, self::META_KEY_EXPIRY, true);
-        if ($expiry && strtotime($expiry) < current_time('timestamp')) {
-            return false;
-        }
-
-        return true;
+        self::init_cache();
+        return isset(self::$featured_cache[$post_id]);
     }
 
     /**
      * Get feature details
      */
     public function getDetails(int $post_id): array {
+        self::init_cache();
+        
+        if (isset(self::$featured_cache[$post_id])) {
+            return [
+                'is_featured' => true,
+                'priority' => self::$featured_cache[$post_id]['priority'],
+                'expiry' => self::$featured_cache[$post_id]['expiry']
+            ];
+        }
+        
         return [
-            'is_featured' => $this->isFeatured($post_id),
-            'priority' => (int) get_post_meta($post_id, self::META_KEY_PRIORITY, true),
-            'expiry' => get_post_meta($post_id, self::META_KEY_EXPIRY, true)
+            'is_featured' => false,
+            'priority' => 0,
+            'expiry' => ''
         ];
     }
 }
