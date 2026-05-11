@@ -74,7 +74,6 @@ class SIT_Program_Recommender {
     private function load_dependencies() {
         // Core classes
         require_once SIT_RECOMMENDER_PLUGIN_DIR . 'includes/class-sit-engine.php';
-        require_once SIT_RECOMMENDER_PLUGIN_DIR . 'includes/class-sit-dal.php';
         require_once SIT_RECOMMENDER_PLUGIN_DIR . 'includes/class-sit-admin.php';
         require_once SIT_RECOMMENDER_PLUGIN_DIR . 'includes/class-sit-frontend.php';
         require_once SIT_RECOMMENDER_PLUGIN_DIR . 'includes/class-sit-rest-api.php';

@@ -708,6 +708,20 @@ if (!empty($faq_display)):
 <?php endif; ?>
 
 
+<!-- ═══════════════════════════════════════════════════════════════
+     OFFICIAL LEGAL DISCLAIMER
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="sit-legal-disclaimer">
+  <div class="sit-legal-disclaimer-inner">
+    <div class="sit-legal-disclaimer-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+    </div>
+    <div class="sit-legal-disclaimer-text">
+      <strong>OFFICIAL LEGAL DISCLAIMER:</strong> Studyinturkiye.com is a private educational consultancy operated by SIT Consultancy LLC. It is not affiliated with, endorsed by, or part of the Turkish Council of Higher Education (YÖK) or any government authority.
+    </div>
+  </div>
+</div>
+
 <div class="programPage-floating-share" id="floating-share-btn">
   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>
 </div>

@@ -89,9 +89,54 @@
 
                 </div>
 
+                <!-- KvKK Consent Section -->
+                <div class="kvkk-consent-section" style="margin-top: 20px;">
+                  <div class="kvkk-consent-box">
+                    <div class="kvkk-info-text">
+                      <p>Pursuant to the Turkish Personal Data Protection Law No. 6698 (KvKK), your personal data will be processed for the purpose of evaluating your consultation request and providing educational consultancy services.</p>
+                      <p>6698 sayılı Kişisel Verilerin Korunması Kanunu (KvKK) kapsamında, kişisel verileriniz danışmanlık talebinizin değerlendirilmesi ve eğitim danışmanlığı hizmetlerinin sağlanması amacıyla işlenecektir.</p>
+                    </div>
 
+                    <label class="kvkk-checkbox-label" for="kvkk-consent-consultation">
+                      <input type="checkbox" name="kvkk_consent" id="kvkk-consent-consultation" required value="1">
+                      <span class="kvkk-checkmark"></span>
+                      <span class="kvkk-label-text">
+                        I have read and accept the
+                        <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" class="kvkk-link">KvKK Clarification Text</a>
+                        and consent to the processing of my personal data as described above.
+                        <span class="text-danger">*</span>
+                      </span>
+                    </label>
 
-                <button type="submit" class="btn btn-danger apply-btn">Apply Now</button>
+                    <label class="kvkk-checkbox-label" for="marketing-consent-consultation">
+                      <input type="checkbox" name="marketing_consent" id="marketing-consent-consultation" value="1">
+                      <span class="kvkk-checkmark"></span>
+                      <span class="kvkk-label-text">
+                        I consent to receiving promotional communications (email, SMS, phone) about educational programs and services.
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                <button type="submit" class="btn btn-danger apply-btn" id="consultation-submit-btn" disabled>Apply Now</button>
+
+                <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var kvkkCheckbox = document.getElementById('kvkk-consent-consultation');
+                    var submitBtn = document.getElementById('consultation-submit-btn');
+                    if (kvkkCheckbox && submitBtn) {
+                        kvkkCheckbox.addEventListener('change', function() {
+                            submitBtn.disabled = !this.checked;
+                        });
+                    }
+                });
+                </script>
+
+                <div class="apply-form-footer" style="margin-top: 16px;">
+                  <p class="apply-privacy-text" style="font-size: 12px; color: #6c757d; text-align: center;">
+                    By submitting this form, you agree to our <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" style="color: #e20a17;">Privacy Policy</a> and <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" style="color: #e20a17;">Terms of Service</a>.
+                  </p>
+                </div>
 
             </form>
 

@@ -330,7 +330,7 @@ jQuery(document).ready(function($) {
                     count + ' university found' : 
                     count + ' universities found';
                 
-                const countHtml = '<div class="university-results-count" style="font-weight: 600; color: #E10B17; font-size: 1.1rem; padding: 0.5rem; background: rgba(225, 11, 23, 0.05); border-radius: 4px; border-left: 4px solid #E10B17;">' + countText + '</div>';
+                const countHtml = '<div class="university-results-count">' + countText + '</div>';
                 
                 if ($('.university-results-count-container').length > 0) {
                     $('.university-results-count-container').html(countHtml);

@@ -143,36 +143,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
-          <?php
-          if((isset($program['Application_Fee']) && !empty($program['Application_Fee'])) || (isset($program['Service_fee']) && !empty($program['Service_fee']))){
-            ?>
-              <div class="uni-fee">
-                <?php
-                if(isset($program['Service_fee']) && !empty($program['Service_fee'])){
-                  ?>
-                    <div class="service-fee">
-                      <span class="apply-price-label">Service Fee</span>
-                      <span class="apply-price-value">$<?= $program['Service_fee'] ?> </span>
-                    </div>
-                  <?php
-                }
-                if(isset($program['Application_Fee']) && !empty($program['Application_Fee'])){
-                  ?>
-                    <div class="service-fee">
-                      <span class="apply-price-label">Application Fee</span>
-                      <span class="apply-price-value">$<?= $program['Application_Fee'] ?></span>
-                    </div>
-                  <?php
-                }
-                ?>
-                <div class="total-fee">
-                    <span class="apply-price-label">Total Fee</span>
-                    <span class="apply-price-value">$<?= (isset($program['Service_fee']) ? $program['Service_fee'] : 0) + (isset($program['Application_Fee']) ? $program['Application_Fee'] : 0) ?></span>
-                </div>
-              </div>
-            <?php
-          }
-          ?>
+
         </div>
       </div>
     </div>
@@ -301,38 +272,68 @@
               <div class="file-name-display" id="transcript-filename"></div>
             </div>
 
-            <?php
-            if($program['type'] == 'Public' && !empty($program['type']) && isset($program['type'])){
-              ?>
-              <div class="apply-form-group">
-                <label class="apply-form-label">Card Details <span class="apply-form-required">*</span></label>
-                <div class="apply-file-container">
-                  <input type="text" class="apply-form-control card-name" id="cardholder-name" placeholder="Name on Card" />
-                  <label>Expiration Date</label>
-                  <div id="card-expiry-element" class="stripe-input"></div>
-                </div>
-              </div>
-              <div class="apply-form-group">
-                <div class="input-row">
-                  <div>
-                    <label>Card Number</label>
-                    <div id="card-number-element" class="stripe-input"></div>
-                  </div>
-                  <div>
-                    <label>Security Code</label>
-                    <div id="card-cvc-element" class="stripe-input"></div>
-                  </div>
-                </div>
-                <div id="card-errors" class="card-errors"></div>
-              </div>
-              <?php
-            }
-            ?>
+
           </div>
         </div>
 
-        <img id="loader" class="loadar" src="/wp-content/uploads/2025/05/fade-stagger-circles-1.svg" alt="">
-        <button type="submit" class="apply-submit-btn" id="pay-button">
+        <!-- KvKK Consent Section -->
+        <div class="apply-form-section kvkk-consent-section">
+          <div class="kvkk-card">
+            <div class="kvkk-card-header">
+              <div class="kvkk-shield-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <div class="kvkk-header-text">
+                <h3 class="kvkk-title">Data Protection Consent</h3>
+                <span class="kvkk-subtitle">KvKK Aydınlatma Metni</span>
+              </div>
+              <span class="kvkk-required-badge">Required</span>
+            </div>
+
+            <div class="kvkk-info-panel">
+              <div class="kvkk-info-text-en">
+                <p>Your personal data (name, email, phone number, nationality, documents) will be processed for evaluating your application and providing educational consultancy services, pursuant to Law No. 6698 (KvKK).</p>
+              </div>
+              <div class="kvkk-info-text-tr">
+                <p>6698 sayılı KvKK kapsamında kişisel verileriniz, başvurunuzun değerlendirilmesi ve eğitim danışmanlığı hizmetlerinin sağlanması amacıyla işlenecektir.</p>
+              </div>
+            </div>
+
+            <div class="kvkk-consent-items">
+              <label class="kvkk-consent-item kvkk-consent-item--required" for="kvkk-consent">
+                <div class="kvkk-toggle-wrap">
+                  <input type="checkbox" name="kvkk_consent" id="kvkk-consent" required value="1">
+                  <span class="kvkk-toggle"></span>
+                </div>
+                <div class="kvkk-consent-content">
+                  <span class="kvkk-consent-text">
+                    I have read and accept the
+                    <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" class="kvkk-link">Privacy Policy & KvKK Clarification Text</a>
+                    and consent to the processing of my personal data.
+                  </span>
+                  <span class="kvkk-consent-tag kvkk-consent-tag--mandatory">Mandatory</span>
+                </div>
+              </label>
+
+              <label class="kvkk-consent-item" for="marketing-consent">
+                <div class="kvkk-toggle-wrap">
+                  <input type="checkbox" name="marketing_consent" id="marketing-consent" value="1">
+                  <span class="kvkk-toggle"></span>
+                </div>
+                <div class="kvkk-consent-content">
+                  <span class="kvkk-consent-text">
+                    I consent to receiving promotional communications (email, SMS, phone) about educational programs and services.
+                  </span>
+                  <span class="kvkk-consent-tag kvkk-consent-tag--optional">Optional</span>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="apply-submit-btn" id="pay-button" disabled>
           <span class="apply-btn-text">Submit Application</span>
           <span class="apply-btn-spinner" style="display:none;">
             <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity="0.3"></circle><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="0.8s" repeatCount="indefinite"/></path></svg>
@@ -352,7 +353,7 @@
 
       <div class="apply-form-footer">
         <p class="apply-privacy-text">
-          By submitting this form, you agree to our <a href="#" class="apply-privacy-link">Privacy Policy</a> and <a href="#" class="apply-privacy-link">Terms of Service</a>.
+          By submitting this form, you agree to our <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" class="apply-privacy-link">Privacy Policy</a> and <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" class="apply-privacy-link">Terms of Service</a>.
         </p>
       </div>
     </div>
@@ -367,7 +368,19 @@
     </div>
     <div class="apply-support-content">
       <h4 class="apply-support-heading">Need help with your application?</h4>
-      <p class="apply-support-description">Our advisors are available Monday to Friday, 9 AM to 5 PM. Contact us at support@studyinturkiye.com or call +90 545 306 1000.</p>
+      <p class="apply-support-description">Our advisors are available Monday to Friday, 9 AM to 5 PM. Contact us at support@studyinturkiye.com or call +90 545 308 1000.</p>
+    </div>
+  </div>
+
+  <!-- Legal Disclaimer -->
+  <div class="sit-legal-disclaimer">
+    <div class="sit-legal-disclaimer-inner">
+      <span class="sit-legal-disclaimer-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+      </span>
+      <p class="sit-legal-disclaimer-text">
+        <strong>OFFICIAL LEGAL DISCLAIMER:</strong> Studyinturkiye.com is a private educational consultancy operated by SIT Consultancy LLC. It is not affiliated with, endorsed by, or part of the Turkish Council of Higher Education (YÖK) or any government authority.
+      </p>
     </div>
   </div>
 </div>
@@ -504,15 +517,31 @@ document.addEventListener('DOMContentLoaded', function() {
     setupFileInput('passport-input', 'passport-label', 'passport-filename');
     setupFileInput('transcript-input', 'transcript-label', 'transcript-filename');
 
+    // KvKK consent toggle: enable/disable submit button
+    var kvkkCheckbox = document.getElementById('kvkk-consent');
+    var payBtn = document.getElementById('pay-button');
+
+    if (kvkkCheckbox && payBtn) {
+      kvkkCheckbox.addEventListener('change', function() {
+        payBtn.disabled = !this.checked;
+      });
+    }
+
     // Prevent double-submit: show spinner + overlay
     var applyForm = document.getElementById('apply-form-body');
-    var payBtn = document.getElementById('pay-button');
     var overlay = document.getElementById('submit-overlay');
 
     if (applyForm && payBtn && overlay) {
       applyForm.addEventListener('submit', function(e) {
-        // Don't block Stripe-handled forms (they handle it separately)
-        if (payBtn.dataset.stripeHandled) return;
+        // KvKK consent validation (safety net)
+        if (kvkkCheckbox && !kvkkCheckbox.checked) {
+          e.preventDefault();
+          kvkkCheckbox.closest('.kvkk-card').classList.add('kvkk-error');
+          kvkkCheckbox.focus();
+          return false;
+        }
+
+
 
         // Show spinner in button
         var btnText = payBtn.querySelector('.apply-btn-text');
@@ -605,113 +634,5 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<?php
-if(isset($program['type']) && $program['type'] == 'Public' && !empty($program['type'])){
-  $stripe_public_key = defined('STRIPE_PUBLIC_KEY') ? STRIPE_PUBLIC_KEY : '';
-  $Application_Fee = (isset($program['Application_Fee']) ? $program['Application_Fee'] : 0) + (isset($program['Service_fee']) ? $program['Service_fee'] : 0);
-  $Application_Fee=intval(round($Application_Fee * 100));
 
-  ?>
-  <script src="https://js.stripe.com/v3/"></script>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-        const stripe = Stripe('<?= $stripe_public_key ?>');
-        const elements = stripe.elements();
-
-        const style = {
-            base: {
-                color: "#32325d",
-                fontFamily: '"Inter", "Roboto" sans-serif',
-                fontSmoothing: "antialiased",
-                fontSize: "15px",
-                "::placeholder": {
-                    color: "#aab7c4"
-                }
-            },
-            invalid: {
-                color: "#fa755a",
-                iconColor: "#fa755a"
-            }
-        };
-
-        const cardNumber = elements.create('cardNumber', { style });
-        const cardExpiry = elements.create('cardExpiry', { style });
-        const cardCvc = elements.create('cardCvc', { style });
-
-        cardNumber.mount('#card-number-element');
-        cardExpiry.mount('#card-expiry-element');
-        cardCvc.mount('#card-cvc-element');
-
-        const displayError = document.getElementById('card-errors');
-
-        [cardNumber, cardExpiry, cardCvc].forEach(element => {
-            element.on('change', (event) => {
-                if (event.error) {
-                    displayError.textContent = event.error.message;
-                } else {
-                    displayError.textContent = '';
-                }
-            });
-        });
-
-        document.getElementById('pay-button').addEventListener('click', async (e) => {
-            e.preventDefault();
-            document.getElementById('loader').style.display = 'block';
-            document.getElementById('pay-button').disabled = true;
-
-            const response = await fetch('/wp-content/plugins/sit-search/create-payment-intent.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    amount: <?= $Application_Fee; ?>,
-                    currency: '<?= strtolower($program['Tuition_Currency']) ?>'
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.error) {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('pay-button').disabled = false;
-                alert("Error creating payment intent: " + data.error);
-                return;
-            }
-
-            const cardholderNameInput = document.getElementById('cardholder-name');
-            const cardholderName = cardholderNameInput ? cardholderNameInput.value : 'Guest';
-
-            const result = await stripe.confirmCardPayment(data.clientSecret, {
-                payment_method: {
-                    card: cardNumber,
-                    billing_details: {
-                        name: cardholderName
-                    }
-                }
-            });
-
-            if (result.error) {
-                displayError.textContent = result.error.message;
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('pay-button').disabled = false;
-            } else {
-                if (result.paymentIntent.status === 'succeeded') {
-                    document.getElementById('loader').style.display = 'none';
-                    document.getElementById('pay-button').disabled = false;
-                    const form = document.getElementById('apply-form-body');
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'stripe_payment_id';
-                    input.value = result.paymentIntent.id;
-                    form.appendChild(input);
-                    form.submit();
-                }
-            }
-        });
-    });
-    </script>
-  <?php
-}
-?>

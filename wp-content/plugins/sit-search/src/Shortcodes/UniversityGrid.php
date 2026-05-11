@@ -23,7 +23,7 @@ class UniversityGrid {
             'university-grid-js',
             SIT_SEARCH_ASSETS . 'js/university-grid.js',
             ['jquery'],
-            STI_SEARCH_VERSION,
+            STI_SEARCH_VERSION . '.2',
             true
         );
         
@@ -31,7 +31,7 @@ class UniversityGrid {
             'university-grid-css',
             SIT_SEARCH_ASSETS . 'css/university-grid.css',
             [],
-            STI_SEARCH_VERSION
+            STI_SEARCH_VERSION . '.2'
         );
 
         wp_localize_script('university-grid-js', 'university_ajax', [
@@ -87,116 +87,67 @@ class UniversityGrid {
              data-posts_per_page="<?php echo esc_attr($atts['posts_per_page']); ?>">
             
             <?php if ($atts['show_filters'] === 'true'): ?>
-            <div class="university-filters">
-                <?php if ($atts['show_search'] === 'true'): ?>
-                <div class="search-row">
-                    <div class="search-group">
-                        <label for="university-search">Search Universities</label>
-                        <input type="text" id="university-search" name="search" placeholder="Search by university name..." value="<?php echo esc_attr($atts['search']); ?>">
-                        <button type="button" id="search-universities" class="btn btn-primary">Search</button>
-                    </div>
-                </div>
-                <?php endif; ?>
-                
-                <div class="filter-row">
+            <div class="university-hero">
+                <div class="university-hero-inner">
+                    <h1 class="university-hero-title">Explore Universities in Türkiye</h1>
+                    <p class="university-hero-subtitle">Discover <?php echo $universities->found_posts; ?>+ universities across Turkey and Northern Cyprus</p>
                     
-                    <?php if ($atts['show_country'] === 'true'): ?>
-                    <div class="filter-group">
-                        <label for="country-filter">Country</label>
-                        <select id="country-filter" name="country">
-                            <option value="">All Countries</option>
-                            <?php foreach ($countries as $country): ?>
-                                <option value="<?php echo esc_attr($country); ?>" <?php selected($atts['country'], $country); ?>>
-                                    <?php echo esc_html($country); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                    <?php if ($atts['show_search'] === 'true'): ?>
+                    <div class="search-row">
+                        <div class="search-group">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                            <input type="text" id="university-search" name="search" placeholder="Search universities by name..." value="<?php echo esc_attr($atts['search']); ?>">
+                            <button type="button" id="search-universities" class="btn btn-hero">Search</button>
+                        </div>
                     </div>
                     <?php endif; ?>
+                    
+                    <div class="filter-row">
+                        <?php if ($atts['show_country'] === 'true'): ?>
+                        <div class="filter-group">
+                            <select id="country-filter" name="country">
+                                <option value="">All Countries</option>
+                                <?php foreach ($countries as $country): ?>
+                                    <option value="<?php echo esc_attr($country); ?>" <?php selected($atts['country'], $country); ?>>
+                                        <?php echo esc_html($country); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
 
-                    <?php if ($atts['show_sector'] === 'true'): ?>
-                    <div class="filter-group">
-                        <label for="sector-filter">Sector</label>
-                        <select id="sector-filter" name="sector">
-                            <option value="">All Sectors</option>
-                            <?php foreach ($sectors as $sector): ?>
-                                <option value="<?php echo esc_attr($sector); ?>" <?php selected($atts['sector'], $sector); ?>>
-                                    <?php echo esc_html($sector); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <?php endif; ?>
+                        <?php if ($atts['show_sector'] === 'true'): ?>
+                        <div class="filter-group">
+                            <select id="sector-filter" name="sector">
+                                <option value="">All Types</option>
+                                <?php foreach ($sectors as $sector): ?>
+                                    <option value="<?php echo esc_attr($sector); ?>" <?php selected($atts['sector'], $sector); ?>>
+                                        <?php echo esc_html($sector); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
 
-                    <?php if ($atts['show_city'] === 'true'): ?>
-                    <div class="filter-group">
-                        <label for="city-filter">City</label>
-                        <select id="city-filter" name="city">
-                            <option value="">All Cities</option>
-                            <?php foreach ($cities as $city): ?>
-                                <option value="<?php echo esc_attr($city); ?>" <?php selected($atts['city'], $city); ?>>
-                                    <?php echo esc_html($city); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <?php endif; ?>
+                        <?php if ($atts['show_city'] === 'true'): ?>
+                        <div class="filter-group">
+                            <select id="city-filter" name="city">
+                                <option value="">All Cities</option>
+                                <?php foreach ($cities as $city): ?>
+                                    <option value="<?php echo esc_attr($city); ?>" <?php selected($atts['city'], $city); ?>>
+                                        <?php echo esc_html($city); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <?php endif; ?>
 
-                    <div class="filter-group filter-actions">
-                        <label>&nbsp;</label>
-                        <div class="button-group">
-                            <button type="button" id="apply-filters" class="btn btn-primary">Apply Filters</button>
-                            <button type="button" id="reset-filters" class="btn btn-secondary">Reset</button>
+                        <div class="filter-group filter-actions">
+                            <button type="button" id="apply-filters" class="btn btn-hero">Apply Filters</button>
+                            <button type="button" id="reset-filters" class="btn btn-hero-outline">Reset</button>
                         </div>
                     </div>
                 </div>
-
-                <?php if ($atts['debug'] === 'false'): ?>
-                <div class="debug-info" style="margin-top: 15px; padding: 15px; background: #f0f0f0; border-radius: 5px; font-size: 12px;">
-                    <strong>Debug Info:</strong><br>
-                    Total Universities: <?php echo $universities->found_posts; ?><br>
-                    Countries from DB: <?php echo count($countries); ?> (<?php echo implode(', ', array_slice($countries, 0, 5)); ?>)<br>
-                    Sectors from DB: <?php echo count($sectors); ?> (<?php echo implode(', ', $sectors); ?>)<br>
-                    Cities from DB: <?php echo count($cities); ?> (<?php echo implode(', ', array_slice($cities, 0, 5)); ?>)<br>
-                    
-                    <?php if (!empty($initial_filters)): ?>
-                        Active Filters: <?php echo json_encode($initial_filters); ?><br>
-                    <?php endif; ?>
-                    
-                    <?php
-                    // Test each field to see what data exists
-                    global $wpdb;
-                    $field_tests = [
-                        '_University_Country' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = '_University_Country' AND meta_value != '' AND meta_value != '0' AND meta_value != 'university_country'"),
-                        'University_Country' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = 'University_Country' AND meta_value != '' AND meta_value != '0' AND meta_value != 'university_country'"),
-                        '_University_City' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = '_University_City' AND meta_value != '' AND meta_value != '0' AND meta_value != 'university_city'"),
-                        'University_City' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = 'University_City' AND meta_value != '' AND meta_value != '0' AND meta_value != 'university_city'"),
-                        '_Sector' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = '_Sector' AND meta_value != '' AND meta_value != 'sector'"),
-                        'Sector' => $wpdb->get_var("SELECT COUNT(DISTINCT meta_value) FROM {$wpdb->postmeta} WHERE meta_key = 'Sector' AND meta_value != '' AND meta_value != 'sector'")
-                    ];
-                    
-                    echo "Field Tests: ";
-                    foreach ($field_tests as $field => $count) {
-                        echo "{$field}={$count} ";
-                    }
-                    
-                    // Check taxonomies
-                    echo "<br>Taxonomies: ";
-                    echo "sit-country=" . (taxonomy_exists('sit-country') ? 'YES' : 'NO') . " ";
-                    echo "sit-city=" . (taxonomy_exists('sit-city') ? 'YES' : 'NO') . " ";
-                    
-                    if (taxonomy_exists('sit-country')) {
-                        $country_terms = get_terms(['taxonomy' => 'sit-country', 'hide_empty' => false]);
-                        echo "sit-country-terms=" . (is_wp_error($country_terms) ? 0 : count($country_terms)) . " ";
-                    }
-                    
-                    if (taxonomy_exists('sit-city')) {
-                        $city_terms = get_terms(['taxonomy' => 'sit-city', 'hide_empty' => false]);
-                        echo "sit-city-terms=" . (is_wp_error($city_terms) ? 0 : count($city_terms)) . " ";
-                    }
-                    ?>
-                </div>
-                <?php endif; ?>
             </div>
             <?php endif; ?>
 
@@ -386,7 +337,8 @@ class UniversityGrid {
             'posts_per_page' => 12,
             'paged' => 1,
             'orderby' => 'title',
-            'order' => 'ASC'
+            'order' => 'ASC',
+            'lang' => 'en' // Prevent Polylang translation duplicates — show only the primary English post
         ];
 
         $args = wp_parse_args($args, $default_args);
@@ -551,18 +503,19 @@ class UniversityGrid {
         ?>
         <div class="university-card" data-university-id="<?php echo esc_attr($university_id); ?>">
             <div class="university-card-inner">
-                
-                <?php if ($logo): ?>
-                <div class="university-logo">
-                    <img src="<?php echo esc_url($logo); ?>" alt="<?php echo esc_attr($university->post_title); ?>" loading="lazy">
-                </div>
-                <?php else: ?>
-                <div class="university-logo university-logo-placeholder">
-                    <div class="logo-placeholder">
-                        <?php echo esc_html(substr($university->post_title, 0, 1)); ?>
+                <a href="<?php echo get_permalink($university_id); ?>" class="university-card-link">
+                    <?php if ($logo): ?>
+                    <div class="university-logo">
+                        <img src="<?php echo esc_url($logo); ?>" alt="<?php echo esc_attr($university->post_title); ?>" loading="lazy">
                     </div>
-                </div>
-                <?php endif; ?>
+                    <?php else: ?>
+                    <div class="university-logo university-logo-placeholder">
+                        <div class="logo-placeholder">
+                            <?php echo esc_html(substr($university->post_title, 0, 1)); ?>
+                        </div>
+                    </div>
+                    <?php endif; ?>
+                </a>
 
                 <div class="university-content">
                     <h3 class="university-title">
@@ -571,47 +524,30 @@ class UniversityGrid {
                         </a>
                     </h3>
 
-                    <div class="university-meta">
-                        <?php if ($city || $country): ?>
-                        <div class="university-location">
-                            <span class="meta-icon">📍</span>
-                            <span class="meta-label">Location:</span>
-                            <span class="meta-value">
-                                <?php 
-                                $location_parts = array_filter([$city, $country]);
-                                echo esc_html(implode(', ', $location_parts)); 
-                                ?>
-                            </span>
-                        </div>
+                    <div class="university-tags">
+                        <?php if ($city): ?>
+                        <span class="uni-tag tag-location">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            <?php echo esc_html($city); ?>
+                        </span>
                         <?php endif; ?>
 
                         <?php if ($sector): ?>
-                        <div class="university-sector">
-                            <span class="meta-icon">🏛️</span>
-                            <span class="meta-label">Type:</span>
-                            <span class="meta-value"><?php echo esc_html($sector); ?></span>
-                        </div>
+                        <span class="uni-tag tag-sector">
+                            <?php echo esc_html($sector); ?>
+                        </span>
                         <?php endif; ?>
 
                         <?php if ($program_count > 0): ?>
-                        <div class="university-programs">
-                            <span class="meta-icon">📚</span>
-                            <span class="meta-label">Programs:</span>
-                            <span class="meta-value">
-                                <?php printf($program_count === 1 ? '%d Program' : '%d Programs', $program_count); ?>
-                            </span>
-                        </div>
+                        <span class="uni-tag tag-programs">
+                            <?php printf($program_count === 1 ? '%d Program' : '%d Programs', $program_count); ?>
+                        </span>
                         <?php endif; ?>
                     </div>
 
                     <div class="university-actions">
                         <a href="<?php echo get_permalink($university_id); ?>" class="btn btn-primary">View Details</a>
-                        <a href="<?php echo $apply_url; ?>" class="btn btn-secondary" target="_blank" rel="noopener">Apply Now</a>
-                        <?php /* kept for reference, now replaced by Apply Now:
-                        <?php if ($website): ?>
-                        <a href="<?php echo esc_url('https://' . $website); ?>" class="btn btn-secondary" target="_blank" rel="noopener">Visit Website</a>
-                        <?php endif; ?>
-                        */ ?>
+                        <a href="<?php echo $apply_url; ?>" class="btn btn-apply" target="_blank" rel="noopener">Apply Now</a>
                     </div>
                 </div>
             </div>

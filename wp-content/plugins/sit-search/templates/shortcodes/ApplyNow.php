@@ -125,8 +125,7 @@ class ApplyNow
                 'link' => $program->guid,
                 'fee' => get_post_meta($prog_id, 'Official_Tuition', true),
                 'Tuition_Currency' => get_post_meta($prog_id, 'Tuition_Currency', true),
-                'Service_fee' => get_post_meta($prog_id, 'Service_fee', true),
-                'Application_Fee' => get_post_meta($prog_id, 'Application_Fee', true),
+
                 'duration' => get_post_meta($prog_id, 'Study_Years', true),
                 'pro_country' => $pro_country,
                 'degree_id' => $zoho_degree_id,

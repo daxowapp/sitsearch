@@ -17,6 +17,7 @@ class TopUniversities
                 'post_type' => 'sit-university',
                 'post_status' => 'publish',
                 'posts_per_page' => 20, // Limit results
+                'lang' => 'en', // Prevent Polylang translation duplicates
                 'meta_query' => array(
                     'relation' => 'AND',
                     array(

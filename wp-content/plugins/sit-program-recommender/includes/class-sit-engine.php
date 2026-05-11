@@ -15,7 +15,7 @@ class SIT_Engine {
     /**
      * OpenAI settings
      */
-    private $openai_settings;
+    private $openrouter_settings;
     
     /**
      * Available study fields/departments
@@ -26,9 +26,9 @@ class SIT_Engine {
      * Constructor
      */
     public function __construct() {
-        $this->openai_settings = get_option('sit_recommender_openai', array());
+        $this->openrouter_settings = get_option('sit_recommender_openrouter', array());
         $this->study_fields = $this->get_study_fields();
-        error_log('SIT Engine: Constructor - OpenAI settings: ' . json_encode($this->openai_settings));
+        error_log('SIT Engine: Constructor - OpenRouter settings: ' . json_encode($this->openrouter_settings));
         error_log('SIT Engine: Constructor - Study fields: ' . json_encode($this->study_fields));
         
         // Let's also check what OpenAI options exist in the database
@@ -91,10 +91,10 @@ class SIT_Engine {
      */
     public function generate_questions($num_questions = 10) {
         error_log('SIT: generate_questions called with ' . $num_questions . ' questions');
-        error_log('SIT: OpenAI settings: ' . json_encode($this->openai_settings));
-        error_log('SIT: OpenAI enabled check: ' . ($this->is_openai_enabled() ? 'true' : 'false'));
+        error_log('SIT: OpenRouter settings: ' . json_encode($this->openrouter_settings));
+        error_log('SIT: OpenAI enabled check: ' . ($this->is_openrouter_enabled() ? 'true' : 'false'));
         
-        if (!$this->is_openai_enabled()) {
+        if (!$this->is_openrouter_enabled()) {
             error_log('SIT: Using fallback questions');
             return $this->get_fallback_questions($num_questions);
         }
@@ -128,7 +128,7 @@ Format as JSON:
   ]
 }";
 
-        $response = $this->call_openai($prompt);
+        $response = $this->call_openrouter($prompt);
         
         if ($response && isset($response['questions'])) {
             return $response;
@@ -145,7 +145,7 @@ Format as JSON:
      * @return array Recommended fields with explanations
      */
     public function analyze_answers_and_recommend($answers, $questions) {
-        if (!$this->is_openai_enabled()) {
+        if (!$this->is_openrouter_enabled()) {
             return $this->get_fallback_recommendations();
         }
         
@@ -197,7 +197,7 @@ Provide recommendations in JSON format:
 
 Rank by confidence (0-100) and provide personalized, specific reasons based on their actual answers.";
 
-        $response = $this->call_openai($prompt);
+        $response = $this->call_openrouter($prompt);
         
         if ($response && isset($response['recommendations'])) {
             return $response;
@@ -207,6 +207,70 @@ Rank by confidence (0-100) and provide personalized, specific reasons based on t
     }
     
     /**
+     * Generate dynamic chat questions based on context
+     */
+    public function generate_chat_question($student_name, $current_step, $conversation_history) {
+        $prompt = "You are an AI academic advisor helping {$student_name} find the perfect study program. ";
+        $prompt .= "This is question " . ($current_step + 1) . " out of 10 total questions. ";
+        
+        if (!empty($conversation_history)) {
+            $prompt .= "Previous answers:\n";
+            foreach ($conversation_history as $entry) {
+                $prompt .= "Q{$entry['question_number']}: {$entry['answer_text']}\n";
+            }
+        }
+        
+        $prompt .= "\nGenerate the next question to better understand {$student_name}'s academic interests, learning style, career goals, or personal preferences. ";
+        $prompt .= "Provide 3-4 multiple choice options. ";
+        $prompt .= "Format your response precisely as JSON: {\"question\": \"Your question here\", \"options\": [{\"id\": \"option1\", \"text\": \"Option Text\", \"description\": \"Brief description\"}]} ";
+        $prompt .= "Make the question personalized and engaging.";
+        
+        $response = $this->call_openrouter($prompt, true);
+        
+        if ($response && isset($response['question']) && isset($response['options'])) {
+            return $response;
+        }
+        
+        // Fallback logic
+        return array(
+            'question' => 'What aspect interests you most about your chosen field?',
+            'options' => array(
+                array('id' => 'practical', 'text' => '🔧 Practical Applications', 'description' => 'Real-world problem solving'),
+                array('id' => 'theoretical', 'text' => '📚 Theoretical Knowledge', 'description' => 'Deep understanding of concepts'),
+                array('id' => 'creative', 'text' => '🎨 Creative Expression', 'description' => 'Innovation and creativity'),
+                array('id' => 'social', 'text' => '👥 Social Impact', 'description' => 'Helping others and society')
+            )
+        );
+    }
+    
+    /**
+     * Generate chat recommendations
+     */
+    public function generate_chat_recommendations($student_name, $conversation_history, $user_profile) {
+        $prompt = "You are an AI academic advisor. Analyze {$student_name}'s complete assessment to recommend study programs.\n\n";
+        
+        $prompt .= "Complete 10-Question Assessment:\n";
+        foreach ($conversation_history as $i => $entry) {
+            $prompt .= "Q" . ($i + 1) . ": {$entry['answer_text']}\n";
+        }
+        
+        $fields_list = implode(', ', $this->study_fields);
+        $prompt .= "\nAvailable fields: {$fields_list}\n";
+        
+        $prompt .= "\nBased on this assessment, provide 3-5 study program recommendations available in Turkey. ";
+        $prompt .= "Format as JSON: {\"recommendations\": [{\"field\": \"Program Name\", \"confidence\": 85, \"why_good_fit\": \"Explanation\", \"reasons\": [\"reason1\", \"reason2\"], \"career_prospects\": \"Career info\"}], \"analysis_explanation\": \"Personal analysis for {$student_name}\"} ";
+        $prompt .= "Focus on real programs and explicitly use the provided field names when possible.";
+        
+        $response = $this->call_openrouter($prompt, true);
+        
+        if ($response && isset($response['recommendations'])) {
+            return $response;
+        }
+        
+        return $this->get_fallback_recommendations();
+    }
+
+    /**
      * Get programs for recommended fields using existing search plugin
      * 
      * @param array $recommended_fields Array of recommended field names
@@ -214,56 +278,90 @@ Rank by confidence (0-100) and provide personalized, specific reasons based on t
      */
     public function get_programs_for_fields($recommended_fields) {
         $programs = array();
+        global $wpdb;
         
         foreach ($recommended_fields as $field_data) {
             $field_name = $field_data['field'];
             
-            // Search by faculty
-            $faculty_terms = get_terms(array(
-                'taxonomy' => 'sit-faculty',
-                'name__like' => $field_name,
-                'hide_empty' => false
-            ));
-            
-            // Search by speciality
-            $speciality_terms = get_terms(array(
-                'taxonomy' => 'sit-speciality',
-                'name__like' => $field_name,
-                'hide_empty' => false
-            ));
-            
-            $term_ids = array();
-            
-            if (!empty($faculty_terms)) {
-                foreach ($faculty_terms as $term) {
-                    $term_ids[] = $term->term_id;
+            if (class_exists('\SIT\Search\Services\CachedData')) {
+                // Optimized search utilizing existing DB cached stores
+                $faculty_terms = \SIT\Search\Services\CachedData::get_taxonomy_terms('sit-faculty');
+                $speciality_terms = \SIT\Search\Services\CachedData::get_taxonomy_terms('sit-speciality');
+                $active_ids = \SIT\Search\Services\CachedData::get_active_university_ids();
+                
+                $term_ids = array();
+                
+                if (!is_wp_error($faculty_terms)) {
+                    foreach ((array)$faculty_terms as $term) {
+                        if (stripos($term->name, $field_name) !== false) {
+                            $term_ids[] = $term->term_id;
+                        }
+                    }
                 }
-            }
-            
-            if (!empty($speciality_terms)) {
-                foreach ($speciality_terms as $term) {
-                    $term_ids[] = $term->term_id;
+                
+                if (!is_wp_error($speciality_terms)) {
+                    foreach ((array)$speciality_terms as $term) {
+                        if (stripos($term->name, $field_name) !== false) {
+                            $term_ids[] = $term->term_id;
+                        }
+                    }
                 }
-            }
-            
-            if (!empty($term_ids)) {
-                $field_programs = get_posts(array(
-                    'post_type' => 'sit-program',
-                    'posts_per_page' => 10,
-                    'tax_query' => array(
-                        'relation' => 'OR',
-                        array(
-                            'taxonomy' => 'sit-faculty',
-                            'field' => 'term_id',
-                            'terms' => $term_ids
-                        ),
-                        array(
-                            'taxonomy' => 'sit-speciality',
-                            'field' => 'term_id',
-                            'terms' => $term_ids
-                        )
-                    )
-                ));
+                
+                if (!empty($term_ids)) {
+                    $term_ids_in = implode(',', array_map('intval', $term_ids));
+                    $cache_key = 'sit_rec_prog_' . md5($field_name);
+                    
+                    $field_programs = get_transient($cache_key);
+                    if ($field_programs === false) {
+                        // Raw SQL avoids looping huge overhead
+                        $sql = $wpdb->prepare("
+                            SELECT DISTINCT p.* FROM {$wpdb->posts} p
+                            INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id
+                            WHERE p.post_type = 'sit-program' AND p.post_status = 'publish'
+                            AND tr.term_taxonomy_id IN ($term_ids_in)
+                            LIMIT %d
+                        ", 10);
+                        
+                        $posts = $wpdb->get_results($sql);
+                        $field_programs = array();
+                        foreach($posts as $p) {
+                            $field_programs[] = get_post($p->ID);
+                        }
+                        
+                        set_transient($cache_key, $field_programs, 3600);
+                    }
+                    
+                    if (!empty($field_programs)) {
+                        $programs[$field_name] = $field_programs;
+                    }
+                }
+            } else {
+                // Hard legacy fallback if CachedData isn't available
+                $cache_key = 'sit_rec_fb_' . md5($field_name);
+                $field_programs = get_transient($cache_key);
+                if ($field_programs === false) {
+                    $faculty_terms = get_terms(array('taxonomy' => 'sit-faculty', 'name__like' => $field_name, 'hide_empty' => false));
+                    $speciality_terms = get_terms(array('taxonomy' => 'sit-speciality', 'name__like' => $field_name, 'hide_empty' => false));
+                    
+                    $term_ids = array();
+                    if (!empty($faculty_terms) && !is_wp_error($faculty_terms)) { foreach ($faculty_terms as $term) { $term_ids[] = $term->term_id; } }
+                    if (!empty($speciality_terms) && !is_wp_error($speciality_terms)) { foreach ($speciality_terms as $term) { $term_ids[] = $term->term_id; } }
+                    
+                    if (!empty($term_ids)) {
+                        $field_programs = get_posts(array(
+                            'post_type' => 'sit-program',
+                            'posts_per_page' => 10,
+                            'tax_query' => array(
+                                'relation' => 'OR',
+                                array('taxonomy' => 'sit-faculty', 'field' => 'term_id', 'terms' => $term_ids),
+                                array('taxonomy' => 'sit-speciality', 'field' => 'term_id', 'terms' => $term_ids)
+                            )
+                        ));
+                    } else {
+                        $field_programs = [];
+                    }
+                    set_transient($cache_key, $field_programs, 3600);
+                }
                 
                 if (!empty($field_programs)) {
                     $programs[$field_name] = $field_programs;
@@ -278,28 +376,32 @@ Rank by confidence (0-100) and provide personalized, specific reasons based on t
      * Call OpenAI API
      * 
      * @param string $prompt The prompt to send to OpenAI
+     * @param bool $expect_json_object Force JSON object via response_format
      * @return array|false Response data or false on failure
      */
-    public function call_openai($prompt) {
-        error_log('SIT Engine: call_openai called with prompt length: ' . strlen($prompt));
+    public function call_openrouter($prompt, $expect_json_object = true) {
+        error_log('SIT Engine: call_openrouter called with prompt length: ' . strlen($prompt));
         
-        if (!$this->is_openai_enabled()) {
-            error_log('SIT Engine: OpenAI not enabled, returning false');
+        if (!$this->is_openrouter_enabled()) {
+            error_log('SIT Engine: OpenRouter not enabled, returning false');
             return false;
         }
         
-        error_log('SIT Engine: OpenAI is enabled, proceeding with API call');
+        error_log('SIT Engine: OpenRouter is enabled, proceeding with API call');
         
-        $api_key = $this->openai_settings['api_key'] ?? '';
-        $model = $this->openai_settings['model'] ?? 'gpt-3.5-turbo';
-        $max_tokens = $this->openai_settings['max_tokens'] ?? 1000;
-        $temperature = $this->openai_settings['temperature'] ?? 0.7;
+        $api_key = $this->openrouter_settings['api_key'] ?? '';
+        $model = $this->openrouter_settings['model'] ?? 'openai/gpt-4o-mini';
+        
+        // OpenRouter natively proxies response_format depending on model support
+        
+        $max_tokens = $this->openrouter_settings['max_tokens'] ?? 1000;
+        $temperature = $this->openrouter_settings['temperature'] ?? 0.7;
         
         if (empty($api_key)) {
             return false;
         }
         
-        $url = 'https://api.openai.com/v1/chat/completions';
+        $url = 'https://openrouter.ai/api/v1/chat/completions';
         
         $data = array(
             'model' => $model,
@@ -317,17 +419,24 @@ Rank by confidence (0-100) and provide personalized, specific reasons based on t
             'temperature' => $temperature
         );
         
+        if ($expect_json_object) {
+            $data['response_format'] = array('type' => 'json_object');
+        }
+        
         $response = wp_remote_post($url, array(
             'headers' => array(
                 'Authorization' => 'Bearer ' . $api_key,
-                'Content-Type' => 'application/json'
+                'Content-Type' => 'application/json',
+                'HTTP-Referer' => home_url(),
+                'X-Title' => 'SIT Recommender'
             ),
             'body' => json_encode($data),
-            'timeout' => 30
+            'timeout' => 30,
+            'sslverify' => false
         ));
         
         if (is_wp_error($response)) {
-            error_log('SIT OpenAI API Error: ' . $response->get_error_message());
+            error_log('SIT OpenRouter API Error: ' . $response->get_error_message());
             return false;
         }
         
@@ -336,51 +445,51 @@ Rank by confidence (0-100) and provide personalized, specific reasons based on t
         $data = json_decode($body, true);
         
         // Log the full response for debugging
-        error_log('SIT OpenAI Response Code: ' . $http_code);
-        error_log('SIT OpenAI Response Body: ' . $body);
+        error_log('SIT OpenRouter Response Code: ' . $http_code);
+        error_log('SIT OpenRouter Response Body: ' . $body);
         
         if ($http_code !== 200) {
-            error_log('SIT OpenAI API HTTP Error: ' . $http_code . ' - ' . $body);
+            error_log('SIT OpenRouter API HTTP Error: ' . $http_code . ' - ' . $body);
             return false;
         }
         
         if (isset($data['error'])) {
-            error_log('SIT OpenAI API Error: ' . json_encode($data['error']));
+            error_log('SIT OpenRouter API Error: ' . json_encode($data['error']));
             return false;
         }
         
         if (isset($data['choices'][0]['message']['content'])) {
             $content = $data['choices'][0]['message']['content'];
-            error_log('SIT OpenAI Content: ' . $content);
+            error_log('SIT OpenRouter Content: ' . $content);
             
             $json_data = json_decode($content, true);
             
             if (json_last_error() === JSON_ERROR_NONE) {
                 return $json_data;
             } else {
-                error_log('SIT OpenAI JSON Parse Error: ' . json_last_error_msg());
-                error_log('SIT OpenAI Raw Content: ' . $content);
+                error_log('SIT OpenRouter JSON Parse Error: ' . json_last_error_msg());
+                error_log('SIT OpenRouter Raw Content: ' . $content);
             }
         } else {
-            error_log('SIT OpenAI No content in response: ' . json_encode($data));
+            error_log('SIT OpenRouter No content in response: ' . json_encode($data));
         }
         
         return false;
     }
     
     /**
-     * Check if OpenAI is enabled and configured
+     * Check if OpenRouter is enabled and configured
      */
-    public function is_openai_enabled() {
-        error_log('SIT Engine: Checking OpenAI enabled status');
-        error_log('SIT Engine: OpenAI settings: ' . json_encode($this->openai_settings));
-        error_log('SIT Engine: Enabled check: ' . (!empty($this->openai_settings['enabled']) ? 'true' : 'false'));
-        error_log('SIT Engine: API key check: ' . (!empty($this->openai_settings['api_key']) ? 'present' : 'missing'));
+    public function is_openrouter_enabled() {
+        error_log('SIT Engine: Checking OpenRouter enabled status');
+        error_log('SIT Engine: OpenRouter settings: ' . json_encode($this->openrouter_settings));
+        error_log('SIT Engine: Enabled check: ' . (!empty($this->openrouter_settings['enabled']) ? 'true' : 'false'));
+        error_log('SIT Engine: API key check: ' . (!empty($this->openrouter_settings['api_key']) ? 'present' : 'missing'));
         
-        $is_enabled = !empty($this->openai_settings['enabled']) && 
-                     !empty($this->openai_settings['api_key']);
+        $is_enabled = !empty($this->openrouter_settings['enabled']) && 
+                     !empty($this->openrouter_settings['api_key']);
         
-        error_log('SIT Engine: Final is_openai_enabled result: ' . ($is_enabled ? 'true' : 'false'));
+        error_log('SIT Engine: Final is_openrouter_enabled result: ' . ($is_enabled ? 'true' : 'false'));
         return $is_enabled;
     }
     

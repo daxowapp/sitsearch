@@ -2,6 +2,95 @@
 
 All notable changes to the SIT Search plugin will be documented in this file.
 
+## [1.4.5] - 2026-05-11
+
+### Fixed
+
+- **Duplicate Universities on All-Universities Page** — Universities like "Istanbul Gelisim University" appeared multiple times in the grid because Polylang creates separate WordPress posts for each language translation, and the `WP_Query` in `UniversityGrid` had no language filter — causing both the English post and its translation(s) to be returned.
+  - **Root cause**: `get_universities()` lacked a `'lang' => 'en'` parameter, so WP_Query returned posts from all Polylang languages
+  - **Fix**: Added `'lang' => 'en'` to the default query args in both `UniversityGrid::get_universities()` and `TopUniversities` shortcode to ensure only the primary English version of each university is displayed
+
+### Files Modified
+
+- `src/Shortcodes/UniversityGrid.php` — Added `'lang' => 'en'` to default WP_Query args
+- `src/Shortcodes/TopUniversities.php` — Added `'lang' => 'en'` to WP_Query args
+
+---
+
+## [1.4.4] - 2026-05-10
+
+### Removed
+
+- **All Payment Collection** — Completely removed service fee, application fee, and Stripe payment processing
+  - Removed fee display (Service Fee, Application Fee, Total Fee) from the Apply Now form
+  - Removed Stripe card input fields (card number, expiry, CVC) for Public university applications
+  - Removed Stripe.js CDN loading and PaymentIntent creation logic
+  - Removed `create-payment-intent.php` endpoint file
+  - Removed `STRIPE_PUBLIC_KEY` and `STRIPE_SECRET_KEY` constants from `sit-search.php`
+  - Removed `Service_fee` and `Application_Fee` data fetching from both ApplyNow shortcode files
+  - Removed Service Fee / Application Fee display from program cards (`program-box.html.php`) — now always shows Rankings + Students
+
+### Changed
+
+- **Privacy Footer Standardization** — All forms now display: "By submitting this form, you agree to our Privacy Policy and Terms of Service" with both links pointing to `/privacy-notice-data-processing-policy-kvkk-compliance/`
+  - Updated Apply Now form footer
+  - Added privacy footer to Consultation form
+
+### Files Modified
+
+- `templates/shortcodes/apply-now.html.php` — Fee display, Stripe fields, Stripe JS removed; privacy footer updated
+- `templates/shortcodes/program-box.html.php` — Fee attributes replaced with Rankings/Students
+- `templates/shortcodes/consultation.html.php` — Privacy footer added
+- `templates/shortcodes/ApplyNow.php` — Fee data fetching removed
+- `src/Shortcodes/ApplyNow.php` — Fee data fetching removed
+- `sit-search.php` — Stripe constants removed
+- `create-payment-intent.php` — **DELETED**
+
+---
+
+## [1.4.3] - 2026-05-10
+
+### Added
+
+- **Official Legal Disclaimer** — Added mandatory legal disclaimer at the bottom of every program page and university page
+  - States that Studyinturkiye.com is operated by SIT Consultancy LLC and is not affiliated with YÖK or any government authority
+  - Styled with a subtle gray left-border info box, responsive on mobile
+  - CSS component: `.sit-legal-disclaimer`, `.sit-legal-disclaimer-inner`, `.sit-legal-disclaimer-icon`, `.sit-legal-disclaimer-text`
+
+### Files Modified
+
+- `templates/shortcodes/single-program.html.php` — Legal disclaimer section added before the floating share button
+- `templates/shortcodes/single-university.html.php` — Legal disclaimer section added after the data correction disclaimer
+- `assets/css/sit-search.css` — Legal disclaimer component styles (55+ lines)
+
+---
+
+## [1.4.2] - 2026-05-08
+
+### Added
+
+- **KvKK Data Protection Consent** — Added mandatory KvKK (Turkish Personal Data Protection Law No. 6698) consent checkboxes to all student-facing forms
+  - **Apply Now Form** — Required KvKK consent checkbox with bilingual (EN/TR) clarification text, optional marketing consent, disabled submit button until consent is given
+  - **Consultation Form** — Same KvKK consent pattern with server-side validation
+  - **AI Recommender Chat** — KvKK consent checkbox on the welcome screen before students can start the AI assessment
+  - **Server-side Validation** — Both `ApplyNow.php` and `Consultation.php` PHP handlers reject submissions without `kvkk_consent` field
+  - **Custom CSS** — Styled checkbox with custom checkmark, red accent border, hover effects, shake animation on error, disabled button state
+  - **Footer Updated** — Apply form footer now links to KvKK Clarification Text, Privacy Policy, and Terms of Service
+
+### Files Modified
+
+- `templates/shortcodes/apply-now.html.php` — KvKK consent section, disabled submit button, JS validation
+- `templates/shortcodes/consultation.html.php` — KvKK consent section, disabled submit button, JS validation
+- `src/Shortcodes/ApplyNow.php` — Server-side KvKK consent validation
+- `src/Shortcodes/Consultation.php` — Server-side KvKK consent validation
+- `assets/css/sit-search.css` — KvKK consent component styles (175+ lines)
+
+### Files Modified (sit-program-recommender plugin)
+
+- `assets/js/frontend.js` — KvKK consent on AI recommender welcome screen
+
+---
+
 ## [1.4.1] - 2026-04-14
 
 ### Added

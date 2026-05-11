@@ -29,10 +29,10 @@ class SIT_Frontend {
             return;
         }
         
-        // Enqueue JavaScript (Clean version)
+        // Enqueue JavaScript
         wp_enqueue_script(
             'sit-recommender-frontend',
-            SIT_RECOMMENDER_PLUGIN_URL . 'assets/js/frontend-chat-clean.js',
+            SIT_RECOMMENDER_PLUGIN_URL . 'assets/js/frontend.js',
             array('jquery'),
             SIT_RECOMMENDER_VERSION,
             true
@@ -44,14 +44,14 @@ class SIT_Frontend {
         $display_settings = get_option('sit_recommender_display', array());
         $filter_settings = get_option('sit_recommender_filters', array());
         $general_settings = get_option('sit_recommender_general', array());
-        $openai_settings = get_option('sit_recommender_openai', array());
+        $openrouter_settings = get_option('sit_recommender_openrouter', array());
         
         wp_localize_script('sit-recommender-frontend', 'sitRecommender', array(
             'apiUrl' => rest_url('sit-recommender/v1/'),
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'nonce' => wp_create_nonce('wp_rest'),
             'trackStats' => !empty($general_settings['track_statistics']),
-            'openaiEnabled' => !empty($openai_settings['api_key']),
+            'openrouterEnabled' => !empty($openrouter_settings['api_key']),
             'settings' => array(
                 'resultsPerPage' => $display_settings['results_per_page'] ?? 10,
                 'showProgressBar' => !empty($display_settings['show_progress_bar']),
@@ -109,197 +109,19 @@ class SIT_Frontend {
         ?>
         <div id="sit-recommender" class="sit-recommender-container <?php echo $theme_class; ?>" data-max-results="<?php echo esc_attr($atts['max_results']); ?>">
             
-            <!-- Loading Overlay -->
-            <div class="sit-loading-overlay" style="display: none;">
-                <div class="sit-spinner"></div>
-                <p class="sit-loading-text"><?php _e('Loading...', 'sit-program-recommender'); ?></p>
+            <div class="sit-bot-initialize">
+                <div class="sit-bot-icon-pulse">🤖</div>
+                <div class="sit-pulse-ring"></div>
+                <p><?php _e('Initializing AI Study Advisor...', 'sit-program-recommender'); ?></p>
             </div>
             
-            <!-- Welcome Screen -->
-            <div class="sit-screen sit-welcome-screen">
-                <div class="sit-welcome-content">
-                    <h2><?php _e('Find Your Perfect Program', 'sit-program-recommender'); ?></h2>
-                    <p><?php _e('Take our quick assessment to discover SIT programs that match your interests, skills, and career goals.', 'sit-program-recommender'); ?></p>
-                    
-                    <div class="sit-welcome-features">
-                        <div class="sit-feature">
-                            <span class="sit-feature-icon">🎯</span>
-                            <h4><?php _e('Personalized Matching', 'sit-program-recommender'); ?></h4>
-                            <p><?php _e('Get recommendations tailored to your unique profile', 'sit-program-recommender'); ?></p>
-                        </div>
-                        <div class="sit-feature">
-                            <span class="sit-feature-icon">⚡</span>
-                            <h4><?php _e('Quick Assessment', 'sit-program-recommender'); ?></h4>
-                            <p><?php _e('Complete the quiz in just 5-10 minutes', 'sit-program-recommender'); ?></p>
-                        </div>
-                        <div class="sit-feature">
-                            <span class="sit-feature-icon">🎓</span>
-                            <h4><?php _e('Expert Insights', 'sit-program-recommender'); ?></h4>
-                            <p><?php _e('Detailed explanations for each recommendation', 'sit-program-recommender'); ?></p>
-                        </div>
-                    </div>
-                    
-                    <button class="sit-btn sit-btn-primary sit-start-quiz" type="button">
-                        <?php _e('Start Assessment', 'sit-program-recommender'); ?>
-                    </button>
-                    
-                    <?php if ($atts['show_search'] === 'true'): ?>
-                    <div class="sit-alternative-actions">
-                        <p><?php _e('Or browse programs directly:', 'sit-program-recommender'); ?></p>
-                        <button class="sit-btn sit-btn-secondary sit-browse-programs" type="button">
-                            <?php _e('Browse All Programs', 'sit-program-recommender'); ?>
-                        </button>
-                    </div>
-                    <?php endif; ?>
-                </div>
-            </div>
-            
-            <!-- Quiz Screen -->
-            <div class="sit-screen sit-quiz-screen" style="display: none;">
-                <div class="sit-quiz-header">
-                    <div class="sit-progress-container">
-                        <div class="sit-progress-bar">
-                            <div class="sit-progress-fill" style="width: 0%;"></div>
-                        </div>
-                        <span class="sit-progress-text">0%</span>
-                    </div>
-                    <button class="sit-btn sit-btn-link sit-exit-quiz" type="button">
-                        <?php _e('Exit Quiz', 'sit-program-recommender'); ?>
-                    </button>
-                </div>
-                
-                <div class="sit-quiz-content">
-                    <div class="sit-question-container">
-                        <!-- Questions will be loaded dynamically -->
-                    </div>
-                    
-                    <div class="sit-quiz-navigation">
-                        <button class="sit-btn sit-btn-secondary sit-prev-question" type="button" style="display: none;">
-                            <?php _e('Previous', 'sit-program-recommender'); ?>
-                        </button>
-                        <button class="sit-btn sit-btn-primary sit-next-question" type="button" disabled>
-                            <?php _e('Next', 'sit-program-recommender'); ?>
-                        </button>
-                        <button class="sit-btn sit-btn-primary sit-get-recommendations" type="button" style="display: none;">
-                            <?php _e('Get My Recommendations', 'sit-program-recommender'); ?>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Results Screen -->
-            <div class="sit-screen sit-results-screen" style="display: none;">
-                <div class="sit-results-header">
-                    <h2><?php _e('Your Program Recommendations', 'sit-program-recommender'); ?></h2>
-                    <p class="sit-results-summary"></p>
-                    
-                    <div class="sit-results-actions">
-                        <button class="sit-btn sit-btn-secondary sit-retake-quiz" type="button">
-                            <?php _e('Retake Assessment', 'sit-program-recommender'); ?>
-                        </button>
-                        <?php if ($atts['show_filters'] === 'true'): ?>
-                        <button class="sit-btn sit-btn-secondary sit-toggle-filters" type="button">
-                            <?php _e('Filter Results', 'sit-program-recommender'); ?>
-                        </button>
-                        <?php endif; ?>
-                    </div>
-                </div>
-                
-                <?php if ($atts['show_filters'] === 'true'): ?>
-                <div class="sit-filters-panel" style="display: none;">
-                    <div class="sit-filters-content">
-                        <h4><?php _e('Filter Programs', 'sit-program-recommender'); ?></h4>
-                        <div class="sit-filter-groups">
-                            <div class="sit-filter-group">
-                                <label><?php _e('School', 'sit-program-recommender'); ?></label>
-                                <select class="sit-filter-select" data-filter="school">
-                                    <option value=""><?php _e('All Schools', 'sit-program-recommender'); ?></option>
-                                </select>
-                            </div>
-                            <div class="sit-filter-group">
-                                <label><?php _e('Level', 'sit-program-recommender'); ?></label>
-                                <select class="sit-filter-select" data-filter="level">
-                                    <option value=""><?php _e('All Levels', 'sit-program-recommender'); ?></option>
-                                </select>
-                            </div>
-                            <div class="sit-filter-group">
-                                <label><?php _e('Study Mode', 'sit-program-recommender'); ?></label>
-                                <select class="sit-filter-select" data-filter="mode">
-                                    <option value=""><?php _e('All Modes', 'sit-program-recommender'); ?></option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="sit-filter-actions">
-                            <button class="sit-btn sit-btn-primary sit-apply-filters" type="button">
-                                <?php _e('Apply Filters', 'sit-program-recommender'); ?>
-                            </button>
-                            <button class="sit-btn sit-btn-link sit-clear-filters" type="button">
-                                <?php _e('Clear All', 'sit-program-recommender'); ?>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
-                
-                <div class="sit-recommendations-container">
-                    <!-- Recommendations will be loaded dynamically -->
-                </div>
-                
-                <div class="sit-load-more-container" style="display: none;">
-                    <button class="sit-btn sit-btn-secondary sit-load-more" type="button">
-                        <?php _e('Load More Programs', 'sit-program-recommender'); ?>
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Browse Screen -->
-            <?php if ($atts['show_search'] === 'true'): ?>
-            <div class="sit-screen sit-browse-screen" style="display: none;">
-                <div class="sit-browse-header">
-                    <h2><?php _e('Browse All Programs', 'sit-program-recommender'); ?></h2>
-                    
-                    <div class="sit-search-container">
-                        <input type="text" class="sit-search-input" placeholder="<?php _e('Search programs...', 'sit-program-recommender'); ?>" />
-                        <button class="sit-btn sit-btn-primary sit-search-btn" type="button">
-                            <?php _e('Search', 'sit-program-recommender'); ?>
-                        </button>
-                    </div>
-                    
-                    <button class="sit-btn sit-btn-link sit-back-to-quiz" type="button">
-                        <?php _e('← Back to Assessment', 'sit-program-recommender'); ?>
-                    </button>
-                </div>
-                
-                <div class="sit-browse-filters">
-                    <!-- Filter options will be loaded dynamically -->
-                </div>
-                
-                <div class="sit-browse-results">
-                    <!-- Browse results will be loaded dynamically -->
-                </div>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Error Screen -->
-            <div class="sit-screen sit-error-screen" style="display: none;">
-                <div class="sit-error-content">
-                    <h3><?php _e('Oops! Something went wrong', 'sit-program-recommender'); ?></h3>
-                    <p class="sit-error-message"></p>
-                    <button class="sit-btn sit-btn-primary sit-retry-action" type="button">
-                        <?php _e('Try Again', 'sit-program-recommender'); ?>
-                    </button>
-                    <button class="sit-btn sit-btn-link sit-back-to-start" type="button">
-                        <?php _e('Start Over', 'sit-program-recommender'); ?>
-                    </button>
-                </div>
-            </div>
         </div>
         
         <!-- Server-side fallback for no-JS users -->
         <noscript>
             <div class="sit-noscript-fallback">
                 <h3><?php _e('JavaScript Required', 'sit-program-recommender'); ?></h3>
-                <p><?php _e('This program recommender requires JavaScript to function properly. Please enable JavaScript in your browser or view our', 'sit-program-recommender'); ?> 
+                <p><?php _e('Our AI Study Advisor requires JavaScript to function properly. Please enable JavaScript in your browser or view our', 'sit-program-recommender'); ?> 
                    <a href="<?php echo esc_url(site_url('/programs')); ?>"><?php _e('complete program list', 'sit-program-recommender'); ?></a>.
                 </p>
                 <?php $this->render_fallback_program_list(); ?>
@@ -312,8 +134,12 @@ class SIT_Frontend {
      * Render fallback program list for no-JS users
      */
     private function render_fallback_program_list() {
-        $dal = new SIT_DAL();
-        $programs = $dal->get_programs(array(), array('posts_per_page' => 20));
+        $programs = get_posts(array(
+            'post_type' => 'sit_program',
+            'posts_per_page' => 20,
+            'post_status' => 'publish',
+            'no_found_rows' => true,
+        ));
         
         if (empty($programs)) {
             return;
@@ -322,30 +148,48 @@ class SIT_Frontend {
         <div class="sit-fallback-programs">
             <h4><?php _e('Featured Programs', 'sit-program-recommender'); ?></h4>
             <div class="sit-program-grid">
-                <?php foreach ($programs as $program): ?>
+                <?php foreach ($programs as $program): 
+                    $featured_image = get_the_post_thumbnail_url($program->ID, 'medium');
+                    $permalink = get_permalink($program->ID);
+                    $school = get_post_meta($program->ID, 'sit_program_school', true);
+                ?>
                 <div class="sit-program-card">
-                    <?php if ($program->featured_image): ?>
+                    <?php if ($featured_image): ?>
                     <div class="sit-program-image">
-                        <img src="<?php echo esc_url($program->featured_image); ?>" alt="<?php echo esc_attr($program->post_title); ?>" />
+                        <img src="<?php echo esc_url($featured_image); ?>" alt="<?php echo esc_attr($program->post_title); ?>" />
                     </div>
                     <?php endif; ?>
                     
                     <div class="sit-program-content">
-                        <h5><a href="<?php echo esc_url($program->permalink); ?>"><?php echo esc_html($program->post_title); ?></a></h5>
-                        <p><?php echo esc_html($program->post_excerpt); ?></p>
+                        <h5><a href="<?php echo esc_url($permalink); ?>"><?php echo esc_html($program->post_title); ?></a></h5>
+                        <p><?php echo esc_html(wp_trim_words($program->post_content, 30)); ?></p>
                         
-                        <?php if (!empty($program->meta['school'])): ?>
+                        <?php if (!empty($school)): ?>
                         <div class="sit-program-meta">
-                            <span class="sit-meta-school"><?php echo esc_html($program->meta['school']); ?></span>
-                            <?php if (!empty($program->meta['level'])): ?>
-                            <span class="sit-meta-level"><?php echo esc_html($program->meta['level']); ?></span>
+                            <span class="sit-meta-item sit-school">
+                                <i class="fas fa-university"></i> <?php echo esc_html($school); ?>
+                            </span>
+                        </div>
+                        <?php endif; ?>
+    <?php
+                        $level = get_post_meta($program->ID, 'sit_program_level', true);
+                        $duration = get_post_meta($program->ID, 'sit_program_duration', true);
+                        ?>
+                        <?php if (!empty($level) || !empty($duration)): ?>
+                        <div class="sit-program-meta-details">
+                            <?php if (!empty($level)): ?>
+                            <span class="sit-meta-level"><?php echo esc_html($level); ?></span>
+                            <?php endif; ?>
+                            
+                            <?php if (!empty($duration)): ?>
+                            <span class="sit-meta-duration"><i class="far fa-clock"></i> <?php echo esc_html($duration); ?></span>
                             <?php endif; ?>
                         </div>
                         <?php endif; ?>
                         
-                        <a href="<?php echo esc_url($program->permalink); ?>" class="sit-btn sit-btn-primary sit-btn-small">
-                            <?php _e('Learn More', 'sit-program-recommender'); ?>
-                        </a>
+                        <div class="sit-program-actions">
+                            <a href="<?php echo esc_url($permalink); ?>" class="sit-btn sit-btn-outline"><?php _e('View Details', 'sit-program-recommender'); ?></a>
+                        </div>
                     </div>
                 </div>
                 <?php endforeach; ?>

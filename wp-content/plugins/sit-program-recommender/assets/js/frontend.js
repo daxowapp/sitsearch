@@ -1,504 +1,452 @@
 jQuery(document).ready(function($) {
     'use strict';
     
-    const SITRecommender = {
+    const SITChatRecommender = {
         sessionId: null,
-        currentQuestionIndex: 0,
-        questions: [],
-        answers: {},
-        recommendations: [],
-        isGeneratingQuestions: false,
-        numQuestions: 10,
+        conversationHistory: [],
+        currentStep: 0,
+        userProfile: {},
+        isTyping: false,
+        totalQuestions: 10,
         
         init: function() {
             this.bindEvents();
-            this.showWelcomeScreen();
+            // Simulate initialization delay
+            setTimeout(() => {
+                this.showWelcomeScreen();
+            }, 800);
         },
         
         bindEvents: function() {
-            $(document).on('click', '.sit-start-quiz', this.startQuiz.bind(this));
-            $(document).on('click', '.sit-answer-option', this.selectAnswer.bind(this));
-            $(document).on('click', '.sit-next-question', this.nextQuestion.bind(this));
-            $(document).on('click', '.sit-prev-question', this.prevQuestion.bind(this));
-            $(document).on('click', '.sit-get-recommendations', this.getRecommendations.bind(this));
-            $(document).on('click', '.sit-restart-quiz', this.restartQuiz.bind(this));
-            $(document).on('click', '.sit-view-programs', this.viewProgramsForField.bind(this));
-            $(document).on('change', '.sit-num-questions', this.updateQuestionCount.bind(this));
-            
-            // Add debugging for all events
-            console.log('SIT Recommender: Event bindings initialized');
+            $(document).on('click', '.sit-start-chat', this.startChat.bind(this));
+            $(document).on('click', '.sit-chat-option', this.selectChatOption.bind(this));
+            $(document).on('click', '.sit-restart-chat', this.restartChat.bind(this));
+            $(document).on('click', '#sit-name-submit', this.submitStudentName.bind(this));
+            $(document).on('keypress', '#sit-student-name', (e) => {
+                if (e.which === 13) this.submitStudentName(e);
+            });
+            $(document).on('keypress', '#sit-text-answer', (e) => {
+                if (e.which === 13) this.submitTextAnswer(e);
+            });
+            $(document).on('click', '#sit-text-submit', this.submitTextAnswer.bind(this));
         },
         
         showWelcomeScreen: function() {
             const welcomeHtml = `
-                <div class="sit-welcome-screen">
-                    <div class="sit-welcome-content">
-                        <h2>🎓 Discover Your Ideal Study Path</h2>
-                        <p>Our AI-powered assessment will analyze your interests, skills, and goals to recommend the perfect academic programs for you.</p>
-                        
-                        <div class="sit-quiz-options">
-                            <label for="sit-num-questions">Number of Questions:</label>
-                            <select id="sit-num-questions" class="sit-num-questions">
-                                <option value="5">5 Questions (Quick)</option>
-                                <option value="10" selected>10 Questions (Recommended)</option>
-                                <option value="15">15 Questions (Detailed)</option>
-                                <option value="20">20 Questions (Comprehensive)</option>
-                            </select>
+                <div class="sit-welcome-screen" style="animation: fadeIn 0.5s ease;">
+                    <div class="sit-bot-initialize" style="min-height: auto; padding: 60px 40px; text-align: center;">
+                        <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 16px;">AI Study Path Advisor</h2>
+                        <p style="font-size: 18px; color: var(--sit-text-muted); max-width: 600px; margin: 0 auto 30px; line-height: 1.6;">
+                            I'm your personal AI advisor! I'll conduct a comprehensive assessment to discover your perfect academic trajectory in Türkiye.
+                        </p>
+
+                        <div class="sit-kvkk-welcome" style="max-width: 550px; margin: 0 auto 30px; text-align: left; background: rgba(0,0,0,0.03); border-radius: 12px; padding: 20px;">
+                            <p style="font-size: 13px; color: #666; line-height: 1.6; margin: 0 0 12px;">
+                                By starting this assessment, your name and responses will be processed to generate personalized program recommendations pursuant to the Turkish Personal Data Protection Law No. 6698 (KvKK).
+                            </p>
+                            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer; font-size: 14px; color: #333;">
+                                <input type="checkbox" id="sit-kvkk-consent" style="margin-top: 3px; width: 18px; height: 18px; accent-color: #e20a17; flex-shrink: 0;">
+                                <span>I have read and accept the <a href="/privacy-notice-data-processing-policy-kvkk-compliance/" target="_blank" style="color: #e20a17; text-decoration: underline;">KvKK Clarification Text</a> and consent to the processing of my personal data. <span style="color: #e20a17;">*</span></span>
+                            </label>
                         </div>
-                        
-                        <div class="sit-ai-notice">
-                            <div class="sit-ai-badge">🤖 AI-Powered</div>
-                            <p>Questions are dynamically generated using advanced AI to provide personalized insights into your academic interests and career aspirations.</p>
-                        </div>
-                        
-                        <button class="sit-start-quiz sit-btn sit-btn-primary">
-                            <span class="sit-btn-text">Start Assessment</span>
-                            <span class="sit-btn-loading" style="display: none;">
-                                <span class="sit-spinner"></span> Generating Questions...
-                            </span>
+
+                        <button class="sit-start-chat sit-btn sit-btn-primary" style="font-size: 18px; padding: 16px 32px;" disabled>
+                            Start AI Assessment <span style="margin-left: 8px;">→</span>
                         </button>
+                        <p class="sit-kvkk-hint" style="font-size: 12px; color: #999; margin-top: 10px;">Please accept the KvKK consent above to continue</p>
                     </div>
                 </div>
             `;
-            
-            $('.sit-recommender-container').html(welcomeHtml);
-        },
-        
-        updateQuestionCount: function(e) {
-            this.numQuestions = parseInt($(e.target).val());
-            console.log('Number of questions updated to:', this.numQuestions);
-        },
-        
-        startQuiz: function(e) {
-            e.preventDefault();
-            
-            if (this.isGeneratingQuestions) return;
-            
-            // Get the current selected number of questions
-            this.numQuestions = parseInt($('.sit-num-questions').val()) || 10;
-            console.log('Starting quiz with', this.numQuestions, 'questions');
-            
-            this.isGeneratingQuestions = true;
-            const $btn = $('.sit-start-quiz');
-            $btn.find('.sit-btn-text').hide();
-            $btn.find('.sit-btn-loading').show();
-            $btn.prop('disabled', true);
-            
-            // Debug: Test API connection first
-            console.log('Testing API connection...', sitRecommender.apiUrl);
-            
-            // Test endpoint first
-            $.ajax({
-                url: sitRecommender.apiUrl + 'test',
-                method: 'GET',
-                success: (response) => {
-                    console.log('API test successful:', response);
-                    this.proceedWithQuizStart();
-                },
-                error: (xhr) => {
-                    console.error('API test failed:', xhr);
-                    let errorMsg = 'API connection failed. ';
-                    if (xhr.status === 404) {
-                        errorMsg += 'REST API routes not found. Please check if the plugin is properly activated.';
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg += xhr.responseJSON.message;
-                    } else {
-                        errorMsg += `HTTP ${xhr.status}: ${xhr.statusText}`;
-                    }
-                    this.showError(errorMsg);
-                    this.isGeneratingQuestions = false;
-                    $btn.find('.sit-btn-text').show();
-                    $btn.find('.sit-btn-loading').hide();
+            $('#sit-recommender').html(welcomeHtml);
+
+            // Enable/disable start button based on KvKK consent
+            $(document).on('change', '#sit-kvkk-consent', function() {
+                const $btn = $('.sit-start-chat');
+                const $hint = $('.sit-kvkk-hint');
+                if (this.checked) {
+                    $btn.prop('disabled', false);
+                    $hint.fadeOut(200);
+                } else {
+                    $btn.prop('disabled', true);
+                    $hint.fadeIn(200);
                 }
             });
         },
         
-        proceedWithQuizStart: function() {
-            // Initialize chat-based assessment
+        startChat: function(e) {
+            if (e) e.preventDefault();
             this.sessionId = 'chat_session_' + Date.now();
             this.conversationHistory = [];
             this.currentStep = 0;
             this.userProfile = {};
-            
             this.showChatScreen();
             this.startConversation();
         },
-                    
-                    <div class="sit-quiz-navigation">
-                        <button class="sit-prev-question sit-btn sit-btn-secondary" style="display: none;">
-                            Previous
-                        </button>
-                        <button class="sit-next-question sit-btn sit-btn-primary" style="display: none;">
-                            Next Question
-                        </button>
-                        <button class="sit-get-recommendations sit-btn sit-btn-success" style="display: none;">
-                            Get My Recommendations
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            $('.sit-recommender-container').html(quizHtml);
-            this.displayCurrentQuestion();
+
+        restartChat: function(e) {
+            if (e) e.preventDefault();
+            this.startChat();
         },
         
-        displayCurrentQuestion: function() {
-            if (this.currentQuestionIndex >= this.questions.length) {
-                this.showRecommendationButton();
+        showChatScreen: function() {
+            let dotsHtml = '';
+            for(let i=0; i<this.totalQuestions; i++) {
+                dotsHtml += `<span class="sit-dot ${i===0 ? 'active' : ''}"></span>`;
+            }
+
+            const chatHtml = `
+                <div class="sit-chat-screen">
+                    <div class="sit-chat-header">
+                        <div class="sit-chat-title">
+                            <div class="sit-chat-icon"><span style="font-size: 24px;">🤖</span></div>
+                            AI Study Advisor
+                        </div>
+                        <div class="sit-progress-dots">
+                            ${dotsHtml}
+                        </div>
+                    </div>
+                    <div class="sit-chat-messages" id="sit-chat-messages"></div>
+                    <div class="sit-chat-options" id="sit-chat-options"></div>
+                </div>
+            `;
+            $('#sit-recommender').html(chatHtml);
+        },
+        
+        startConversation: function() {
+            this.trackUsage('assessment_started', {});
+            this.addBotMessage("Hi there! 👋 I'm your AI advisor. Before we begin, what should I call you?");
+            this.showNamePrompt();
+        },
+        
+        showNamePrompt: function() {
+            const nameHtml = `
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="text" id="sit-student-name" class="sit-input" placeholder="Enter your name..." />
+                    <button id="sit-name-submit" class="sit-btn sit-btn-primary">Start</button>
+                </div>
+            `;
+            $('#sit-chat-options').html(nameHtml);
+            setTimeout(() => $('#sit-student-name').focus(), 100);
+        },
+        
+        submitStudentName: function(e) {
+            e.preventDefault();
+            const name = ($('#sit-student-name').val() || '').trim();
+            if (!name) {
+                $('#sit-student-name').addClass('sit-input-error');
                 return;
             }
+            this.userProfile.name = name;
+            this.addUserMessage(name);
+            $('#sit-chat-options').empty();
             
-            const question = this.questions[this.currentQuestionIndex];
-            const progress = ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
+            setTimeout(() => {
+                this.addBotMessage(`Hi ${name}! 👋 I'm excited to help you discover your perfect study path.`);
+                setTimeout(() => {
+                    this.addBotMessage('I\'ll ask you a series of contextual questions to understand your academic goals. Let\'s start!');
+                    this.showFirstQuestion();
+                }, 1000);
+            }, 500);
+        },
+        
+        showFirstQuestion: function() {
+            this.getNextQuestionFromAI();
+        },
+        
+        getNextQuestionFromAI: function() {
+            this.showTypingIndicator();
             
-            // Update progress
-            $('.sit-progress-fill').css('width', progress + '%');
-            $('.sit-current-q').text(this.currentQuestionIndex + 1);
+            const context = {
+                student_name: this.userProfile.name,
+                current_step: this.currentStep,
+                conversation_history: this.conversationHistory,
+                total_questions: this.totalQuestions
+            };
             
-            // Build question HTML
-            let optionsHtml = '';
-            question.options.forEach(option => {
-                const isSelected = this.answers[question.id] === option.id;
-                optionsHtml += `
-                    <div class="sit-answer-option ${isSelected ? 'selected' : ''}" 
-                         data-question-id="${question.id}" 
-                         data-answer-id="${option.id}">
-                        <div class="sit-option-radio">
-                            <span class="sit-radio-mark ${isSelected ? 'checked' : ''}"></span>
-                        </div>
-                        <div class="sit-option-text">${option.text}</div>
+            if (typeof sitRecommender !== 'undefined' && sitRecommender.openrouterEnabled) {
+                $.ajax({
+                    url: sitRecommender.apiUrl + 'chat/question',
+                    method: 'POST',
+                    headers: { 'X-WP-Nonce': sitRecommender.nonce },
+                    data: { context: JSON.stringify(context) },
+                    success: (response) => {
+                        this.hideTypingIndicator();
+                        if (response.success && response.data) {
+                            this.displayAIQuestion(response.data);
+                        } else {
+                            this.showFallbackQuestion();
+                        }
+                    },
+                    error: () => {
+                        this.hideTypingIndicator();
+                        this.showFallbackQuestion();
+                    }
+                });
+            } else {
+                this.hideTypingIndicator();
+                this.showFallbackQuestion();
+            }
+        },
+        
+        displayAIQuestion: function(data) {
+            if (data.question) {
+                this.addBotMessage(data.question);
+            }
+            if (data.options && data.options.length > 0) {
+                this.showChatOptions(data.options);
+            } else {
+                this.showTextInput();
+            }
+        },
+        
+        showFallbackQuestion: function() {
+            const fallbacks = [
+                {
+                    question: "What type of subjects interest you most?",
+                    options: [
+                        { id: 'tech', text: '💻 Technology', description: 'Computers, AI, software' },
+                        { id: 'biz', text: '💼 Business', description: 'Management, finance' },
+                        { id: 'creative', text: '🎨 Creative', description: 'Design, arts, media' },
+                        { id: 'sci', text: '🔬 Science', description: 'Biology, physics, research' }
+                    ]
+                },
+                {
+                    question: "How do you prefer to learn?",
+                    options: [
+                        { id: 'hands', text: '🔧 Hands-on', description: 'Labs, practical work' },
+                        { id: 'theory', text: '📚 Theoretical', description: 'Deep study, research' }
+                    ]
+                }
+            ];
+            
+            const q = fallbacks[Math.min(this.currentStep, fallbacks.length - 1)];
+            this.addBotMessage(q.question);
+            this.showChatOptions(q.options);
+        },
+
+        showTextInput: function() {
+            const html = `
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="text" id="sit-text-answer" class="sit-input" placeholder="Type your answer..." />
+                    <button id="sit-text-submit" class="sit-btn sit-btn-primary">Send</button>
+                </div>
+            `;
+            $('#sit-chat-options').html(html);
+            setTimeout(() => $('#sit-text-answer').focus(), 100);
+        },
+
+        submitTextAnswer: function(e) {
+            e.preventDefault();
+            const answer = ($('#sit-text-answer').val() || '').trim();
+            if (!answer) {
+                $('#sit-text-answer').addClass('sit-input-error');
+                return;
+            }
+            this.processUserAnswer('text', answer, answer);
+        },
+        
+        showChatOptions: function(options) {
+            let html = '<div class="sit-chat-options-grid">';
+            options.forEach(opt => {
+                html += `
+                    <div class="sit-chat-option" data-id="${opt.id}">
+                        <div class="sit-option-main">${opt.text}</div>
+                        ${opt.description ? `<div class="sit-option-desc">${opt.description}</div>` : ''}
                     </div>
                 `;
             });
+            html += '</div>';
+            $('#sit-chat-options').html(html);
+        },
+        
+        selectChatOption: function(e) {
+            const $opt = $(e.currentTarget);
+            this.processUserAnswer($opt.data('id'), $opt.find('.sit-option-main').text(), $opt.find('.sit-option-main').text());
+        },
+        
+        processUserAnswer: function(id, text, display) {
+            this.addUserMessage(display);
+            $('#sit-chat-options').empty();
             
-            const questionHtml = `
-                <div class="sit-question">
-                    <h3 class="sit-question-text">${question.question}</h3>
-                    <div class="sit-question-options">
-                        ${optionsHtml}
-                    </div>
-                </div>
-            `;
-            
-            $('.sit-question-container').html(questionHtml);
-            
-            // Debug: Check if elements were created
-            console.log('Question HTML inserted');
-            console.log('Answer options found:', $('.sit-answer-option').length);
-            
-            // Test click binding manually
-            $('.sit-answer-option').off('click').on('click', function(e) {
-                console.log('Direct click handler triggered!', this);
-                SITRecommender.selectAnswer.call(SITRecommender, e);
+            this.conversationHistory.push({
+                step: this.currentStep,
+                question_number: this.currentStep + 1,
+                answer_id: id,
+                answer_text: text,
+                timestamp: new Date().toISOString()
             });
             
-            // Update navigation buttons
-            $('.sit-prev-question').toggle(this.currentQuestionIndex > 0);
-            $('.sit-next-question').toggle(this.currentQuestionIndex < this.questions.length - 1 && this.answers[question.id]);
-            $('.sit-get-recommendations').toggle(this.currentQuestionIndex === this.questions.length - 1 && this.answers[question.id]);
-        },
-        
-        selectAnswer: function(e) {
-            console.log('Answer option clicked!', e.currentTarget);
-            const $option = $(e.currentTarget);
-            const questionId = $option.data('question-id');
-            const answerId = $option.data('answer-id');
+            this.currentStep++;
+            this.updateProgress();
             
-            console.log('Question ID:', questionId, 'Answer ID:', answerId);
-            
-            // Update UI
-            $option.siblings().removeClass('selected').find('.sit-radio-mark').removeClass('checked');
-            $option.addClass('selected').find('.sit-radio-mark').addClass('checked');
-            
-            // Store answer
-            this.answers[questionId] = answerId;
-            console.log('Current answers:', this.answers);
-            
-            // Submit answer to server (skip for test)
-            // this.submitAnswer(questionId, answerId);
-            
-            // Update navigation
-            $('.sit-next-question').toggle(this.currentQuestionIndex < this.questions.length - 1);
-            $('.sit-get-recommendations').toggle(this.currentQuestionIndex === this.questions.length - 1);
-        },
-        
-        submitAnswer: function(questionId, answerId) {
-            $.ajax({
-                url: sitRecommender.apiUrl + '/quiz/answer',
-                method: 'POST',
-                headers: {
-                    'X-WP-Nonce': sitRecommender.nonce
-                },
-                data: {
-                    session_id: this.sessionId,
-                    question_id: questionId,
-                    answer_id: answerId
-                },
-                success: (response) => {
-                    if (!response.success) {
-                        console.error('Failed to submit answer:', response.message);
-                    }
-                },
-                error: (xhr) => {
-                    console.error('Error submitting answer:', xhr.responseJSON);
-                }
-            });
-        },
-        
-        nextQuestion: function(e) {
-            e.preventDefault();
-            if (this.currentQuestionIndex < this.questions.length - 1) {
-                this.currentQuestionIndex++;
-                this.displayCurrentQuestion();
+            if (this.currentStep >= this.totalQuestions) {
+                this.showTypingIndicator();
+                setTimeout(() => {
+                    this.hideTypingIndicator();
+                    this.addBotMessage("Excellent! 🎉 Analyzing your profile...");
+                    this.generateRecommendations();
+                }, 1000);
+            } else {
+                this.getNextQuestionFromAI();
             }
         },
         
-        prevQuestion: function(e) {
-            e.preventDefault();
-            if (this.currentQuestionIndex > 0) {
-                this.currentQuestionIndex--;
-                this.displayCurrentQuestion();
-            }
-        },
-        
-        getRecommendations: function(e) {
-            e.preventDefault();
-            
-            const $btn = $(e.currentTarget);
-            $btn.prop('disabled', true).html('<span class="sit-spinner"></span> Analyzing Your Answers...');
-            
-            $.ajax({
-                url: sitRecommender.apiUrl + 'test-recommend',
-                method: 'POST',
-                headers: {
-                    'X-WP-Nonce': sitRecommender.nonce
-                },
-                data: {
-                    session_id: this.sessionId
-                },
-                success: (response) => {
-                    if (response.success) {
-                        this.recommendations = response.recommendations;
-                        this.programsByField = response.programs_by_field;
-                        this.showResults();
-                    } else {
-                        this.showError('Failed to generate recommendations: ' + (response.message || 'Unknown error'));
-                    }
-                },
-                error: (xhr) => {
-                    let errorMsg = 'Failed to analyze your answers. ';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
-                        errorMsg += xhr.responseJSON.message;
-                    }
-                    this.showError(errorMsg);
-                },
-                complete: () => {
-                    $btn.prop('disabled', false).html('Get My Recommendations');
-                }
+        updateProgress: function() {
+            $('.sit-dot').each(function(idx) {
+                $(this).toggleClass('active', idx <= SITChatRecommender.currentStep);
             });
         },
         
-        showResults: function() {
-            let resultsHtml = `
-                <div class="sit-results-screen">
-                    <div class="sit-results-header">
-                        <h2>🎯 Your Personalized Study Recommendations</h2>
-                        <p>Based on your answers, here are the fields of study that best match your interests and goals:</p>
-                    </div>
-                    
-                    <div class="sit-recommendations">
-            `;
+        generateRecommendations: function() {
+            this.showTypingIndicator();
             
-            this.recommendations.forEach((rec, index) => {
-                const confidenceClass = rec.confidence >= 80 ? 'high' : rec.confidence >= 60 ? 'medium' : 'low';
-                const studyAreas = this.programsByField[rec.field] || [];
-                const totalPrograms = studyAreas.reduce((sum, area) => sum + area.count, 0);
-                const programCountClass = totalPrograms > 0 ? '' : 'zero';
+            if (typeof sitRecommender !== 'undefined') {
+                $.ajax({
+                    url: sitRecommender.apiUrl + 'chat/recommend',
+                    method: 'POST',
+                    headers: { 'X-WP-Nonce': sitRecommender.nonce },
+                    data: {
+                        conversation_history: JSON.stringify(this.conversationHistory),
+                        user_profile: JSON.stringify(this.userProfile),
+                        student_name: this.userProfile.name,
+                        total_questions: this.totalQuestions,
+                        session_id: this.sessionId
+                    },
+                    success: (res) => {
+                        this.hideTypingIndicator();
+                        if (res.success && res.data) {
+                            this.showAIRecommendations(res.data);
+                        } else {
+                            this.addBotMessage("Something went wrong generating your recommendations.");
+                        }
+                    },
+                    error: () => {
+                        this.hideTypingIndicator();
+                        this.addBotMessage("Connection error while fetching recommendations.");
+                    }
+                });
+            } else {
+                this.hideTypingIndicator();
+                this.addBotMessage("API not configured properly.");
+            }
+        },
+        
+        showAIRecommendations: function(aiData) {
+            const name = this.userProfile.name || 'Student';
+            
+            $('#sit-recommender').fadeOut(300, function() {
+                let html = `
+                    <div class="sit-results-screen">
+                        <div class="sit-results-header">
+                            <h2>🎓 Your Academic Path</h2>
+                            <p style="font-size: 18px; color: var(--sit-text-muted);">Here are the best programs for you, ${name}</p>
+                        </div>
+                        <div class="sit-recommendations">
+                `;
                 
-                resultsHtml += `
-                    <div class="sit-recommendation-card">
-                        <div class="sit-rec-header">
-                            <h3 class="sit-rec-title">
-                                <span class="sit-rec-rank">#${index + 1}</span>
-                                ${rec.field}
-                            </h3>
-                            <div class="sit-confidence-badge ${confidenceClass}">
-                                ${rec.confidence}% Match
-                            </div>
-                        </div>
+                if (aiData.recommendations && aiData.recommendations.length > 0) {
+                    aiData.recommendations.forEach((rec, idx) => {
+                        const confidence = rec.confidence || (95 - (idx * 5));
                         
-                        <div class="sit-rec-content">
-                            <div class="sit-rec-fit">
-                                <h4>Why This Field Suits You:</h4>
-                                <p>${rec.why_good_fit}</p>
-                            </div>
-                            
-                            <div class="sit-rec-reasons">
-                                <h4>Key Reasons:</h4>
-                                <ul>
-                                    ${rec.reasons.map(reason => `<li>${reason}</li>`).join('')}
-                                </ul>
-                            </div>
-                            
-                            <div class="sit-rec-careers">
-                                <h4>Career Prospects:</h4>
-                                <p>${rec.career_prospects}</p>
-                            </div>
-                            
-                            <div class="sit-rec-programs">
-                                <div class="sit-programs-info">
-                                    <span class="sit-program-count ${programCountClass}">${totalPrograms} programs available</span>
+                        let programsHtml = '';
+                        if (aiData.programs_by_field && aiData.programs_by_field[rec.field]) {
+                            const progs = aiData.programs_by_field[rec.field].slice(0, 2);
+                            progs.forEach(p => {
+                                programsHtml += `<a href="${p.url}" target="_blank" class="sit-btn sit-btn-primary" style="padding: 8px 16px; font-size: 14px;">${p.name}</a>`;
+                            });
+                        }
+
+                        let reasons = '';
+                        if (rec.reasons && rec.reasons.length > 0) {
+                            reasons = `
+                                <div class="sit-rec-reasons">
+                                    <strong>Why it fits:</strong>
+                                    <ul>${rec.reasons.map(r => `<li>${r}</li>`).join('')}</ul>
                                 </div>
-                                ${totalPrograms > 0 ? `
-                                    <button class="sit-view-programs sit-btn sit-btn-primary" 
-                                            data-field="${rec.field}">
-                                        View Study Areas
-                                    </button>
-                                ` : `
-                                    <button class="sit-search-external sit-btn sit-btn-secondary" 
-                                            data-field="${rec.field}"
-                                            onclick="window.open('http://search.studyinturkiye.com/study-areas', '_blank')">
-                                        Browse All Study Areas
-                                    </button>
-                                `}
-                            </div>
-                            
-                            ${studyAreas.length > 0 ? `
-                                <div class="sit-study-areas">
-                                    <h4>Related Study Areas:</h4>
-                                    <div class="sit-area-list">
-                                        ${studyAreas.map(area => `
-                                            <div class="sit-area-item">
-                                                <div class="sit-area-info">
-                                                    <span class="sit-area-name">${area.name}</span>
-                                                    <span class="sit-area-count">${area.count} programs</span>
-                                                </div>
-                                                <a href="${area.url}" target="_blank" class="sit-area-link">
-                                                    Explore <i class="fas fa-external-link-alt"></i>
-                                                </a>
-                                            </div>
-                                        `).join('')}
-                                    </div>
+                            `;
+                        }
+
+                        html += `
+                            <div class="sit-recommendation-card">
+                                <div class="sit-rec-header">
+                                    <h3>${rec.field}</h3>
+                                    <span class="sit-match-percentage">${confidence}% Match</span>
                                 </div>
-                            ` : ''}
+                                <div class="sit-rec-content">
+                                    <p style="margin-bottom: 20px;">${rec.why_good_fit || rec.explanation}</p>
+                                    ${reasons}
+                                    ${programsHtml ? `<div class="sit-program-links">${programsHtml}</div>` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+                
+                html += `
+                        </div>
+                        <div style="text-align: center; margin-top: 40px;">
+                            <button class="sit-restart-chat sit-btn sit-btn-secondary">Start Over</button>
                         </div>
                     </div>
                 `;
+                
+                $(this).html(html).fadeIn(300);
             });
-            
-            resultsHtml += `
-                    </div>
-                    
-                    <div class="sit-results-actions">
-                        <button class="sit-restart-quiz sit-btn sit-btn-secondary">
-                            Take Assessment Again
-                        </button>
-                        <button class="sit-save-results sit-btn sit-btn-outline">
-                            Save Results (PDF)
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            $('.sit-recommender-container').html(resultsHtml);
         },
         
-        viewProgramsForField: function(e) {
-            e.preventDefault();
-            const field = $(e.currentTarget).data('field');
-            const programs = this.programsByField[field] || [];
-            
-            if (programs.length === 0) {
-                this.showError('No programs found for ' + field);
-                return;
+        addBotMessage: function(msg) {
+            const html = `<div class="sit-chat-bubble sit-bot-message">
+                <div class="sit-avatar">🤖</div>
+                <div class="sit-message">${msg}</div>
+            </div>`;
+            $('#sit-chat-messages').append(html);
+            this.scrollToBottom();
+        },
+        
+        addUserMessage: function(msg) {
+            const html = `<div class="sit-chat-bubble sit-user-message">
+                <div class="sit-avatar">U</div>
+                <div class="sit-message">${msg}</div>
+            </div>`;
+            $('#sit-chat-messages').append(html);
+            this.scrollToBottom();
+        },
+        
+        showTypingIndicator: function() {
+            if ($('#sit-typing').length) return;
+            const html = `<div class="sit-chat-bubble sit-bot-message" id="sit-typing">
+                <div class="sit-avatar">🤖</div>
+                <div class="sit-typing-indicator"><span></span><span></span><span></span></div>
+            </div>`;
+            $('#sit-chat-messages').append(html);
+            this.scrollToBottom();
+        },
+        
+        hideTypingIndicator: function() {
+            $('#sit-typing').remove();
+        },
+        
+        scrollToBottom: function() {
+            const $msgs = $('#sit-chat-messages');
+            if ($msgs.length) {
+                $msgs.scrollTop($msgs[0].scrollHeight);
             }
-            
-            // Use your existing search plugin shortcode to display programs
-            // This integrates with your SIT Search plugin
-            let programsHtml = `
-                <div class="sit-programs-screen">
-                    <div class="sit-programs-header">
-                        <h2>📚 ${field} Programs</h2>
-                        <p>Here are the available programs in ${field}:</p>
-                        <button class="sit-back-to-results sit-btn sit-btn-secondary">
-                            ← Back to Recommendations
-                        </button>
-                    </div>
-                    
-                    <div class="sit-programs-list">
-            `;
-            
-            programs.forEach(program => {
-                programsHtml += `
-                    <div class="sit-program-card">
-                        <div class="sit-program-image">
-                            ${program.featured_image ? `<img src="${program.featured_image}" alt="${program.title}">` : '<div class="sit-program-placeholder">📖</div>'}
-                        </div>
-                        <div class="sit-program-content">
-                            <h3><a href="${program.permalink}" target="_blank">${program.title}</a></h3>
-                            <p>${program.excerpt || 'Program description not available.'}</p>
-                            <div class="sit-program-meta">
-                                ${program.meta.sit_program_school ? `<span class="sit-meta-item">🏫 ${program.meta.sit_program_school[0]}</span>` : ''}
-                                ${program.meta.sit_program_duration ? `<span class="sit-meta-item">⏱️ ${program.meta.sit_program_duration[0]} years</span>` : ''}
-                                ${program.meta.sit_program_mode ? `<span class="sit-meta-item">📚 ${program.meta.sit_program_mode[0]}</span>` : ''}
-                            </div>
-                            <a href="${program.permalink}" class="sit-btn sit-btn-primary" target="_blank">
-                                Learn More
-                            </a>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            programsHtml += `
-                    </div>
-                </div>
-            `;
-            
-            $('.sit-recommender-container').html(programsHtml);
-            
-            // Bind back button
-            $(document).on('click', '.sit-back-to-results', () => {
-                this.showResults();
-            });
         },
         
-        restartQuiz: function(e) {
-            e.preventDefault();
-            this.sessionId = null;
-            this.currentQuestionIndex = 0;
-            this.questions = [];
-            this.answers = {};
-            this.recommendations = [];
-            this.showWelcomeScreen();
-        },
-        
-        showError: function(message) {
-            const errorHtml = `
-                <div class="sit-error-screen">
-                    <div class="sit-error-content">
-                        <div class="sit-error-icon">⚠️</div>
-                        <h3>Oops! Something went wrong</h3>
-                        <p>${message}</p>
-                        <button class="sit-restart-quiz sit-btn sit-btn-primary">
-                            Try Again
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            $('.sit-recommender-container').html(errorHtml);
+        trackUsage: function(action, data) {
+            if (typeof sitRecommender !== 'undefined' && sitRecommender.trackStats) {
+                $.post(sitRecommender.ajaxUrl, {
+                    action: 'sit_track_usage',
+                    action_type: action,
+                    data: JSON.stringify(data),
+                    nonce: sitRecommender.nonce
+                });
+            }
         }
     };
     
-    // Initialize the recommender
-    console.log('jQuery loaded:', typeof $ !== 'undefined');
-    console.log('SIT container found:', $('.sit-recommender-container').length);
-    
-    if ($('.sit-recommender-container').length) {
-        console.log('Initializing SIT Recommender...');
-        SITRecommender.init();
-    } else {
-        console.error('SIT Recommender container not found!');
+    // Initialize
+    if ($('#sit-recommender').length) {
+        SITChatRecommender.init();
     }
 });

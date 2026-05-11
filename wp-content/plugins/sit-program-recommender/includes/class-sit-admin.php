@@ -23,7 +23,7 @@ class SIT_Admin {
         add_action('admin_menu', array($this, 'add_admin_menu'));
         add_action('admin_init', array($this, 'register_settings'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
-        add_action('wp_ajax_sit_test_openai', array($this, 'test_openai_connection'));
+        add_action('wp_ajax_sit_test_openai', array($this, 'test_openrouter_connection'));
         add_action('wp_ajax_sit_clear_stats', array($this, 'clear_statistics'));
         
         // Track usage statistics
@@ -52,7 +52,7 @@ class SIT_Admin {
     public function register_settings() {
         // Essential settings only
         register_setting('sit_recommender_settings', 'sit_recommender_general');
-        register_setting('sit_recommender_settings', 'sit_recommender_openai');
+        register_setting('sit_recommender_settings', 'sit_recommender_openrouter');
     }
     
     /**
@@ -181,15 +181,31 @@ class SIT_Admin {
                         </tr>
                     </table>
                     
-                    <h3>OpenAI Settings</h3>
-                    <?php $openai_settings = get_option('sit_recommender_openai', array()); ?>
+                    <h3>OpenRouter Settings</h3>
+                    <?php $openrouter_settings = get_option('sit_recommender_openrouter', array()); ?>
                     
                     <table class="form-table">
                         <tr>
-                            <th scope="row">OpenAI API Key</th>
+                            <th scope="row">Enable OpenRouter</th>
                             <td>
-                                <input type="password" name="sit_recommender_openai[api_key]" value="<?php echo esc_attr(isset($openai_settings['api_key']) ? $openai_settings['api_key'] : ''); ?>" class="regular-text" placeholder="sk-..." />
-                                <p class="description">Enter your OpenAI API key for enhanced AI recommendations.</p>
+                                <label>
+                                    <input type="checkbox" name="sit_recommender_openrouter[enabled]" value="1" <?php checked(isset($openrouter_settings['enabled']) ? $openrouter_settings['enabled'] : 1, 1); ?> />
+                                    Enable AI features using OpenRouter
+                                </label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">OpenRouter API Key</th>
+                            <td>
+                                <input type="password" name="sit_recommender_openrouter[api_key]" value="<?php echo esc_attr(isset($openrouter_settings['api_key']) ? $openrouter_settings['api_key'] : ''); ?>" class="regular-text" placeholder="sk-or-v1-..." />
+                                <p class="description">Enter your OpenRouter API key for enhanced AI recommendations.</p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">OpenRouter Model</th>
+                            <td>
+                                <input type="text" name="sit_recommender_openrouter[model]" value="<?php echo esc_attr(isset($openrouter_settings['model']) ? $openrouter_settings['model'] : 'openai/gpt-4o-mini'); ?>" class="regular-text" placeholder="e.g. openai/gpt-4o-mini" />
+                                <p class="description">Enter the model string. Default: openai/gpt-4o-mini (Recommend a model that natively supports JSON generation)</p>
                             </td>
                         </tr>
                     </table>
@@ -429,9 +445,9 @@ class SIT_Admin {
     }
     
     /**
-     * Test OpenAI connection
+     * Test OpenRouter connection
      */
-    public function test_openai_connection() {
+    public function test_openrouter_connection() {
         if (!wp_verify_nonce($_POST['nonce'] ?? '', 'sit_admin_nonce')) {
             wp_send_json_error('Security check failed');
         }
@@ -441,25 +457,29 @@ class SIT_Admin {
         }
         
         $api_key = sanitize_text_field($_POST['api_key'] ?? '');
+        $model = sanitize_text_field($_POST['model'] ?? 'openai/gpt-4o-mini');
         
         if (empty($api_key)) {
             wp_send_json_error('API key is required');
         }
         
         // Test the API key
-        $response = wp_remote_post('https://api.openai.com/v1/chat/completions', array(
+        $response = wp_remote_post('https://openrouter.ai/api/v1/chat/completions', array(
             'headers' => array(
                 'Authorization' => 'Bearer ' . $api_key,
                 'Content-Type' => 'application/json',
+                'HTTP-Referer' => home_url(),
+                'X-Title' => 'SIT Recommender'
             ),
             'body' => json_encode(array(
-                'model' => 'gpt-3.5-turbo',
+                'model' => $model,
                 'messages' => array(
                     array('role' => 'user', 'content' => 'Test connection')
                 ),
                 'max_tokens' => 5
             )),
-            'timeout' => 30
+            'timeout' => 30,
+            'sslverify' => false
         ));
         
         if (is_wp_error($response)) {

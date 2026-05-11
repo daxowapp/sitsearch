@@ -4,6 +4,9 @@
 
 ### Added
 
+- [2026-04-16] - Modernized SIT Program Recommender - Refactored `sit-program-recommender` plugin to utilize a dynamic AI chatbot interface. Completely revamped `class-sit-frontend.php`, `frontend.js`, and `frontend.css` using modern Bento-box designs and conversational flows. Deprecated over 2000 lines of legacy code in `class-sit-rest-api.php` and deleted obsolete data layers (`class-sit-dal.php`), replacing `WP_Query` loops with rapid `wpdb` calls and integrating `CachedData` service for significant overhead reduction and faster matching.
+
+
 - [2026-04-16] - University Page Legal Disclaimer - Injected a professional disclaimer block at the bottom of the University Single Page layout requesting university management to contact `webmaster@studyinturkiye.com` for any data correction requests. This mitigates liability and creates a formal channel for updating legacy information.
 - [2026-04-16] - Empty Search Validation (v2) - Rebuilt empty-search protection with a dual-layer architecture: inline validation in `search-bar.html.php` fires in the DOM capture phase (before jQuery) using `stopImmediatePropagation()` to block the `main.js` spinner from activating. Shows a modern glassmorphic toast with slide-in/out animation instead of a native `alert()`. Added an 8-second safety-net timeout in `main.js` to auto-recover the button if the page fails to navigate.
 - [2026-04-16] - Program Archive View Toggle Fix - Fixed the Grid/List layout toggle on the Program Archive pages (like Country Search). Restored the missing `.filter-results` class to the grid container, removed brittle `!important` CSS overrides causing JavaScript inline `display: none` directives to fail, and resolved an AJAX `TypeError` to ensure pagination works flawlessly across both layouts.
@@ -12,6 +15,8 @@
 - [2026-04-14] - Project Documentation - Added AGENTS.md to thoroughly document the project architecture, data models via Supabase, and AI agent rules.
 
 ### Changed
+
+- [2026-04-16] - Recommender AI Migration - Migrated the SIT Program Recommender AI backend from OpenAI to OpenRouter. Updated admin settings to support OpenRouter API keys and configurable model strings (defaulting to openai/gpt-3.5-turbo). Replaced underlying endpoints and request headers in `SIT_Engine` to accommodate OpenRouter's specifications, bypassing direct OpenAI API limits.
 
 - [2026-04-14] - Search Cache Invalidation Fix - Fixed a 15-minute sync delay issue where adding/removing universities from the "Featured Universities" admin dashboard would not immediately reflect on the public search results. Implemented a robust global `sit_search_cache_version` hash modifier that dynamically invalidates all paginated search and API caches `sit_filtersort_*` and `sit_search_v2_*` instantly without database stress when featured statuses are altered.
 

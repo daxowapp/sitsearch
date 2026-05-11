@@ -491,6 +491,20 @@ $location_str    = $city ? "$city, $country" : $country;
       <strong>Information for University Management:</strong> The data presented on this profile is gathered from public sources and our partner network. If you represent the administration or management of <strong><?= esc_html($title) ?></strong> and notice any outdated or incorrect information, please contact us immediately at <a href="mailto:webmaster@studyinturkiye.com" style="color: #E20A17; font-weight: 500; text-decoration: none;">webmaster@studyinturkiye.com</a>. We are committed to maintaining accurate, high-quality university profiles and will process your requested corrections promptly to protect your institution's representation.
     </div>
 
+    <!-- ══════════════════════════════════════════════
+         OFFICIAL LEGAL DISCLAIMER
+         ══════════════════════════════════════════════ -->
+    <div class="sit-legal-disclaimer">
+      <div class="sit-legal-disclaimer-inner">
+        <div class="sit-legal-disclaimer-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+        </div>
+        <div class="sit-legal-disclaimer-text">
+          <strong>OFFICIAL LEGAL DISCLAIMER:</strong> Studyinturkiye.com is a private educational consultancy operated by SIT Consultancy LLC. It is not affiliated with, endorsed by, or part of the Turkish Council of Higher Education (YÖK) or any government authority.
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- ──── SIDEBAR ──── -->

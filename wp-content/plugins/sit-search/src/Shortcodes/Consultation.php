@@ -41,6 +41,12 @@ class Consultation
 
             }
 
+            // KvKK consent validation (server-side)
+            $kvkk_consent = isset($_POST['kvkk_consent']) ? trim($_POST['kvkk_consent']) : '';
+            if (empty($kvkk_consent)) {
+                die("You must accept the KvKK (Personal Data Protection) consent to submit this form.");
+            }
+
             $lead_data = array(
 
                 "data" => array(

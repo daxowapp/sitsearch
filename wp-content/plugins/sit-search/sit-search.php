@@ -25,8 +25,6 @@ define('STI_SEARCH_DIR', plugin_dir_path(__FILE__));
 define('STI_SEARCH_URL', plugin_dir_url(__FILE__));
 define('SIT_SEARCH_TEXT_DOMAIN', 'study-in-turkiye-search');
 define('SIT_SEARCH_ASSETS', STI_SEARCH_URL . 'assets/');
-define('STRIPE_PUBLIC_KEY', defined('SIT_STRIPE_PUBLIC_KEY') ? SIT_STRIPE_PUBLIC_KEY : '');
-define('STRIPE_SECRET_KEY', defined('SIT_STRIPE_SECRET_KEY') ? SIT_STRIPE_SECRET_KEY : '');
 
 // Supabase Configuration
 define('SUPABASE_URL', 'https://knqtjanxjwfjfrwoater.supabase.co');
