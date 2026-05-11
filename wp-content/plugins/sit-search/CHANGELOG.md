@@ -10,10 +10,26 @@ All notable changes to the SIT Search plugin will be documented in this file.
   - **Root cause**: `get_universities()` lacked a `'lang' => 'en'` parameter, so WP_Query returned posts from all Polylang languages
   - **Fix**: Added `'lang' => 'en'` to the default query args in both `UniversityGrid::get_universities()` and `TopUniversities` shortcode to ensure only the primary English version of each university is displayed
 
+### Changed
+
+- **All-Universities Page Premium Redesign** — Complete visual overhaul of the `/all-universities/` page
+  - **Dark gradient hero section** — Replaced the flat white filter box with a dark navy gradient hero (`#0f172a → #1e293b`) featuring centered title "Explore Universities in Türkiye", subtitle with university count, and a subtle radial color accent
+  - **Glassmorphic search bar** — Transparent search input with backdrop blur effect, inline magnifying glass icon, and red accent search button
+  - **Pill-shaped filter dropdowns** — Compact, dark-themed select elements with custom chevron icons replacing labeled filter fields
+  - **Pill badge tags on cards** — Replaced `icon + Label: Value` metadata rows with compact, color-coded pill badges: blue for location, green for type, purple for program count
+  - **Clickable logo area** — Logo section now links directly to the university page
+  - **Refined card design** — Cleaner borders, subtle shadows, gradient logo backgrounds, letter-initial placeholders, 2-line title truncation
+  - **Premium button styling** — Solid red "View Details" and outlined "Apply Now" buttons with hover transitions
+  - **Results count cleanup** — Removed inline JS styles from AJAX results counter, now uses CSS class only
+  - **Removed debug info block** — Eliminated the debug section that was running 6 expensive `COUNT(DISTINCT)` SQL queries on every page load (the condition was also inverted: `debug === 'false'`)
+  - **Version bump** — CSS/JS assets versioned to `1.0.0.2` for cache busting
+
 ### Files Modified
 
-- `src/Shortcodes/UniversityGrid.php` — Added `'lang' => 'en'` to default WP_Query args
+- `src/Shortcodes/UniversityGrid.php` — Dark hero HTML, pill badge card template, removed debug block, added `'lang' => 'en'`, bumped asset versions
 - `src/Shortcodes/TopUniversities.php` — Added `'lang' => 'en'` to WP_Query args
+- `assets/css/university-grid.css` — Complete CSS rewrite: 600+ lines of premium dark hero, card, badge, pagination, and responsive styles
+- `assets/js/university-grid.js` — Removed inline style override from results count HTML
 
 ---
 
